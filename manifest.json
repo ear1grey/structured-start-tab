@@ -1,0 +1,33 @@
+{
+    "manifest_version": 2,
+    "version": "1.1.0",
+    "name": "Structured Start Tab",
+    "description": "Show a structured start page for each new tab.",
+    "author": "Rich Boakes",
+
+    "permissions": [
+        "storage",
+        "bookmarks",
+        "file:///*",
+        "fileSystem": ["write"]
+      ],
+      "omnibox": {
+        "keyword": "zz"
+      },
+    "icons": {
+        "16": "i/16.png",
+        "48": "i/48.png",
+       "128": "i/128.png"
+    },
+    "browser_action": {
+        "default_icon": "i/48.png"
+    },
+    "chrome_url_overrides": {
+        "newtab": "index.html"
+    },
+    "options_page": "options.html",
+    "web_accessible_resources": [
+        "data/*",
+        "chrome://settings/strings.js"
+    ]
+}

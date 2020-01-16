@@ -1,0 +1,174 @@
+:root {
+    box-sizing: border-box;
+    font-size: 12pt;
+   --bg: #222;
+   --bginv: #4C4;
+   --speed: 0.8s;
+}
+
+* {
+    font-size: 1rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    opacity: 1;
+    color: #222;
+}
+
+body {
+    font-family: sans-serif;
+    background: #333;
+    display: flex;
+    flex-direction: row;
+}
+
+div {
+    display: flex;
+    flex: 1 1 auto;
+    background: rgba(255,255,255,0.5);
+}
+
+div>div>h1 {
+    flex: 1 0 100%;
+    margin-top: 1rem;
+    max-height: 2rem;
+}
+
+
+.hide div {
+    display: none;
+}
+  
+.hide h1 {
+    text-orientation: sideways;
+    writing-mode: horizontal-tb;
+    transform: rotate(0deg);
+}
+  
+main, aside {
+    opacity:0;
+    transition: opacity var(--speed) ease-in-out;
+}
+
+main.visible,
+aside.visible {
+    opacity:1;
+}
+
+main>div>h1 {
+    text-orientation: sideways-right;
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    text-align: end;
+}
+
+main>div {
+    flex-wrap: none;
+}
+
+main>div>div {
+    margin: 0;
+    border: none;
+}
+
+
+div>div {
+    border: solid white thin;
+    background: rgba(0,0,0, 0.2);
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0.25rem;
+    padding: 0 1ex 1ex 1ex;
+}
+
+h1, h2, a {
+    border: 0.125em solid transparent;
+    padding: 0.05rem;
+    margin-top: 0.25rem;
+}
+
+a {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.3);
+    border: solid white thin;
+    border-radius: 0.25rem;
+    display: flex;
+    filter: brightness(95%) opacity(100%);
+    flex: 1 1 5rem;
+    justify-content: center;
+    margin: 0.25rem;
+    padding: 0 1ex;
+    min-height: 2rem;
+    transition: all 0.1s ease-in-out;
+    text-align: center;
+    text-decoration: none;
+}
+
+a:hover, a:focus {
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 0 2em 0.5em rgba(255, 255, 255, 0.5);
+    outline: none;
+}
+
+a:not([href]),
+[href=""] {
+    border-style: dashed;
+}
+
+[data-matches="1"] {
+    filter: brightness(100%) opacity(100%) !important;
+}
+
+[data-matches="0"] {
+    filter: brightness(25%) opacity(50%);
+    transition: all 1s fade-in-out;
+}
+
+.old {
+    filter: brightness(75%);
+}
+
+.lectures a {
+    max-height: 1em;
+    flex: 1 1 auto;
+    padding: 0;
+}
+
+
+/* used? */
+img.icon {
+    height: 1em;
+    padding-right: 0.5em;
+}
+
+.up {
+    border-width: 1ex;
+    border-color: red;
+}
+
+.down {
+    border-width: 1ex;
+    border-color: black;
+    border-style: dotted;
+    cursor: not-allowed;
+}
+
+.proj div {
+  transform: scale(0.8);
+}
+
+​ @media screen and (max-width: 900px) {
+    article {
+        flex-direction: column;
+    }
+    article>h1 {
+        text-orientation: inherit;
+        writing-mode: inherit;
+        transform: none;
+    }
+    nav>a {
+        height: 2rem;
+    }
+}
+

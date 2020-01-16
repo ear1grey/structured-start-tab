@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="74px" height="50px" viewBox="0 0 74 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
+    <title>Artboard</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <radialGradient cx="210.365695%" cy="55.7655527%" fx="210.365695%" fy="55.7655527%" r="211.55163%" gradientTransform="translate(2.103657,0.557656),scale(0.667238,1.000000),translate(-2.103657,-0.557656)" id="radialGradient-1">
+            <stop stop-color="#FAAF40" offset="0%"></stop>
+            <stop stop-color="#F9A538" offset="4.321454%"></stop>
+            <stop stop-color="#F89D31" offset="11.16%"></stop>
+            <stop stop-color="#F89A2F" offset="22.69%"></stop>
+            <stop stop-color="#F7922D" offset="52.76%"></stop>
+            <stop stop-color="#F37B28" offset="100%"></stop>
+        </radialGradient>
+        <linearGradient x1="-0.0460076046%" y1="50.1177004%" x2="99.8045627%" y2="50.1177004%" id="linearGradient-2">
+            <stop stop-color="#929497" offset="0%"></stop>
+            <stop stop-color="#757578" offset="12.45%"></stop>
+            <stop stop-color="#575658" offset="27.92%"></stop>
+            <stop stop-color="#403E3F" offset="44.03%"></stop>
+            <stop stop-color="#302D2E" offset="60.85%"></stop>
+            <stop stop-color="#262223" offset="78.84%"></stop>
+            <stop stop-color="#231F20" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="24.2442263%" y1="1.63748246%" x2="73.7609354%" y2="103.149958%" id="linearGradient-3">
+            <stop stop-color="#231F20" offset="0%"></stop>
+            <stop stop-color="#231F20" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-0.06875%" y1="50.323755%" x2="99.9291667%" y2="50.323755%" id="linearGradient-4">
+            <stop stop-color="#929497" offset="0%"></stop>
+            <stop stop-color="#757578" offset="12.45%"></stop>
+            <stop stop-color="#575658" offset="27.92%"></stop>
+            <stop stop-color="#403E3F" offset="44.03%"></stop>
+            <stop stop-color="#302D2E" offset="60.85%"></stop>
+            <stop stop-color="#262223" offset="78.84%"></stop>
+            <stop stop-color="#231F20" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard">
+            <g id="moodle">
+                <path d="M62.4,49.2 L62.4,26.4 C62.4,21.6 60.4,19.2 56.5,19.2 C52.6,19.2 50.6,21.6 50.6,26.4 L50.6,49.2 L38.9,49.2 L38.9,26.4 C38.9,21.6 37,19.2 33.1,19.2 C29.2,19.2 27.2,21.6 27.2,26.4 L27.2,49.2 L15.6,49.2 L15.6,25.1 C15.6,20.1 17.3,16.4 20.8,13.8 C23.8,11.5 28,10.4 33.1,10.4 C38.4,10.4 42.2,11.7 44.7,14.4 C46.8,11.7 50.7,10.4 56.4,10.4 C61.6,10.4 65.7,11.5 68.7,13.8 C72.2,16.4 73.9,20.1 73.9,25.1 L73.9,49.3 L62.4,49.3 L62.4,49.2 Z" id="Shape" fill="url(#radialGradient-1)" fill-rule="nonzero"></path>
+                <path d="M16.7,16.2 C16.3,18.2 15.9,20.2 15.5,22.2 C26.5,25.9 36.9,22.3 42.4,12.7 C34.3,7.1 26.8,12.8 16.7,16.2" id="Shape" fill="#58595B" fill-rule="nonzero"></path>
+                <path d="M16.7,14.7 C16.3,17 16,19.2 15.6,21.5 C26.1,25.1 36.4,22 41.9,12.6 C34.9,4.5 27.1,11.2 16.7,14.7" id="Shape" fill="url(#linearGradient-2)" fill-rule="nonzero"></path>
+                <path d="M29.2,17.4 C24.4,16.4 19.2,18.9 15.6,21.5 C13.3,4.7 23.7,5.1 37.3,9.3 C36.4,13.4 34.9,18.9 32.3,22.2 C32.2,20 31.2,18.5 29.2,17.4" id="Shape" fill="url(#linearGradient-3)" fill-rule="nonzero"></path>
+                <path d="M1.2,14.7 C18.8,4.1 28.7,2.1 49.2,0 C25.4,18.8 24.8,14.7 1.2,14.7" id="Shape" fill="url(#linearGradient-4)" fill-rule="nonzero"></path>
+                <path d="M49.2,0.1 L30.3,13.8" id="Shape" stroke="#4A4A4C" stroke-width="0.5" fill="#383738" fill-rule="nonzero"></path>
+                <path d="M26.7,7.4 C26.9,9.6 26.4,5.3 26.7,7.4" id="Shape" fill="#231F20" fill-rule="nonzero" opacity="0.23"></path>
+                <path d="M1.2,14.7 L30.3,13.8" id="Shape" stroke="#A8ABAD" stroke-width="0.5" fill="#FFFFFF" fill-rule="nonzero"></path>
+                <path d="M24.9,7.6 C19.9,9 3.5,12.6 3.3,14.7 C2.8,18.6 3.2,24.8 3.2,24.8" id="Shape" stroke="#F16922" stroke-width="0.5"></path>
+                <path d="M4.7,39.7 C2.9,35.2 0.7,30.2 3.3,24 C5,29.8 4.7,34.2 4.7,39.7" id="Shape" fill="#F16922" fill-rule="nonzero"></path>
+                <ellipse id="Oval" fill="#6D6E70" fill-rule="nonzero" transform="translate(24.239640, 7.389680) rotate(-19.609116) translate(-24.239640, -7.389680) " cx="24.23964" cy="7.28968043" rx="1" ry="1"></ellipse>
+            </g>
+        </g>
+    </g>
+</svg>

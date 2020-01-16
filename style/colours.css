@@ -1,0 +1,106 @@
+div.c2109 {
+    background: #000;
+}
+
+
+.gsuite {
+    background: rgba(166, 155, 248, 0.6);
+}
+
+.edit {
+    background: rgba(0, 250, 50, 0.6);
+}
+
+.webres {
+    background: rgba(73, 134, 231, 0.3);
+}
+
+.webf1 {
+    background: rgba(66, 214, 146, 0.3);
+}
+
+.webscript {
+    background: rgba(127, 219, 255, 0.3);
+}
+
+.dev {
+    background: rgba(0,51,0,0.9);
+}
+
+
+.proj {
+  background: rgba(200,0,0,0.7);
+}
+.proj * {
+  color:white;
+}
+
+
+.dev h1 {
+    color: #00FF0099;
+}
+
+.dev a{
+    border-color: black;
+    background: rgba(0,0,0,0.2);
+    color: #00FF0099 !important;
+}
+
+
+.dev a:hover, .dev a:focus {
+    box-shadow: 0 0 1em rgba(0, 255,0, 0.75) inset,
+    0 0 1em #0008;
+    outline: none;
+}
+
+
+.yr1516 {
+    background: #EFCFFF;
+}
+
+.yr1617 {
+    background: #EFEFDF;
+}
+
+.yr1718 {
+    background: #5FEFFF;
+}
+
+.yr1819 {
+    background: #AF52A2;
+}
+
+.c2019 {
+    background: #55CCFF;
+}
+
+
+.se {
+    background: white;
+    background-size: 10px 10px;
+    background-image: linear-gradient(to right, #DDF 1px, transparent 1px), linear-gradient(to bottom, #DDF 1px, transparent 1px);
+}
+.se a {
+    border: solid #36B6 thin;
+}
+
+.useful {
+    background: white;
+}
+
+.ed {
+    background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(200, 100, 50, 0) 5%, rgba(0, 0, 0, 1) 5%, rgba(154, 181, 143, 0.8) 7%), linear-gradient(to bottom right,red, orange , yellow, green, cyan, blue, violet, red, orange , yellow, green, cyan, blue, violet, red);
+}
+
+.high {
+    background: rgba(255,127,0,0.5);
+}
+
+aside a {
+    background: orange;
+    font-size: 70%;
+}
+
+.fresh {
+    background: #99FF44;
+}

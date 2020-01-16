@@ -1,0 +1,10 @@
+{
+    "workbench.colorCustomizations": {
+        "editor.selectionBackground": "#996600",
+        "editor.selectionHighlightBackground": "#885500",
+        "activityBar.background": "#5D0337",
+        "titleBar.activeBackground": "#82054E",
+        "titleBar.activeForeground": "#FFFBFD"
+    },
+    "git.ignoreLimitWarning": true
+}
