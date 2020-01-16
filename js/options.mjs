@@ -17,6 +17,14 @@ function getRadio(what) {
   OPTS[what] = document.getElementById(what).checked;
 }
 
+function setJSON(prefs, what) {
+  document.getElementById(what).value = JSON.stringify(prefs[what]);
+}
+
+function getJSON(what) {
+  OPTS[what] = JSON.parse(document.getElementById(what).value);
+}
+
 
 function setValue(prefs, what) {
   document.getElementById(what).value = prefs[what];
@@ -51,12 +59,14 @@ async function updatePrefsWithPage() {
   getRadio('showBookmarksSidebar');
   getValue('showBookmarksLimit');
   getValue('sourceFile');
+  getJSON('configJSON');
 }
 
 function updatePageWithPrefs(prefs) {
   setRadio(prefs, 'showBookmarksSidebar');
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'sourceFile');
+  setJSON(prefs, 'configJSON');
   document.getElementById('showBookmarksSidebar').checked = prefs.showBookmarksSidebar;
   document.getElementById('showBookmarksLimit').value = prefs.showBookmarksLimit;
   document.getElementById('sourceFile').value = prefs.sourceFile;

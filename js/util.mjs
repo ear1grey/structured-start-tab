@@ -34,3 +34,13 @@ async function urlActiveCheck(url) {
   }
 }
 
+export function doNotFollowDisabledLinks(e) {
+  if (e.target.nodeName == 'A' && e.target.dataset.matches == 0) {
+    console.log('disabled');
+    e.preventDefault();
+    return false;
+  }
+  if (e.target.nodeName == 'DIV' && e.target.parentElement.nodeName == "MAIN") {
+    e.target.classList.toggle("hide");
+  }
+}

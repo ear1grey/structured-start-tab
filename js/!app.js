@@ -1,3 +1,5 @@
+import { doNotFollowDisabledLinks, prepareClickables } from './util.mjs';
+
 import { OPTS } from './defaults.mjs';
 import { loadOptionsWithPromise } from './options.mjs';
 import { prepareBookmarks } from './bookmarks.mjs';
@@ -48,26 +50,6 @@ async function loadAvoidingCORS(path) {
   });
 }
 
-
-async function loadUsingFileReader(path) {
-  const fr = new FileReader();
-  return new Promise((resolve, reject) => {
-    const request = new XMLHttpRequest();
-    request.open('GET', path, true);
-    request.responseType = 'blob';
-
-    request.onload = () => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.onerror = (err) => reject(err);
-      reader.readAsDataURL(request.response);
-    };
-
-    request.send();
-  });
-}
-
-
 // Accept an array of things that are either containers or links
 // inject in the section template
 // use the name
@@ -92,7 +74,7 @@ async function build(data, target = el.main, str = '') {
     target.appendChild(a);
 
     if (a.href) {
-      index[str + o.separator + data.name] = a.href;
+      index[str + OPTS.separator + data.name] = a.href;
     }
   } else if (data.name) {
     const div = document.createElement('div');
@@ -119,7 +101,7 @@ async function build(data, target = el.main, str = '') {
         .replace(/[^a-z0-9]/g, ''));
     }
     if (data.links) {
-      build(data.links, div, data.name ? str + o.separator + data.name : str);
+      build(data.links, div, data.name ? str + OPTS.separator + data.name : str);
     }
   }
 }
@@ -128,7 +110,7 @@ async function build(data, target = el.main, str = '') {
 async function buildFromData(fn) {
   let data;
   try {
-    data = await loadAvoidingCORS(fn);
+    data = OPTS.configJSON;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.errpr('Error loading: ', fn);
@@ -145,7 +127,7 @@ async function connectListeners() {
   // const sourceFile = chrome.runtime.getURL(o.sourceFile);
   const data = await buildFromData(o.sourceFile);
 
-  await prepareBookmarks();
+  await prepareBookmarks(OPTS);
 
   cleanIndex();
   if (EXTENSION) listenForStorageChanges();
