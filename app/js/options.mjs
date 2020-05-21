@@ -63,11 +63,9 @@ function updatePrefsWithPage() {
 function updatePageWithPrefs(prefs) {
   setRadio(prefs, 'showBookmarksSidebar');
   setValue(prefs, 'showBookmarksLimit');
-  setValue(prefs, 'sourceFile');
   setJSON(prefs, 'configJSON');
   document.getElementById('showBookmarksSidebar').checked = prefs.showBookmarksSidebar;
   document.getElementById('showBookmarksLimit').value = prefs.showBookmarksLimit;
-  document.getElementById('sourceFile').value = prefs.sourceFile;
 }
 
 export async function loadOptions() {
