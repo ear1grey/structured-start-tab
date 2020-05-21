@@ -26,7 +26,7 @@ function recuriveBuild(data, target = el.main, str = '') {
   if (data.href) {
     if (data.href === 'options') {
       // convert the word options into the options url
-      data.href = chrome.extension.getURL('options.html');
+      data.href = chrome.extension.getURL('app/options.html');
     }
 
     // it's a link
