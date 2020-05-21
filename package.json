@@ -9,7 +9,6 @@
     "lint": "eslint js/*.js"
   },
   "dependencies": {
-    "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.19.1"
   },
@@ -17,4 +16,29 @@
     "type": "git",
     "url": "https://github.com/ashleygwilliams/my_package.git"
   },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-portsoc": "^0.6.0"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es6": true
+    },
+    "extends": [
+      "portsoc"
+    ],
+    "globals": {
+      "Atomics": "readonly",
+      "SharedArrayBuffer": "readonly",
+      "chrome": "readonly"
+    },
+    "parserOptions": {
+      "ecmaVersion": 2018,
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-restricted-syntax": 0
+    }
+  }
 }

@@ -8,6 +8,11 @@ a::before {
     width: 0;
 }
 
+a[href*="calendar.google"]::before {
+  background-image: url('i/cal.svg');
+  width: 1.5em;
+}
+
 a[href*="google.com/spreadsheets/"]::before {
         background-image: url('i/plan.svg');
         width: 1.5em;
@@ -35,6 +40,11 @@ a[href*="drive.google"]::before {
     width: 1.5em;
 }
 
+a[href*="port.ac.uk"]::before {
+  background-image: url('i/port.svg');
+  width: 1.5em;
+}
+
 a[href*="moodle.port"]::before {
     background-image: url('i/m.svg');
     width: 1.5em;
@@ -49,5 +59,10 @@ a[href*="github.com"]::before {
 .gryf {
     background-image: url('i/g.svg');
     width: 1.5em;
+}
+
+a[href*="links"]::before {
+  background-image: url('i/link.svg');
+  width: 1.5em;
 }
 
