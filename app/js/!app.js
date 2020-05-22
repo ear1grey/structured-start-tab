@@ -1,11 +1,21 @@
-import { OPTS } from './defaults.mjs';
-import { loadOptionsWithPromise } from './options.mjs';
+import * as options from './options.mjs';
 import { prepareBookmarks } from './bookmarks.mjs';
+import { OPTS } from './defaults.mjs';
 
-const el = {
-  main: document.querySelector('main'),
-  aside: document.querySelector('aside'),
-};
+const el = {};
+
+function mouseOverLink(e) {
+  if (e.metaKey) {
+    e.target.classList.add('mouseover');
+  } else {
+    e.target.classList.remove('mouseover');
+  }
+}
+
+function mouseOutLink(e) {
+  e.target.classList.remove('mouseover');
+}
+
 
 // Accept an array of things that are either containers or links
 // inject in the section template
@@ -13,11 +23,11 @@ const el = {
 // stick in the links
 //  if link has links - recurse
 //  if link has no links - inject
-function recuriveBuild(data, target = el.main, str = '') {
+function recursiveBuild(data, target, str = '') {
   // if it's an array, drill into it.
   if (Array.isArray(data)) {
     for (const x of data) {
-      recuriveBuild(x, target, str);
+      recursiveBuild(x, target, str);
     }
   }
 
@@ -31,9 +41,12 @@ function recuriveBuild(data, target = el.main, str = '') {
 
     // it's a link
     const a = document.createElement('a');
-    a.href = data.href;
+    a.dataset.href = data.href;
     a.textContent = data.name;
     target.appendChild(a);
+    a.addEventListener('click', linkClicked);
+    a.addEventListener('mousemove', mouseOverLink);
+    a.addEventListener('mouseout', mouseOutLink);
   } else {
     if (data.name) {
       const div = document.createElement('div');
@@ -60,27 +73,139 @@ function recuriveBuild(data, target = el.main, str = '') {
           .replace(/[^a-z0-9]/g, ''));
       }
       if (data.links) {
-        recuriveBuild(data.links, div, data.name ? str + OPTS.separator + data.name : str);
+        recursiveBuild(data.links, div, data.name ? str + OPTS.separator + data.name : str);
       }
     }
   }
 }
 
-
-function build(OPTS) {
-  recuriveBuild(OPTS.configJSON);
+function build(OPTS, target) {
+  recursiveBuild(OPTS.configJSON, target);
 }
+
+
+function editStart(elem) {
+  el.editHeading.value = 'Editing...';
+  el.editName.value = elem.textContent;
+  el.editURL.value = elem.dataset.href;
+  el.editOrigURL.value = elem.dataset.href;
+  el.body.classList.add('editing');
+  el.editing = elem;
+  el.editName.focus();
+}
+
+
+function linkClicked(e) {
+  if (e.metaKey) {
+    editStart(e.target);
+  } else {
+    window.location = e.target.dataset.href;
+  }
+}
+
+function editCancel() {
+  el.editName.value = '';
+  el.editURL.value = '';
+  el.editOrigURL.value = '';
+  el.body.classList.remove('editing');
+}
+
+function recursiveReplace(data, orig, url, text) {
+  // if it's an object, check for an href
+  // or if there is no href make a div
+  if (data.href === orig) {
+    // replace
+    data.href = url;
+    data.name = text;
+    return;
+  }
+  if (Array.isArray(data)) {
+    for (const x of data) {
+      recursiveReplace(x, orig, url, text);
+    }
+  }
+  if (data.links) {
+    recursiveReplace(data.links, orig, url, text);
+  }
+}
+
+function editOk() {
+  // find the entry in OPTS using the original URL.
+  // replace the URL & text
+  recursiveReplace(OPTS.configJSON, el.editOrigURL.value, el.editURL.value, el.editName.value);
+
+  // store the updated version
+  chrome.storage.sync.set(OPTS, () => {
+    // update UI
+    el.editing.textContent = el.editName.value;
+    el.editing.dataset.href = el.editURL.value;
+    el.body.classList.remove('editing');
+  });
+}
+
 
 function makeVisible() {
   el.main.classList.add('visible');
   el.aside.classList.add('visible');
 }
 
+function removeClassEverywhere(clsName) {
+  const all = [...document.getElementsByClassName(clsName)];
+  all.forEach(e => e.classList.remove(clsName));
+}
+
+function detectKeyup(e) {
+  if (e.key === 'Meta') {
+    el.main.classList.remove('editing');
+    removeClassEverywhere('mouseover');
+  }
+  if (e.key === 'Escape') {
+    editCancel();
+    el.main.classList.remove('editing');
+  }
+}
+
+function detectKeydown(e) {
+  if (e.key === 'Meta') {
+    e.target.classList.add('mouseover');
+    el.main.classList.add('editing');
+  } else {
+    e.target.classList.remove('mouseover');
+    el.main.classList.remove('editing');
+  }
+
+  if (e.key === 'Enter') {
+    if (e.target.tagName === 'INPUT') {
+      e.target.nextElementSibling.focus();
+    }
+  }
+}
+
+function prepElements(el) {
+  el.body = document.querySelector('body');
+  el.main = document.querySelector('main');
+  el.aside = document.querySelector('aside');
+  el.footer = document.querySelector('footer');
+  el.editHeading = document.querySelector('#editheading');
+  el.editName = document.querySelector('#editname');
+  el.editURL = document.querySelector('#editurl');
+  el.editOrigURL = document.querySelector('#editorigurl');
+  el.editCancel = document.querySelector('#editcancel');
+  el.editOk = document.querySelector('#editok');
+}
+
 async function connectListeners() {
-  await loadOptionsWithPromise();
-  build(OPTS);
+  await options.loadOptionsWithPromise();
+  prepElements(el);
+  build(OPTS, el.main);
   prepareBookmarks(OPTS, el.aside);
   makeVisible();
+
+  // connect the add stuff
+  document.addEventListener('keydown', detectKeydown);
+  document.addEventListener('keyup', detectKeyup);
+  el.editOk.addEventListener('click', editOk);
+  el.editCancel.addEventListener('click', editCancel);
 }
 
 window.addEventListener('DOMContentLoaded', connectListeners);

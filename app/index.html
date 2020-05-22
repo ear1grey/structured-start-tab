@@ -3,6 +3,8 @@
 <title>Structured Start Tab</title>
 
 <style>
+  @import url("style/vars.css");
+  @import url("style/layout.css");
   @import url("style/base.css");
   @import url("style/icons.css");
   @import url("style/colours.css");
@@ -13,5 +15,14 @@
 
 <aside>
 </aside>
+
+<footer id=edit>
+  <h1 id=editheading>Add Item</h1>
+  <input id=editorigurl type=hidden>
+  <input id=editname type=string placeholder='Item Name'>
+  <input id=editurl type=string placeholder='URL'>
+  <button id=editok value="ok">Save</button>
+  <button id=editcancel value="cancel">Cancel</button>
+</footer>
 
 <script type=module src=./js/!app.js></script>

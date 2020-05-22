@@ -23,13 +23,13 @@ export const OPTS = {
               href: 'https://example.org/',
             },
             {
-              name: 'Three',
-              href: '',
+              name: 'Options',
+              href: 'options',
             },
           ],
         },
         {
-          name: 'Blah',
+          name: 'Two',
           links: [
             {
               name: 'local:8080',

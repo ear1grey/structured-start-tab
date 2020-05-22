@@ -1,0 +1,24 @@
+:root {
+  --page-width: 40rem;
+  --page-font: sans-serif;
+  --speed: 0.1s;
+
+  --bg-dark: #111; 
+  --bg-mid: #333;
+  --bg-light: #555;
+
+  --fg-dark: #BBB; 
+  --fg-mid: #DDD;
+  --fg-light: #FFF;
+
+  --small: 0.25rem;
+
+  --overlay-light: rgba(255,255,255,0.5);
+  --overlay-mid: rgba(255,255,255,0.3);
+  --overlay-dark: rgba(0,0,0,0.2);
+
+  --edit-border: #A00;
+
+  --bg: #222;
+  --bginv: #4C4;
+}

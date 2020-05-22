@@ -1,8 +1,6 @@
-:root {
-  --page-width: 40rem;
-}
-
 body {
+  background: var(--bg-mid);
+  color: var(--fg-mid);
   display: flex;
   flex-direction: column;
   align-items: center;

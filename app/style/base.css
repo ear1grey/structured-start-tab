@@ -1,9 +1,7 @@
 :root {
     box-sizing: border-box;
     font-size: 12pt;
-   --bg: #222;
-   --bginv: #4C4;
-   --speed: 0.4s;
+
 }
 
 * {
@@ -12,24 +10,24 @@
     padding: 0;
     border: 0;
     opacity: 1;
-    color: #222;
+    color: var(--bg-mid);
 }
 
 body {
-    font-family: sans-serif;
-    background: #333;
-    display: flex;
+    font-family: var(--page-font);
+    color: var(--fg-mid);
+    background: var(--bg-mid);
     flex-direction: row;
 }
 
 div {
     display: flex;
     flex: 1 1 auto;
-    background: rgba(255,255,255,0.5);
+    background: var(--overlay-light);
 }
 
 div>div>h1 {
-    flex: 1 0 100%;
+    flex: 0 0 100%;
     margin-top: 1rem;
     max-height: 2rem;
 }
@@ -73,30 +71,30 @@ main>div>div {
 
 
 div>div {
-    border: solid white thin;
-    background: rgba(0,0,0, 0.2);
+    border: var(--fg-light);
+    background: var(--overlay-dark);
     flex-direction: row;
     flex-wrap: wrap;
-    margin: 0.25rem;
+    margin: var(--small);
     padding: 0 1ex 1ex 1ex;
 }
 
 h1, h2, a {
     border: 0.125em solid transparent;
     padding: 0.05rem;
-    margin-top: 0.25rem;
+    margin-top: var(--small);
 }
 
 a {
     align-items: center;
-    background: rgba(255, 255, 255, 0.3);
-    border: solid white thin;
-    border-radius: 0.25rem;
+    background: var(--overlay-mid);
+    border: solidvar(--fg-light) thin;
+    border-radius: var(--small);
     display: flex;
     filter: brightness(95%) opacity(100%);
-    flex: 1 1 5rem;
+    flex: 1 1 calc(var(--small) * 2);
     justify-content: center;
-    margin: 0.25rem;
+    margin: var(--small);
     padding: 0 1ex;
     min-height: 2rem;
     transition: all calc(var(--speed)*2) ease-in-out;
@@ -107,54 +105,32 @@ a {
 a:hover, a:focus {
     background: rgba(0, 0, 0, 0.4);
     color: #fff;
-    box-shadow: 0 0 2em 0.5em rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 calc(var(--small) * 4) calc(var(--small) * 2) var(--overlay-light);
     outline: none;
     transition: all calc(var(--speed)/2) ease-in-out;
 }
 
-a:not([href]),
-[href=""] {
+a:not([data-href]),
+[data-href=""] {
     border-style: dashed;
 }
 
-[data-matches="1"] {
-    filter: brightness(100%) opacity(100%) !important;
+a.mouseover,
+main.editing a:hover {
+  border-color: var(--edit-border);
+  position: relative;
+  cursor: move;
+  z-index: 1000;
 }
 
-[data-matches="0"] {
-    filter: brightness(25%) opacity(50%);
-    transition: all 0.25s fade-in-out;
+a.mouseover::after,
+main.editing a:hover::after {
+  content: 'Drag or Click';
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--edit-border);
+  color: var(--fg-mid);
+  padding: var(--small);
 }
 
-.old {
-    filter: brightness(75%);
-}
-
-.lectures a {
-    max-height: 1em;
-    flex: 1 1 auto;
-    padding: 0;
-}
-
-
-/* used? */
-img.icon {
-    height: 1em;
-    padding-right: 0.5em;
-}
-
-.up {
-    border-width: 1ex;
-    border-color: red;
-}
-
-.down {
-    border-width: 1ex;
-    border-color: black;
-    border-style: dotted;
-    cursor: not-allowed;
-}
-
-.proj div {
-  transform: scale(0.8);
-}

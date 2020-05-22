@@ -1,9 +1,10 @@
+
 div.c2109 {
     background: #000;
 }
 
-
 .gsuite {
+    /* backdrop-filter: hue-rotate(20deg); */
     background: rgba(166, 155, 248, 0.6);
 }
 
@@ -53,19 +54,6 @@ div.c2109 {
     outline: none;
 }
 
-
-.yr1516 {
-    background: #EFCFFF;
-}
-
-.yr1617 {
-    background: #EFEFDF;
-}
-
-.yr1718 {
-    background: #5FEFFF;
-}
-
 .yr1819 {
     background: #AF52A2;
 }
@@ -99,6 +87,10 @@ div.c2109 {
 aside a {
     background: orange;
     font-size: 70%;
+}
+
+footer {
+    background: var(--bg-light);
 }
 
 .fresh {
