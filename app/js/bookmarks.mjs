@@ -14,7 +14,7 @@ export function buildBookmarks(data, target) {
     a.href = x.url;
     a.textContent = x.title;
 
-    if (x.dateAdded > Date.now() + FOUR_DAYS) {
+    if (x.dateAdded > Date.now() - FOUR_DAYS) {
       a.classList.add('fresh');
     }
 
