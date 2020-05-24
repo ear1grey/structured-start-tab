@@ -42,6 +42,7 @@ function recursiveBuild(data, target, str = '') {
     // it's a link
     const a = document.createElement('a');
     a.dataset.href = data.href;
+    a.dataset.uid = data.uid;
     a.textContent = data.name;
     target.appendChild(a);
     a.addEventListener('click', linkClicked);
@@ -79,6 +80,29 @@ function recursiveBuild(data, target, str = '') {
   }
 }
 
+
+/** A unique-enough uid */
+function genUid() {
+  return window.btoa(Date.now() * Math.random()).slice(-8).toLowerCase();
+}
+
+function recursiveId(data) {
+  // if it's an array, drill into it.
+  if (Array.isArray(data)) {
+    for (const x of data) {
+      recursiveId(x);
+    }
+  }
+
+  // if it's an object, add an ID if necessary
+  if (!data.uid) {
+    data.uid = genUid();
+  }
+  if (data.links) {
+    recursiveId(data.links);
+  }
+}
+
 function build(OPTS, target) {
   recursiveBuild(OPTS.configJSON, target);
 }
@@ -88,7 +112,7 @@ function editStart(elem) {
   el.editHeading.value = 'Editing...';
   el.editName.value = elem.textContent;
   el.editURL.value = elem.dataset.href;
-  el.editOrigURL.value = elem.dataset.href;
+  el.editUID.value = elem.dataset.uid;
   el.body.classList.add('editing');
   el.editing = elem;
   el.editName.focus();
@@ -106,7 +130,7 @@ function linkClicked(e) {
 function editCancel() {
   el.editName.value = '';
   el.editURL.value = '';
-  el.editOrigURL.value = '';
+  el.editUID.value = '';
   el.body.classList.remove('editing');
 }
 
@@ -132,7 +156,7 @@ function recursiveReplace(data, orig, url, text) {
 function editOk() {
   // find the entry in OPTS using the original URL.
   // replace the URL & text
-  recursiveReplace(OPTS.configJSON, el.editOrigURL.value, el.editURL.value, el.editName.value);
+  recursiveReplace(OPTS.configJSON, el.editUID.value, el.editURL.value, el.editName.value);
 
   // store the updated version
   chrome.storage.sync.set(OPTS, () => {
@@ -189,7 +213,7 @@ function prepElements(el) {
   el.editHeading = document.querySelector('#editheading');
   el.editName = document.querySelector('#editname');
   el.editURL = document.querySelector('#editurl');
-  el.editOrigURL = document.querySelector('#editorigurl');
+  el.editUID = document.querySelector('#edituid');
   el.editCancel = document.querySelector('#editcancel');
   el.editOk = document.querySelector('#editok');
 }
@@ -197,6 +221,7 @@ function prepElements(el) {
 async function connectListeners() {
   await options.loadOptionsWithPromise();
   prepElements(el);
+  recursiveId(OPTS.configJSON);
   build(OPTS, el.main);
   prepareBookmarks(OPTS, el.aside);
   makeVisible();
