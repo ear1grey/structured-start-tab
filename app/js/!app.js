@@ -1,5 +1,6 @@
 import * as options from './options.mjs';
 import { prepareBookmarks } from './bookmarks.mjs';
+import { prepareDrag } from './drag.mjs';
 import { OPTS } from './defaults.mjs';
 
 const el = {};
@@ -55,6 +56,7 @@ function recursiveBuild(data, target, str = '') {
       h.textContent = data.name;
       div.appendChild(h);
       target.appendChild(div);
+      div.dataset.uid = data.uid;
       if (data.id) {
         div.id = data.id;
       }
@@ -224,6 +226,7 @@ async function connectListeners() {
   recursiveId(OPTS.configJSON);
   build(OPTS, el.main);
   prepareBookmarks(OPTS, el.aside);
+  prepareDrag(OPTS);
   makeVisible();
 
   // connect the add stuff
