@@ -102,7 +102,7 @@ a {
     text-decoration: none;
 }
 
-a:hover, a:focus {
+a:focus {
     background: rgba(0, 0, 0, 0.4);
     color: #fff;
     box-shadow: 0 0 calc(var(--small) * 4) calc(var(--small) * 2) var(--overlay-light);
@@ -115,22 +115,7 @@ a:not([data-href]),
     border-style: dashed;
 }
 
-a.mouseover,
-main.editing a:hover {
-  border-color: var(--edit-border);
-  position: relative;
+a.metamouseover:not(.dragging),
+main.editing a:hover:not(.dragging) {
   cursor: move;
-  z-index: 1000;
 }
-
-a.mouseover::after,
-main.editing a:hover::after {
-  content: 'Drag or Click';
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: var(--edit-border);
-  color: var(--fg-mid);
-  padding: var(--small);
-}
-

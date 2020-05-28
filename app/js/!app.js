@@ -7,14 +7,14 @@ const el = {};
 
 function mouseOverLink(e) {
   if (e.metaKey) {
-    e.target.classList.add('mouseover');
+    e.target.classList.add('metamouseover');
   } else {
-    e.target.classList.remove('mouseover');
+    e.target.classList.remove('metamouseover');
   }
 }
 
 function mouseOutLink(e) {
-  e.target.classList.remove('mouseover');
+  e.target.classList.remove('metamouseover');
 }
 
 
@@ -183,7 +183,7 @@ function removeClassEverywhere(clsName) {
 function detectKeyup(e) {
   if (e.key === 'Meta') {
     el.main.classList.remove('editing');
-    removeClassEverywhere('mouseover');
+    removeClassEverywhere('metamouseover');
   }
   if (e.key === 'Escape') {
     editCancel();
@@ -193,10 +193,10 @@ function detectKeyup(e) {
 
 function detectKeydown(e) {
   if (e.key === 'Meta') {
-    e.target.classList.add('mouseover');
+    e.target.classList.add('metamouseover');
     el.main.classList.add('editing');
   } else {
-    e.target.classList.remove('mouseover');
+    e.target.classList.remove('metamouseover');
     el.main.classList.remove('editing');
   }
 
