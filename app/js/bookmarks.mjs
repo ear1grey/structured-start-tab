@@ -13,6 +13,8 @@ export function buildBookmarks(data, target) {
     const a = document.createElement('a');
     a.href = x.url;
     a.textContent = x.title;
+    a.id = window.btoa(Date.now() * Math.random()).slice(-8).toLowerCase();
+    a.draggable = true;
 
     if (x.dateAdded > Date.now() - FOUR_DAYS) {
       a.classList.add('fresh');
