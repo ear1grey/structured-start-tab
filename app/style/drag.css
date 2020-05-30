@@ -2,10 +2,6 @@
   opacity: 1;
 }
 
-* {
-  transition: all 0.5s linear;
-}
-
 .dragging {
   transition: all 1s linear;
   background: #C00;

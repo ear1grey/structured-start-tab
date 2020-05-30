@@ -3,7 +3,8 @@ import { prepareBookmarks } from './bookmarks.mjs';
 import { prepareDrag } from './drag.mjs';
 import { OPTS } from './defaults.mjs';
 
-const el = {};
+const STORE = chrome.storage[OPTS.storage];
+let el = {};
 
 function mouseOverLink(e) {
   if (e.metaKey) {
@@ -18,103 +19,29 @@ function mouseOutLink(e) {
 }
 
 
-// Accept an array of things that are either containers or links
-// inject in the section template
-// use the name
-// stick in the links
-//  if link has links - recurse
-//  if link has no links - inject
-function recursiveBuild(data, target, str = '') {
-  // if it's an array, drill into it.
-  if (Array.isArray(data)) {
-    for (const x of data) {
-      recursiveBuild(x, target, str);
-    }
-  }
-
-  // if it's an object, check for an href
-  // or if there is no href make a div
-  if (data.href) {
-    if (data.href === 'options') {
-      // convert the word options into the options url
-      data.href = chrome.extension.getURL('app/options.html');
-    }
-
-    // it's a link
-    const a = document.createElement('a');
-    a.dataset.href = data.href;
-    a.dataset.uid = data.uid;
-    a.textContent = data.name;
-    target.appendChild(a);
-    a.addEventListener('click', linkClicked);
-    a.addEventListener('mousemove', mouseOverLink);
-    a.addEventListener('mouseout', mouseOutLink);
-  } else {
-    if (data.name) {
-      const div = document.createElement('div');
-      const h = document.createElement('h1');
-      h.textContent = data.name;
-      div.appendChild(h);
-      target.appendChild(div);
-      div.dataset.uid = data.uid;
-      if (data.id) {
-        div.id = data.id;
-      }
-      if (data.hide) {
-        div.classList.add('hide');
-      }
-      if (data.class) {
-        if (Array.isArray(data.class)) {
-          for (const cl of data.class) {
-            div.classList.add(cl);
-          }
-        } else {
-          div.classList.add(data.class);
-        }
-      } else if (data.name) {
-        div.classList.add(data.name.toLowerCase()
-          .replace(/[^a-z0-9]/g, ''));
-      }
-      if (data.links) {
-        recursiveBuild(data.links, div, data.name ? str + OPTS.separator + data.name : str);
-      }
-    }
-  }
-}
-
-
 /** A unique-enough uid */
 function genUid() {
   return window.btoa(Date.now() * Math.random()).slice(-8).toLowerCase();
 }
 
-function recursiveId(data) {
-  // if it's an array, drill into it.
-  if (Array.isArray(data)) {
-    for (const x of data) {
-      recursiveId(x);
-    }
-  }
-
-  // if it's an object, add an ID if necessary
-  if (!data.uid) {
-    data.uid = genUid();
-  }
-  if (data.links) {
-    recursiveId(data.links);
-  }
-}
-
-function build(OPTS, target) {
-  recursiveBuild(OPTS.configJSON, target);
+/* Create an object that can be safely used to refer to elements
+ * in the dom. similar to window.id but without the risk of
+ * clashing variable names and with the bonus of being able
+ * to use a comma separated list of CSS selectors
+ */
+function prepareElements(selectors = '[id]') {
+  const el = {};
+  const elems = document.querySelectorAll(selectors);
+  elems.forEach(e => { el[e.id ? e.id : e.tagName.toLowerCase()] = e; });
+  return el;
 }
 
 
 function editStart(elem) {
   el.editHeading.value = 'Editing...';
   el.editName.value = elem.textContent;
-  el.editURL.value = elem.dataset.href;
-  el.editUID.value = elem.dataset.uid;
+  el.editURL.value = elem.href;
+  el.editID.value = elem.id;
   el.body.classList.add('editing');
   el.editing = elem;
   el.editName.focus();
@@ -123,48 +50,26 @@ function editStart(elem) {
 
 function linkClicked(e) {
   if (e.metaKey) {
+    e.preventDefault();
     editStart(e.target);
   } else {
-    window.location = e.target.dataset.href;
+    // default action is to open URL in link
   }
 }
 
 function editCancel() {
   el.editName.value = '';
   el.editURL.value = '';
-  el.editUID.value = '';
+  el.editID.value = '';
   el.body.classList.remove('editing');
 }
 
-function recursiveReplace(data, orig, url, text) {
-  // if it's an object, check for an href
-  // or if there is no href make a div
-  if (data.href === orig) {
-    // replace
-    data.href = url;
-    data.name = text;
-    return;
-  }
-  if (Array.isArray(data)) {
-    for (const x of data) {
-      recursiveReplace(x, orig, url, text);
-    }
-  }
-  if (data.links) {
-    recursiveReplace(data.links, orig, url, text);
-  }
-}
-
-function editOk() {
-  // find the entry in OPTS using the original URL.
-  // replace the URL & text
-  recursiveReplace(OPTS.configJSON, el.editUID.value, el.editURL.value, el.editName.value);
-
   // store the updated version
-  chrome.storage.sync.set(OPTS, () => {
+  function editOk() {
+  STORE.set(OPTS, () => {
     // update UI
     el.editing.textContent = el.editName.value;
-    el.editing.dataset.href = el.editURL.value;
+    el.editing.href = el.editURL.value;
     el.body.classList.remove('editing');
   });
 }
@@ -205,35 +110,48 @@ function detectKeydown(e) {
       e.target.nextElementSibling.focus();
     }
   }
+
+  if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey)) {
+    console.log('Undo');
+    if (OPTS.backup) {
+      const prev = OPTS.html;
+      OPTS.html = OPTS.backup;
+      OPTS.backup = prev;
+    }
+    STORE.set(OPTS, () => {
+      replaceContent(OPTS.html);
+      console.log('undo complete and stored');
+    });
+  }
 }
 
-function prepElements(el) {
-  el.body = document.querySelector('body');
-  el.main = document.querySelector('main');
-  el.aside = document.querySelector('aside');
-  el.footer = document.querySelector('footer');
-  el.editHeading = document.querySelector('#editheading');
-  el.editName = document.querySelector('#editname');
-  el.editURL = document.querySelector('#editurl');
-  el.editUID = document.querySelector('#edituid');
-  el.editCancel = document.querySelector('#editcancel');
-  el.editOk = document.querySelector('#editok');
+
+function prepareListeners() {
+  const anchors = document.querySelectorAll('a');
+  for (const a of anchors) {
+    a.addEventListener('click', linkClicked);
+    a.addEventListener('mousemove', mouseOverLink);
+    a.addEventListener('mouseout', mouseOutLink);
+  }
+  document.addEventListener('keydown', detectKeydown);
+  document.addEventListener('keyup', detectKeyup);
+  el.editok.addEventListener('click', editOk);
+  el.editcancel.addEventListener('click', editCancel);
+}
+
+
+function replaceContent(html) {
+  el.main.innerHTML = html;
+  prepareListeners();
 }
 
 async function connectListeners() {
   await options.loadOptionsWithPromise();
-  prepElements(el);
-  recursiveId(OPTS.configJSON);
-  build(OPTS, el.main);
+  el = prepareElements('[id], body, main, aside, footer');
   prepareBookmarks(OPTS, el.aside);
+  replaceContent(OPTS.html);
   prepareDrag(OPTS);
   makeVisible();
-
-  // connect the add stuff
-  document.addEventListener('keydown', detectKeydown);
-  document.addEventListener('keyup', detectKeyup);
-  el.editOk.addEventListener('click', editOk);
-  el.editCancel.addEventListener('click', editCancel);
 }
 
 window.addEventListener('DOMContentLoaded', connectListeners);

@@ -1,7 +1,7 @@
 body {
   display: grid;
 
-  grid-template-columns: 4fr 1fr;
+  grid-template-columns: 8fr 15em;
   grid-template-rows: auto 1fr;
   grid-template-areas: "footer footer" "main aside";
   height: 100vh;

@@ -1,3 +1,5 @@
+const STORE = chrome.storage.local; // or chrome.storage.sync
+
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
 import { OPTS } from './defaults.mjs';
@@ -21,7 +23,12 @@ function setJSON(prefs, what) {
 }
 
 function getJSON(what) {
-  OPTS[what] = JSON.parse(document.getElementById(what).value);
+  try {
+    OPTS[what] = JSON.parse(document.getElementById(what).value);
+  } catch (e) {
+    console.log({what});
+    console.error(e);
+  }
 }
 
 function setValue(prefs, what) {
@@ -33,11 +40,9 @@ function getValue(what) {
 }
 
 export function loadOptionsWithPromise() {
-  chrome.storage.sync.set({ separator: 'WXYZ' });
+//  STORE.set({ separator: 'WXYZ' });
   return new Promise((resolve, reject) => {
-    console.log('before', JSON.stringify(OPTS));
-    chrome.storage.sync.get(OPTS, (items) => {
-      console.log('after', JSON.stringify(OPTS));
+    STORE.get(OPTS, (items) => {
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError.message);
         reject(chrome.runtime.lastError.message);
@@ -56,14 +61,13 @@ export function loadOptionsWithPromise() {
 function updatePrefsWithPage() {
   getRadio('showBookmarksSidebar');
   getValue('showBookmarksLimit');
-  getValue('sourceFile');
-  getJSON('configJSON');
+  getJSON('html');
 }
 
 function updatePageWithPrefs(prefs) {
   setRadio(prefs, 'showBookmarksSidebar');
   setValue(prefs, 'showBookmarksLimit');
-  setJSON(prefs, 'configJSON');
+  setJSON(prefs, 'html');
   document.getElementById('showBookmarksSidebar').checked = prefs.showBookmarksSidebar;
   document.getElementById('showBookmarksLimit').value = prefs.showBookmarksLimit;
 }
@@ -75,5 +79,5 @@ export async function loadOptions() {
 
 export function saveOptions() {
   updatePrefsWithPage();
-  chrome.storage.sync.set(OPTS, afterSave);
+  STORE.set(OPTS, afterSave);
 }
