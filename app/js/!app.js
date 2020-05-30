@@ -38,13 +38,13 @@ function prepareElements(selectors = '[id]') {
 
 
 function editStart(elem) {
-  el.editHeading.value = 'Editing...';
-  el.editName.value = elem.textContent;
-  el.editURL.value = elem.href;
-  el.editID.value = elem.id;
+  el.editheading.value = 'Editing...';
+  el.editname.value = elem.textContent;
+  el.editurl.value = elem.href;
+  el.editid.value = elem.id;
   el.body.classList.add('editing');
   el.editing = elem;
-  el.editName.focus();
+  el.editname.focus();
 }
 
 
@@ -58,18 +58,18 @@ function linkClicked(e) {
 }
 
 function editCancel() {
-  el.editName.value = '';
-  el.editURL.value = '';
-  el.editID.value = '';
+  el.editname.value = '';
+  el.editurl.value = '';
+  el.editid.value = '';
   el.body.classList.remove('editing');
 }
 
-  // store the updated version
-  function editOk() {
+// store the updated version
+function editOk() {
   STORE.set(OPTS, () => {
     // update UI
-    el.editing.textContent = el.editName.value;
-    el.editing.href = el.editURL.value;
+    el.editing.textContent = el.editname.value;
+    el.editing.href = el.editurl.value;
     el.body.classList.remove('editing');
   });
 }
@@ -137,6 +137,15 @@ function prepareListeners() {
   document.addEventListener('keyup', detectKeyup);
   el.editok.addEventListener('click', editOk);
   el.editcancel.addEventListener('click', editCancel);
+  el.addlink.addEventListener('click', addLink);
+}
+
+function addLink() {
+  const a = document.createElement('a');
+  a.id = genUid();
+  a.href = 'http://example.org';
+  a.textContent = 'example.org';
+  el.main.append(a);
 }
 
 
