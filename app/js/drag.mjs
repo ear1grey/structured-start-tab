@@ -33,15 +33,6 @@ function moveElement(tgt) {
 
 /* respond when a drag begins */
 function dragStart(e) {
-  console.log(e.target);
-  if (e.target.classList.contains('metamouseover')) {
-    dragging = e.target;
-    dragging.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.dropEffect = 'move';
-    return;
-  }
-
   if (e.target.classList.contains('new')) {
     dummy = document.createElement('a');
     dummy.text = 'Example';
@@ -49,10 +40,12 @@ function dragStart(e) {
     dummy.draggable = true;
     dummy.classList.add('dragging');
     dragging = dummy;
-    return;
+  } else {
+    dragging = e.target;
+    dragging.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.dropEffect = 'move';
   }
-
-  e.preventDefault();
 }
 
 /* respond if dropping here is ok */
