@@ -17,13 +17,17 @@ function moveElement(tgt) {
   const dropTarget = findContainer(tgt);
   if (dropTarget === dragging) return;
   if (dropTarget === tgt) {
-    if (dropTarget.children.length > 0) {
-      // only drop directly ina div if it's empty
+    if (dropTarget.children.length <= 1) {
+      // only drop directly in a div if it's empty (with heading)
       // otherwise drop on an element to insert before it
       dropTarget.append(dragging);
     }
   } else {
-    dropTarget.insertBefore(dragging, tgt);
+    if (tgt.tagName === 'H1') {
+      dropTarget.insertBefore(dragging, tgt.nextSibling);
+    } else {
+      dropTarget.insertBefore(dragging, tgt);
+    }
   }
 }
 
