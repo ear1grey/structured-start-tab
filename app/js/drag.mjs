@@ -1,6 +1,6 @@
-let dragging, OPTS, STORE;
+let dragging, dummy, OPTS, STORE;
 
-function updateConfig(what) {
+function updateConfig() {
   OPTS.backup = OPTS.html;
   OPTS.html = document.querySelector('main').innerHTML;
   STORE.set(OPTS, () => console.log('saved'));
@@ -31,14 +31,24 @@ function moveElement(tgt) {
 function dragStart(e) {
   console.log(e.target);
   if (e.target.classList.contains('metamouseover')) {
-    // || e.target.tagName === "DIV"
     dragging = e.target;
     dragging.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.dropEffect = 'move';
-  } else {
-    e.preventDefault();
+    return;
   }
+
+  if (e.target.classList.contains('new')) {
+    dummy = document.createElement('a');
+    dummy.text = 'Example';
+    dummy.href = 'http://example.org';
+    dummy.draggable = true;
+    dummy.classList.add('dragging');
+    dragging = dummy;
+    return;
+  }
+
+  e.preventDefault();
 }
 
 /* respond if dropping here is ok */
@@ -51,7 +61,12 @@ function dragEnd(e) {
   e.preventDefault();
   dragging.classList.remove('dragging');
   dragging.classList.remove('fresh');
-  updateConfig(dragging);
+  if (dragging === dummy) {
+    const evt = new CustomEvent('editrequest', { detail: { target: dummy } });
+    document.dispatchEvent(evt);
+    dummy = null;
+  }
+  updateConfig();
 }
 
 /*

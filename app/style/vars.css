@@ -12,6 +12,9 @@
   --fg-light: #FFF;
 
   --small: 0.25rem;
+  --medium: calc( var(--small) * 2 );
+  --large: calc( var(--small) * 4 );
+  
 
   --overlay-light: rgba(255,255,255,0.5);
   --overlay-mid: rgba(255,255,255,0.3);
