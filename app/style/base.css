@@ -1,0 +1,346 @@
+:root {
+    font-size: 12pt;
+}
+
+* {
+    box-sizing: border-box;
+    font-size: 1rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    opacity: 1;
+    background: transparent;
+    color: inherit;
+}
+
+body {
+    display: grid;
+    grid-template-columns: calc(100vw - var(--bookmark-width)) var(--bookmark-width);
+    grid-template-rows: min-content auto;
+    grid-template-areas: "edit edit" "main bookmarks";
+    min-height: 100vh;
+    width: 100vw;
+    background: var(--bg-mid);
+    color: var(--fg-mid);
+}
+
+main { grid-area: main; margin-bottom: 4em;}
+.bookmarks { grid-area: bookmarks; }
+
+#toolbar[disabled],
+[disabled] h1,
+[disabled] a:not(.edited) {
+    filter: opacity(0.5) blur(1px);
+    cursor: not-allowed !important;
+}
+
+.flash {
+    filter: brightness(2);
+    background: yellow;
+}
+
+#edit {
+    grid-area: edit;
+    height: 0em;
+    display: none;
+    transition: height var(--speed) linear;
+    z-index: 2000;
+}
+
+body.editing #edit {
+    display: flex;
+    height: auto;
+    overflow: visible;
+}
+
+#edit>* {
+    flex: 1 1 auto;
+    padding: 1rem;
+} 
+
+
+#edit {
+    align-items: center;
+    align-content: stretch;
+    width: 100%;
+}
+
+#edit * {
+    padding: var(--medium);
+    flex-grow: 0;
+    display: flex;
+}
+
+#edit dl {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+} 
+
+
+#edit input {
+    flex-grow: 1;
+    background: var(--bg-light);
+    color: var(--fg-dark);
+    height: 2em;
+}
+
+#edit textarea {
+    background: var(--bg-light);
+    color: var(--fg-dark);
+    min-height: 8em;
+    min-width: 30em;
+    width: 100%;
+}
+
+#edit button {
+    padding: var(--massive);
+    margin: var(--large);
+    background: var(--bg-dark);
+    border-radius: var(--medium);
+}
+
+body {
+    font-family: var(--page-font);
+    flex-direction: row;
+    position: relative;
+}
+
+section>h1 {
+    flex-grow: 0;
+}
+
+section.hide>h1 {
+    text-orientation: sideways;
+    writing-mode: horizontal-tb;
+    transform: rotate(0deg);
+}
+
+section>nav {
+    display: flex;
+    flex: 1 1 auto;
+    background: var(--overlay-light);
+}
+
+section>nav:empty {
+    border: white dashed thin;
+    min-height: 2em;
+}
+
+
+section.hide nav {
+    display: none;
+}
+  
+
+main>section>nav,
+main>section {
+    flex-wrap: none;
+    margin: var(--small);
+}
+
+
+section {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: stretch;
+    align-content: flex-start;
+    background: var(--overlay-dark);
+    border: var(--fg-light);
+    flex-direction: row;
+    margin: var(--small);
+    padding: var(--small);
+    border-radius: var(--medium);
+}
+
+section section {
+    flex-direction: column;
+    border-radius: var(--small);
+    width: min-content;
+}
+
+section nav {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    background: transparent;
+    flex-wrap: wrap;
+}
+
+section section nav {
+    flex-wrap: wrap;
+}
+
+main * section.folded,
+main>section>h1 {
+    text-orientation: sideways-right;
+    writing-mode: vertical-lr;
+    transform: rotate(-180deg);
+    text-align: end;
+    flex-grow: 0;
+}
+
+main section.folded>h1 {
+    text-orientation: unset;
+    writing-mode: unset;
+    transform: unset;
+    text-align: unset;
+    flex-direction: row-reverse;
+}
+
+
+h1, h2, main a {
+    border: 0.125em solid transparent;
+    padding: 0.05rem;
+    margin-top: var(--small);
+    background: transparent;
+}
+
+.bookmarks a, 
+main a {
+    display: flex;
+    align-items: center;
+    background: var(--overlay-mid);
+    border: solid transparent thin;
+    border-radius: var(--tiny);
+    justify-content: center;
+    margin: var(--tiny);
+    padding: var(--medium);
+    min-height: 1.5rem;
+    transition: all calc(var(--speed)*2) ease-in-out;
+    text-align: center;
+    text-decoration: none;
+    overflow: hidden;
+    flex-grow: 1;
+    min-height: 1.5em;
+    cursor: pointer;
+}
+
+main>a {
+    max-width: 10em;
+    border: solid var(--fg-light) thin;
+}
+
+a:focus {
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    box-shadow: 0 0 calc(var(--small) * 4) calc(var(--small) * 2) var(--overlay-light);
+    outline: none;
+    transition: all calc(var(--speed)/2) ease-in-out;
+}
+
+a:hover {
+    border-color: var(--fg-light);
+}
+
+
+a.metamouseover:not(.dragging),
+main.editing a:hover:not(.dragging) {
+  cursor: move;
+}
+
+#toolbar {
+    position: fixed;
+    bottom: 0;
+    background: var(--bg-mid);
+    height: 3em;
+    width: 100vw;
+    box-shadow: 0 0 var(--large) var(--small) black;
+    display: flex;
+    flex: 0 0 auto;
+}
+
+
+#toolbar>* {
+    height: 100%;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+
+#statuswrapper {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    height: 3em;
+    overflow: hidden;
+    flex: 1 1 auto;
+    background: var(--bg-mid);
+}
+
+#status {
+    position: absolute;
+    bottom: 0rem;
+    flex-grow: 1;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    width: 100%;
+    padding: 1rem;
+    margin: 0;
+    background: var(--bg-mid);
+}
+
+#status p{
+    flex-shrink: 0;
+    padding: 1em;
+    height: 1em;
+    background: var(--bg-mid);
+}
+
+#statuswrapper:hover {
+    height: auto;
+    overflow: visible;
+}
+
+
+.folded *:not(:first-child) {
+    display: none;
+}
+
+
+#trash {
+    display: none;
+    background: var(--overlay-dark);
+}
+
+#trash nav {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+#trash.open {
+    display: flex;
+}
+
+
+
+.drophere {
+    opacity: 1;
+}
+
+.dragging {
+    transition: all 1s linear;
+    background: #C00;
+    color: white;
+    border-color: white;
+    border-style: solid;
+}
+
+.bookmarks a {
+    background: var(--bookmark);
+}
+
+.bookmarks a.fresh {
+    background: var(--fresh);
+}
+
+footer {
+    background: var(--bg-light);
+}

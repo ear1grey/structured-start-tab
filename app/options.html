@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<meta charset=utf8>
+<title>Structured Start Tab Options</title>
+
+<style>
+  @import url("style/vars.css");
+  @import url("style/options.css");
+</style>
+
+<header>
+  <h1><img src="style/i/128.png" alt="SST icon"> SST: Structured Start Tab</h1>
+</header>
+
+<main>
+
+  <label for=showBookmarksSidebar>
+    <input id=showBookmarksSidebar type=checkbox>
+    <p>Include a sidebar of most recent bookmarks.</p>
+  </label>
+
+  <label for=showBookmarksLimit>
+    <input value=10 type="number" id="showBookmarksLimit">
+    <p>Number of recent bookmarks to show.</p>
+  </label>
+ 
+  <label for=html class="wideopt">
+    <p>Caution: This is the raw HTML of your page.  Edit at your peril.</p>    
+    <textarea rows=10 cols=80 id="html">Config goes here...</textarea>
+  </label>
+
+  <button id="save">Save</button>
+
+<div id="status"></div>
+</main>
+
+<script type=module src="./js/options-start.js"></script>

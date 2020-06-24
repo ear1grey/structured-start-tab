@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" >
+ <desc>Created by hand by rjb@port.ac.uk</desc>
+    <path d="m0 0h20v30h-10c-5 0-10-5-10-10z" fill="#009fff"/>
+    <polygon points="20 0 10 10 10 40 20 30" fill="#0077b1"/>
+    <path d="m10 10h10c5 0 10 5 10 10s-5 10-10 10l-10 10z" fill="#61135f"/>
+</svg>

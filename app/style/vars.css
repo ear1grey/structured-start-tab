@@ -1,0 +1,46 @@
+:root {
+  --speed: 0.1s;
+  --page-font: sans-serif;
+
+  /* Sizes */
+
+  --page-width: 40rem;
+
+  --tiny: 0.1rem;
+  --small: calc( var(--tiny) * 2 );
+  --medium: calc( var(--tiny) * 4 );
+  --large: calc( var(--tiny) * 8 );
+  --massive: calc( var(--tiny) * 32 );
+  
+  /* Colours */
+
+  --fg-dark: #111; 
+  --fg-mid: #333;
+  --fg-light: #555;
+
+  --bg-dark: #BBB; 
+  --bg-mid: #DDD;
+  --bg-light: #FFF;
+
+  --overlay-light: rgba(255,255,255,0.5);
+  --overlay-mid: rgba(255,255,255,0.3);
+  --overlay-dark: rgba(0,0,0,0.2);
+
+  --edit-border: #A00;
+
+  --fresh: #befb8da8;
+  --bookmark: var(--bg-dark);
+  --bookmark-width: 0em;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-dark: #111; 
+    --bg-mid: #333;
+    --bg-light: #555;
+
+    --fg-dark: #BBB; 
+    --fg-mid: #DDD;
+    --fg-light: #FFF;
+  }
+}

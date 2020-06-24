@@ -1,0 +1,28 @@
+{
+    "manifest_version": 2,
+    "version": "1.1.4",
+    "name": "Structured Start Tab",
+    "description": "Show a structured page when a new tab is opened.",
+    "author": "Rich Boakes",
+
+    "permissions": [
+        "storage",
+        "bookmarks"
+    ],
+    "icons": {
+        "16": "app/style/i/16.png",
+        "48": "app/style/i/48.png",
+       "128": "app/style/i/128.png"
+    },
+    "browser_action": {
+        "default_icon": "app/style/i/48.png"
+    },
+    "chrome_url_overrides": {
+        "newtab": "app/index.html"
+    },
+    "options_page": "app/options.html",
+    "web_accessible_resources": [
+        "data/*",
+        "chrome://settings/strings.js"
+    ]
+}
