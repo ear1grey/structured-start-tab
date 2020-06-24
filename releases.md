@@ -2,6 +2,7 @@
 
 ## Alpha Releases
 
+* 1.1.5 Receive links dropped from other pages
 * 1.1.4 Welcome page added
 * 1.1.3 Panel style editing added
 * 1.1.2 Drag and drop panel creation and nesting

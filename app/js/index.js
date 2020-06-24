@@ -161,10 +161,10 @@ function detectKeydown(e) {
   }
 }
 
-function createExampleLink() {
+function createExampleLink(text = 'Example', href = 'http://example.org') {
   const a = document.createElement('a');
-  a.dataset.href = 'http://example.org';
-  a.textContent = 'example.org';
+  a.dataset.href = href;
+  a.textContent = text;
   a.draggable = true;
   addAnchorListeners(a);
   return a;
@@ -258,7 +258,6 @@ function findNav(elem) {
 /*
  * add a placeholder element to the position where the
  * current thing would be dropped
- *       // when dropping an a on the heading, prepend it to the nav ???
  */
 function moveElement(tgt) {
   if (dragging === tgt) return; // can't drop on self
@@ -302,6 +301,11 @@ function replaceElementInOriginalPosition() {
     original.parent.append(dragging);
   }
 }
+
+function dragEnter(e) {
+  dragging = dragging || createExampleLink("New Link");
+}
+
 
 /* respond when a drag begins */
 function dragStart(e) {
@@ -369,6 +373,17 @@ function dragDrop(e) {
     updateConfig();
     feedback(dragging.textContent + ' moved to trash.');
   } else {
+    // handle special case where dragged from offpage.
+    const parser = new DOMParser();
+    const tdoc = parser.parseFromString(e.dataTransfer.getData("text/html"), "text/html");
+    const link = tdoc.querySelector("a");
+    // const tag = document.createElement("div");
+    // tag.innerHTML = e.dataTransfer.getData("text/html");
+    if (link) {
+      dragging.dataset.href = link.href;
+      dragging.textContent = link.textContent;
+    }
+    // handle all cases
     updateConfig();
   }
   original.parent = null;
@@ -522,6 +537,7 @@ export function prepareDrag() {
   document.addEventListener('dragover', dragOver);
   document.addEventListener('drop', dragDrop);
   document.addEventListener('dragend', dragEnd);
+  document.addEventListener('dragenter', dragEnter);
 }
 
 
