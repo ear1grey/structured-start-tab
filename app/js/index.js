@@ -303,7 +303,7 @@ function replaceElementInOriginalPosition() {
 }
 
 function dragEnter(e) {
-  dragging = dragging || createExampleLink("New Link");
+  dragging = dragging || createExampleLink('New Link');
 }
 
 
@@ -375,8 +375,8 @@ function dragDrop(e) {
   } else {
     // handle special case where dragged from offpage.
     const parser = new DOMParser();
-    const tdoc = parser.parseFromString(e.dataTransfer.getData("text/html"), "text/html");
-    const link = tdoc.querySelector("a");
+    const tdoc = parser.parseFromString(e.dataTransfer.getData('text/html'), 'text/html');
+    const link = tdoc.querySelector('a');
     // const tag = document.createElement("div");
     // tag.innerHTML = e.dataTransfer.getData("text/html");
     if (link) {
