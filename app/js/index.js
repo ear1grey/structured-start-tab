@@ -491,7 +491,13 @@ function prepareListeners() {
 }
 
 function prepareContent(html) {
-  el.main.innerHTML = html;
+  // 6 lines to do the same as innerHTML - keeps mozilla happy
+  const parser = new DOMParser();
+  const tempdoc = parser.parseFromString(html, 'text/html');
+  const topLevel = tempdoc.querySelectorAll('body>*');
+  for (const elem of topLevel) {
+    el.main.append(elem);
+  }
   prepareListeners();
 }
 
