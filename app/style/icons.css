@@ -35,6 +35,17 @@ a[data-href*="google.com/mail"]::before {
     width: 1.5em;
 }
 
+a[data-href*="slack.com"]::before {
+    background-image: url('i/slack.svg');
+    width: 1.5em;
+}
+
+
+a[data-href*="meet.google.com"]::before {
+    background-image: url('i/meet.svg');
+    width: 1.5em;
+}
+
 a[data-href*="drive.google"]::before {
     background-image: url('i/drive.svg');
     width: 1.5em;
