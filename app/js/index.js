@@ -436,11 +436,6 @@ function showBookmarks(visible = true) {
     document.documentElement.style.setProperty('--bookmark-margin', '0em');
     document.documentElement.style.setProperty('--bookmark-padding', '0em');
     document.documentElement.style.setProperty('--bookmark-border', '0em');
-  } else {
-    document.documentElement.style.removeProperty('--bookmark-width');
-    document.documentElement.style.removeProperty('--bookmark-margin');
-    document.documentElement.style.removeProperty('--bookmark-padding');
-    document.documentElement.style.removeProperty('--bookmark-border');
   }
 }
 
