@@ -217,6 +217,12 @@ main a {
     cursor: pointer;
 }
 
+.bookmarks a {
+    margin: var(--bookmark-margin);
+    padding: var(--bookmark-padding);
+    border-width: var(--bookmark-border);
+}
+
 main>a {
     max-width: 10em;
     border: solid var(--fg-light) thin;

@@ -425,7 +425,17 @@ function toggleBookmarks() {
 }
 
 function showBookmarks(visible = true) {
-  document.documentElement.style.setProperty('--bookmark-width', visible ? '15em' : '0em');
+  if (visible) {
+    document.documentElement.style.setProperty('--bookmark-width', '0em');
+    document.documentElement.style.setProperty('--bookmark-margin', '0em');
+    document.documentElement.style.setProperty('--bookmark-padding', '0em');
+    document.documentElement.style.setProperty('--bookmark-border', '0em');
+  } else {
+    document.documentElement.style.removeProperty('--bookmark-width');
+    document.documentElement.style.removeProperty('--bookmark-margin');
+    document.documentElement.style.removeProperty('--bookmark-padding');
+    document.documentElement.style.removeProperty('--bookmark-border');
+  }
 }
 
 /* Create an object that can be safely used to refer to elements
