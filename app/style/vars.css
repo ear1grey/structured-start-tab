@@ -17,6 +17,7 @@
   --fg-dark: #111; 
   --fg-mid: #333;
   --fg-light: #555;
+  --fg-light-alpha: #5557;
 
   --bg-dark: #BBB; 
   --bg-mid: #DDD;
@@ -45,5 +46,6 @@
     --fg-dark: #BBB; 
     --fg-mid: #DDD;
     --fg-light: #FFF;
+    --fg-light-alpha: #FFF7;
   }
 }

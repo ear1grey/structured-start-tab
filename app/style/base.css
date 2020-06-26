@@ -146,7 +146,7 @@ section {
     align-items: stretch;
     align-content: flex-start;
     background: var(--overlay-dark);
-    border: var(--fg-light);
+    border: solid thin var(--fg-light-alpha);
     flex-direction: row;
     margin: var(--small);
     padding: var(--small);
