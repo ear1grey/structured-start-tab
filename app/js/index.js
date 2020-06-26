@@ -301,15 +301,18 @@ function replaceElementInOriginalPosition() {
   } else {
     original.parent.append(dragging);
   }
+  dragging = null;
 }
 
 function dragEnter(e) {
-  dragging = dragging || createExampleLink('New Link');
+  dragging = dragging || createExampleLink('💧');
+  dragging.classList.add('dragging');
 }
 
-
+let dragStartedOnThisPage = false;
 /* respond when a drag begins */
 function dragStart(e) {
+  dragStartedOnThisPage = true;
   if (el.body.classList.contains('editing')) return;
   if (e.target.classList.contains('new')) {
     if (e.target.id === 'addlink') {
@@ -374,15 +377,16 @@ function dragDrop(e) {
     updateConfig();
     feedback(dragging.textContent + ' moved to trash.');
   } else {
-    // handle special case where dragged from offpage.
-    const parser = new DOMParser();
-    const tdoc = parser.parseFromString(e.dataTransfer.getData('text/html'), 'text/html');
-    const link = tdoc.querySelector('a');
-    // const tag = document.createElement("div");
-    // tag.innerHTML = e.dataTransfer.getData("text/html");
-    if (link) {
-      dragging.dataset.href = link.href;
-      dragging.textContent = link.textContent;
+    if (!dragStartedOnThisPage) {
+      const parser = new DOMParser();
+      const tdoc = parser.parseFromString(e.dataTransfer.getData('text/html'), 'text/html');
+      const link = tdoc.querySelector('a');
+      if (link) {
+        dragging.dataset.href = link.href;
+        dragging.textContent = link.textContent;
+      } else {
+        dragging.remove();
+      }
     }
     // handle all cases
     updateConfig();
@@ -393,18 +397,26 @@ function dragDrop(e) {
   dragging = null;
 }
 
+
 function dragEnd(e) {
   if (dragging) {
-    // event must have been cancelled because dragging
-    // should be reset on drop
+    // event must have been cancelled because `dragging` should be reset on drop
     if (e.srcElement.classList.contains('new')) {
-      if (dummy) dummy.remove();
+      if (dummy) {
+        dummy.remove();
+        dummy = null;
+      }
+      // if (dragging) {
+      //   dragging.remove();
+      //   dragging=null;
+      // }
     } else {
       replaceElementInOriginalPosition();
     }
     feedback('Cancelled.');
     dummy = null;
   }
+  dragStartedOnThisPage = false;
 }
 
 export async function prepareBookmarks(OPTS, target) {
