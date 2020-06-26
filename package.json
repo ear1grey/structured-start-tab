@@ -7,7 +7,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint app/js/*.js",
-    "zip": "zip -u -9 -v -r sst.zip app manifest.json release.md -x '*/.*'; echo 'bump versions in releases.md, manifest.json and package.json...'"
+    "zip": "rm sst.zip;find . -name '.DS_Store' -type f -delete;zip -u -9 -v -r sst.zip app manifest.json release.md; echo 'bump versions in releases.md, manifest.json and package.json...'"
   },
   "dependencies": {
   },
