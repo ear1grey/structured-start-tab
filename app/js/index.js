@@ -206,6 +206,7 @@ function feedback(msg) {
  * iff link has no links - inject
  */
 export function buildBookmarks(data, target, count) {
+  target.textContent = '';
   for (const x of data) {
     if (count === 0) break;
 
@@ -413,8 +414,8 @@ export async function prepareBookmarks(OPTS, target) {
       chrome.bookmarks.getRecent(count + 20, resolve);
     });
     buildBookmarks(await bp, target, count);
-    showBookmarks();
   }
+  showBookmarks(OPTS.showBookmarksSidebar);
 }
 
 function toggleBookmarks() {
@@ -426,6 +427,11 @@ function toggleBookmarks() {
 
 function showBookmarks(visible = true) {
   if (visible) {
+    document.documentElement.style.removeProperty('--bookmark-width');
+    document.documentElement.style.removeProperty('--bookmark-margin');
+    document.documentElement.style.removeProperty('--bookmark-padding');
+    document.documentElement.style.removeProperty('--bookmark-border');
+  } else {
     document.documentElement.style.setProperty('--bookmark-width', '0em');
     document.documentElement.style.setProperty('--bookmark-margin', '0em');
     document.documentElement.style.setProperty('--bookmark-padding', '0em');
