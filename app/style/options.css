@@ -46,18 +46,17 @@ label>input {
 }
 
 label>input[type=checkbox] {
-  height:0;
-  font-size: 200%;
+  width: 6em;
 }
 
 label>input[type=checkbox]:after {
   margin-left: -0.5em;
-  content: "❌";
+  height: 100%;
+  content: url(i/off.svg);
 }
 
 label>input[type=checkbox]:checked:after {
-
-  content: "✅";
+  content: url(i/on.svg);
 }
 
 
