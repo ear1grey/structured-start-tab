@@ -23,6 +23,9 @@
   --bg-mid: #DDD;
   --bg-light: #FFF;
 
+  --bg-drop: #C00;
+  --fg-drop: #FFF;
+
   --overlay-light: rgba(255,255,255,0.5);
   --overlay-mid: rgba(255,255,255,0.3);
   --overlay-dark: rgba(0,0,0,0.2);
@@ -47,5 +50,8 @@
     --fg-mid: #DDD;
     --fg-light: #FFF;
     --fg-light-alpha: #FFF7;
+
+    --bg-drop: #A00;
+    --fg-drop: #CCC;  
   }
 }

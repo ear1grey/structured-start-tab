@@ -305,7 +305,7 @@ function replaceElementInOriginalPosition() {
   dragging = null;
 }
 
-function dragEnter(e) {
+function dragEnter() {
   dragging = dragging || createExampleLink('💧');
   dragging.classList.add('dragging');
 }
@@ -314,6 +314,7 @@ let dragStartedOnThisPage = false;
 /* respond when a drag begins */
 function dragStart(e) {
   dragStartedOnThisPage = true;
+  el.body.classList.add('dragOngoing');
   if (el.body.classList.contains('editing')) return;
   if (e.target.classList.contains('new')) {
     if (e.target.id === 'addlink') {
@@ -345,6 +346,11 @@ function flash(elem) {
 
 /* respond if dropping here is ok */
 function dragOver(e) {
+  if (e.target === el.bin) {
+    el.bin.classList.add('over');
+  } else {
+    el.bin.classList.remove('over');
+  }
   if (checkDragIsWithin(e.target, el.main)) {
     e.preventDefault();
     if (!el.toolbar.contains(e.target)) {
@@ -400,6 +406,8 @@ function dragDrop(e) {
 
 
 function dragEnd(e) {
+  el.body.classList.remove('dragOngoing');
+  el.bin.classList.remove('over');
   if (dragging) {
     // event must have been cancelled because `dragging` should be reset on drop
     if (e.srcElement.classList.contains('new')) {
@@ -407,10 +415,6 @@ function dragEnd(e) {
         dummy.remove();
         dummy = null;
       }
-      // if (dragging) {
-      //   dragging.remove();
-      //   dragging=null;
-      // }
     } else {
       replaceElementInOriginalPosition();
     }

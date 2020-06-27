@@ -325,6 +325,10 @@ main.editing a:hover:not(.dragging) {
     display: flex;
 }
 
+#bin.over {
+  background: var(--bg-drop);
+  color: var(--fg-drop);
+}
 
 
 .drophere {
@@ -333,9 +337,9 @@ main.editing a:hover:not(.dragging) {
 
 .dragging {
     transition: all 1s linear;
-    background: #C00;
-    color: white;
-    border-color: white;
+    background: var(--bg-drop);
+    color: var(--fg-drop);
+    border-color: var(--fg-drop);
     border-style: solid;
 }
 
