@@ -10,6 +10,7 @@ A browser extension that replaces the default tab content with a page of organis
 
 * Please add suggestions, feature requests and bug reports to the [issue tracker](https://github.com/ear1grey/structured-start-tab/issues). 
 * Code contributions are most welcome, please submit a PR.
+* Future release plans can be seen in the [open milestones](https://github.com/ear1grey/structured-start-tab/milestones?state=open)
 
 ## License
 
