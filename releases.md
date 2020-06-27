@@ -1,6 +1,6 @@
 # Release History
 
-Every release for the foreseeable future will be an alpha level release.  This means you can expect an evolving and improving feature set, and also bugs.  Please report bugs and reques features vie the button on the toolbar.
+Every release for the foreseeable future will be an alpha level release.  This means you can expect an evolving and improving feature set, and also bugs.  Please report bugs and request features via the Suggestions button on the toolbar.
 
 ## Alpha Releases
 
