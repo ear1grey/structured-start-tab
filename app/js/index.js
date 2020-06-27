@@ -59,12 +59,13 @@ function editStart(elem) {
   document.querySelector('#editcancel').addEventListener('click', editCancel);
 
   el.editname = document.querySelector('#editname');
-  el.editname.focus();
   flash(el.editname);
   flash(elem);
   el.main.setAttribute('disabled', true);
   el.aside.setAttribute('disabled', true);
   el.toolbar.setAttribute('disabled', true);
+  el.editname.focus();
+  el.editname.select();
 }
 
 
