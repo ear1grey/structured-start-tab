@@ -136,7 +136,9 @@ function detectKeydown(e) {
     el.main.classList.remove('editing');
   }
 
-  if (e.key === 'Enter') {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    const saveButton = document.querySelector('#editok');
+    if (saveButton) saveButton.click();
   }
 
   if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey)) {
