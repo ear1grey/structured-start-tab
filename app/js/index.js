@@ -377,6 +377,34 @@ function dragOver(e) {
   }
 }
 
+function extractDataFromDrop(e) {
+  debugger;
+  const html = e.dataTransfer.getData('text/html');
+  const plainText = e.dataTransfer.getData('text/plain');
+  let url, text;
+  if (html) {
+    const parser = new DOMParser();
+    const tdoc = parser.parseFromString(html, 'text/html');
+    const link = tdoc.querySelector('a');
+    url = link.href;
+    text = link.textContent;
+  } else {
+    try {
+      const u = new URL(plainText);
+      url = u.toString();
+      text = url;  
+    } catch {
+      feedback("Not a link or URL.");
+    }
+  }
+  if (url) {
+    dragging.dataset.href = url;
+    dragging.textContent = text;
+  } else {
+    dragging.remove();
+  }
+}
+
 function dragDrop(e) {
   e.preventDefault();
   dragging.classList.remove('dragging');
@@ -387,15 +415,7 @@ function dragDrop(e) {
     feedback(dragging.textContent + ' moved to trash.');
   } else {
     if (!dragStartedOnThisPage) {
-      const parser = new DOMParser();
-      const tdoc = parser.parseFromString(e.dataTransfer.getData('text/html'), 'text/html');
-      const link = tdoc.querySelector('a');
-      if (link) {
-        dragging.dataset.href = link.href;
-        dragging.textContent = link.textContent;
-      } else {
-        dragging.remove();
-      }
+      extractDataFromDrop(e);
     }
     // handle all cases
     updateConfig();
