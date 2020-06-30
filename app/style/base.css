@@ -183,7 +183,7 @@ main>section>h1 {
     writing-mode: vertical-lr;
     transform: rotate(-180deg);
     text-align: end;
-    flex-grow: 0;
+    flex-grow: 0 !important;
 }
 
 main section.folded>h1 {
