@@ -263,6 +263,7 @@ function findNav(elem) {
     case 'NAV': return elem;
     case 'A': return elem.parentElement;
     case 'MAIN': return elem;
+    case 'IMG': return elem.parentElement.parentElement;
   }
   throw new Error("can't safely choose container");
 }
