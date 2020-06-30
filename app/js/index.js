@@ -388,7 +388,6 @@ function dragOver(e) {
 }
 
 function extractDataFromDrop(e) {
-  debugger;
   const html = e.dataTransfer.getData('text/html');
   const plainText = e.dataTransfer.getData('text/plain');
   let url, text;
@@ -402,9 +401,9 @@ function extractDataFromDrop(e) {
     try {
       const u = new URL(plainText);
       url = u.toString();
-      text = url;  
-    } catch {
-      feedback("Not a link or URL.");
+      text = url;
+    } catch (e) {
+      feedback('Not a link or URL.');
     }
   }
   if (url) {
