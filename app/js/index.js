@@ -21,18 +21,18 @@ function linkClicked(e) {
   if (e.shiftKey) {
     editStart(e.target);
   } else {
-    window.location.href = e.target.dataset.href;
+    window.location.href = e.currentTarget.dataset.href;
   }
 }
 
 function linkHover(e) {
-  e.target.dataset.feedback = feedback(e.target.dataset.info || e.target.dataset.href);
+  e.currentTarget.dataset.feedback = feedback(e.target.dataset.info || e.target.dataset.href);
 }
 
 function linkHoverOut(e) {
-  const f = document.querySelector('#' + e.target.dataset.feedback);
+  const f = document.querySelector('#' + e.currentTarget.dataset.feedback);
   if (f) f.remove();
-  delete e.target.dataset.feedback;
+  delete e.currentTarget.dataset.feedback;
 }
 
 
@@ -86,12 +86,24 @@ function editCancel() {
   }
 }
 
+function setFavicon(el, url) {
+  let favicon = el.querySelector('img.favicon');
+  if (!favicon) {
+    favicon = document.createElement('img');
+    favicon.className = 'favicon';
+    el.prepend(favicon);
+  }
+
+  favicon.src = 'chrome://favicon/' + url;
+}
+
 
 // store the updated version
 function editOk() {
   if (el.editing.tagName === 'A') {
     el.editing.textContent = getValue('#editname');
     el.editing.dataset.href = getValue('#editurl');
+    setFavicon(el.editing, getValue('#editurl'));
     el.editing.classList.remove('edited');
   } else {
     if (el.editing.tagName === 'SECTION') {
@@ -169,6 +181,7 @@ function createExampleLink(text = 'Example', href = 'http://example.org') {
   a.dataset.href = href;
   a.textContent = text;
   a.draggable = true;
+  setFavicon(a, href);
   addAnchorListeners(a);
   return a;
 }
@@ -220,15 +233,11 @@ export function buildBookmarks(data, target, count) {
       // TODO make this an option?
     } else {
       count--;
-      const a = document.createElement('a');
-      a.dataset.href = x.url;
-      a.textContent = x.title;
+      const a = createExampleLink(x.title, x.url);
       a.id = window.btoa(Date.now() * Math.random()).slice(-8).toLowerCase();
-      a.draggable = true;
       if (x.dateAdded > Date.now() - fourDays) {
         a.classList.add('fresh');
       }
-      addAnchorListeners(a);
       target.append(a);
     }
   }
@@ -254,6 +263,7 @@ function findNav(elem) {
     case 'NAV': return elem;
     case 'A': return elem.parentElement;
     case 'MAIN': return elem;
+    case 'IMG': return elem.parentElement.parentElement;
   }
   throw new Error("can't safely choose container");
 }
@@ -378,7 +388,6 @@ function dragOver(e) {
 }
 
 function extractDataFromDrop(e) {
-  debugger;
   const html = e.dataTransfer.getData('text/html');
   const plainText = e.dataTransfer.getData('text/plain');
   let url, text;
@@ -392,13 +401,14 @@ function extractDataFromDrop(e) {
     try {
       const u = new URL(plainText);
       url = u.toString();
-      text = url;  
-    } catch {
-      feedback("Not a link or URL.");
+      text = url;
+    } catch (e) {
+      feedback('Not a link or URL.');
     }
   }
   if (url) {
     dragging.dataset.href = url;
+    setFavicon(dragging, url);
     dragging.textContent = text;
   } else {
     dragging.remove();

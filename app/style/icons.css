@@ -1,79 +1,8 @@
-a::before {
-    height: 1em;
-    display: block;
-    content: ' ';
-    background-size: 1em;
-    background-repeat: no-repeat;
-    height: 1em;
-    width: 0;
-}
-
-a[data-href*="calendar.google"]::before {
-  background-image: url('i/cal.svg');
-  width: 1.5em;
-}
-
-a[data-href*="google.com/spreadsheets/"]::before {
-        background-image: url('i/plan.svg');
-        width: 1.5em;
-    }
-
-a[data-href*="vscode"]::before {
-    background-image: url('i/doc.svg');
-    filter: hue-rotate(240deg);
-    width: 1.5em;
-}
-
-
-a[data-href*="google.com/document/"]::before {
-    background-image: url('i/doc.svg');
-    width: 1.5em;
-}
-
-a[data-href*="google.com/mail"]::before {
-    background-image: url('i/gmail.svg');
-    width: 1.5em;
-}
-
-a[data-href*="slack.com"]::before {
-    background-image: url('i/slack.svg');
-    width: 1.5em;
-}
-
-
-a[data-href*="meet.google.com"]::before {
-    background-image: url('i/meet.svg');
-    width: 1.5em;
-}
-
-a[data-href*="drive.google"]::before {
-    background-image: url('i/drive.svg');
-    width: 1.5em;
-}
-
-a[data-href*="port.ac.uk"]::before {
-  background-image: url('i/port.svg');
-  width: 1.5em;
-}
-
-a[data-href*="moodle.port"]::before {
-    background-image: url('i/m.svg');
-    width: 1.5em;
-}
-
-a[data-href*="github.io"]::before,
-a[data-href*="github.com"]::before {
-    background-image: url('i/github.svg');
-    width: 1.5em;
-}
-
 .gryf {
     background-image: url('i/g.svg');
     width: 1.5em;
 }
 
-a[data-href*="links"]::before {
-  background-image: url('i/link.svg');
-  width: 1.5em;
+.favicon {
+  margin-right: .5em;
 }
-
