@@ -89,12 +89,27 @@ function editCancel() {
 function setFavicon(el, url) {
   let favicon = el.querySelector('img.favicon');
   if (!favicon) {
+    console.log('!');
     favicon = document.createElement('img');
     favicon.className = 'favicon';
     el.prepend(favicon);
   }
 
   favicon.src = 'chrome://favicon/' + url;
+}
+
+function prepareFavicons() {
+  const links = el.main.querySelectorAll('a');
+  for (const a of links) {
+    setFavicon(a, a.dataset.href);
+  }
+}
+
+function removeFavicons(root) {
+  const images = root.querySelectorAll('img.favicon');
+  for (const a of images) {
+    a.remove();
+  }
 }
 
 
@@ -119,16 +134,40 @@ function editOk() {
   el.aside.removeAttribute('disabled');
   el.toolbar.removeAttribute('disabled');
 
-  OPTS.html = document.querySelector('main').innerHTML;
-  store.set(OPTS, () => {
-    el.body.classList.remove('editing');
-    feedback('Saved');
-  });
+
+  el.body.classList.remove('editing');
+  saveChanges();
 
   flash(el.editing);
   el.editing = null;
 }
 
+function saveChanges() {
+  OPTS.backup = OPTS.html;
+
+  const html = document.querySelector('main').innerHTML;
+  const tree = treeFromHTML(html);
+  removeFavicons(tree);
+  cleanTree(tree);
+
+  OPTS.html = tree.body.innerHTML;
+  store.set(OPTS, () => feedback('Saved'));
+}
+
+function cleanTree(tree) {
+  const all = tree.querySelectorAll('section, a');
+  for (const e of all) {
+    if (e.classList.length === 0) {
+      e.removeAttribute('class');
+    }
+  }
+}
+
+
+function treeFromHTML(html) {
+  const parser = new DOMParser();
+  return parser.parseFromString(html, 'text/html');
+}
 
 function makeVisible() {
   el.main.classList.add('visible');
@@ -249,11 +288,6 @@ function addAnchorListeners(a) {
   a.addEventListener('mouseleave', linkHoverOut);
 }
 
-function updateConfig() {
-  OPTS.backup = OPTS.html;
-  OPTS.html = document.querySelector('main').innerHTML;
-  store.set(OPTS, () => feedback('OK'));
-}
 
 /* For a given elem, if it's not a container element, return its parent. */
 function findNav(elem) {
@@ -421,14 +455,14 @@ function dragDrop(e) {
   dragging.classList.remove('fresh');
   if (e.target === el.bin) {
     el.trash.lastElementChild.append(dragging);
-    updateConfig();
+    saveChanges();
     feedback(dragging.textContent + ' moved to trash.');
   } else {
     if (!dragStartedOnThisPage) {
       extractDataFromDrop(e);
     }
     // handle all cases
-    updateConfig();
+    saveChanges();
   }
   original.parent = null;
   original.sibling = null;
@@ -471,7 +505,7 @@ function toggleBookmarks() {
   OPTS.showBookmarksSidebar = !OPTS.showBookmarksSidebar;
   prepareBookmarks(OPTS, el.aside);
   showBookmarks(OPTS.showBookmarksSidebar);
-  updateConfig();
+  saveChanges();
 }
 
 function showBookmarks(visible = true) {
@@ -513,12 +547,12 @@ const toggleFold = e => {
   if (foldMe === el.trash) {
     feedback('Trash panel hidden.');
     toggleTrash();
-    updateConfig();
+    saveChanges();
     return;
   }
   if (foldMe.tagName === 'SECTION') {
     foldMe.classList.toggle('folded');
-    updateConfig();
+    saveChanges();
   }
 };
 
@@ -614,6 +648,7 @@ async function prepareAll() {
   prepareBookmarks(OPTS, el.aside);
   prepareDrag();
   prepareFoldables();
+  prepareFavicons();
   prepareTrash();
   makeVisible();
   feedback('Structured Start Tab - Ready');

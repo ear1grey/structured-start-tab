@@ -359,3 +359,9 @@ main.editing a:hover:not(.dragging) {
 footer {
     background: var(--bg-light);
 }
+
+.favicon {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+}
