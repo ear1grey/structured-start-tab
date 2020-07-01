@@ -226,7 +226,7 @@ export function buildBookmarks(data, target, count) {
   for (const x of data) {
     if (count === 0) break;
 
-    const indoc = document.querySelector(`[href="${x.url}"]`);
+    const indoc = document.querySelector(`[data-href="${x.url}"]`);
     if (indoc || x.dateAdded < Date.now() - twoWeeks) {
       // bookmark is already in doc, or its older
       // than three weeks, so skip it.
