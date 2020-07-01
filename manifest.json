@@ -7,7 +7,8 @@
 
     "permissions": [
         "storage",
-        "bookmarks"
+        "bookmarks",
+        "chrome://favicon/"
     ],
     "icons": {
         "16": "app/style/i/16.png",
