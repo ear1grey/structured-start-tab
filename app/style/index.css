@@ -374,6 +374,16 @@ footer {
   margin-right: var(--small);
 }
 
+.new {
+  cursor: copy;
+}
+
+#toolbar>a,
+#bin {
+  cursor: pointer;
+}
+
+
 [data-size="1"] { flex-grow: 1; }
 [data-size="2"] { flex-grow: 2; }
 [data-size="3"] { flex-grow: 3; }
