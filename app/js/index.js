@@ -652,9 +652,14 @@ function prepareCSSVariables(OPTS) {
 }
 
 function prepareDynamicFlex(where) {
-  const topLevelSections = where.querySelectorAll(':scope > section');
-  for (const child of topLevelSections) {
-    calculateDynamicFlex(child);
+  if (OPTS.proportionalSections) {
+    const topLevelSections = where.querySelectorAll(':scope > section');
+    for (const child of topLevelSections) {
+      calculateDynamicFlex(child);
+    }
+  } else {
+    const elems = el.main.querySelectorAll('[data-size]');
+    elems.forEach(el => { el.removeAttribute('data-size'); });
   }
 }
 
@@ -679,8 +684,6 @@ function calculateDynamicFlex(where) {
   }
   return total;
 }
-
-
 
 async function prepareAll() {
   await loadOptionsWithPromise();
