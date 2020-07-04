@@ -4,7 +4,7 @@
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
 import { OPTS } from './defaults.mjs'; const STORE = chrome.storage.local;
 
-function afterSave() {
+export function ok() {
   window.location = 'index.html';
 }
 
@@ -16,8 +16,8 @@ function getRadio(what) {
   OPTS[what] = document.getElementById(what).checked;
 }
 
-function setValue(prefs, what) {
-  document.getElementById(what).value = prefs[what];
+function setValue(prefs, what, defaultValue = 0) {
+  document.getElementById(what).value = prefs[what] || defaultValue;
 }
 
 function getValue(what) {
@@ -45,35 +45,116 @@ export function loadOptionsWithPromise() {
 function updatePrefsWithPage() {
   getRadio('showBookmarksSidebar');
   getValue('showBookmarksLimit');
-  getValue('html');
+  getValue('space');
+  getValue('fontsize');
 }
 
 function updatePageWithPrefs(prefs) {
   setRadio(prefs, 'showBookmarksSidebar');
   setValue(prefs, 'showBookmarksLimit');
-  setValue(prefs, 'html');
-  document.getElementById('showBookmarksSidebar').checked = prefs.showBookmarksSidebar;
-  document.getElementById('showBookmarksLimit').value = prefs.showBookmarksLimit;
+  setValue(prefs, 'space');
+  setValue(prefs, 'fontsize');
 }
 
+function cloneTemplate(selector) {
+  const template = document.querySelector(selector);
+  return document.importNode(template.content, true);
+}
 
-export function prepareBackup(OPTS) {
-  const html = document.getElementById('html');
+/**
+ * Creates a new 'option' based on a template.
+  * @param where - where to insert the option
+  * @param type - which template to use
+  * @param attrs - to be added to the input element (e.g. max, min)
+  * @param txt - text for the label
+  */
+function create(where, type, attrs, txt) {
+  let elem = cloneTemplate('#template_' + type);
+  where.append(elem);
+  elem = where.lastElementChild;
+  elem.setAttribute('for', attrs.id);
+  const input = elem.querySelector('[name=input]');
+  for (const [attr, val] of Object.entries(attrs)) {
+    input[attr] = val;
+  }
+  if (txt) {
+    elem.querySelector('[name=text]').textContent = txt;
+  }
+  elem.addEventListener('change', saveOptions);
+
+  return elem;
+}
+
+function createPageWithPrefs(prefs) {
+  const settings = document.querySelector('#settings');
+  create(settings, 'checkbox', { id: 'showBookmarksSidebar' }, 'Include a sidebar of most recent bookmarks.');
+  create(settings, 'number', { id: 'showBookmarksLimit' }, 'Number of recent bookmarks to show.');
+  create(settings, 'range', { id: 'space', max: 200, min: 0, step: 5 }, 'Space between items.');
+  create(settings, 'range', { id: 'fontsize', max: 150, min: 50, step: 10 }, 'Adjust font size.');
+  updatePageWithPrefs(prefs);
+}
+
+function exportHTML() {
+  const now = (new Date()).toISOString().slice(0, 10).replace(/-/g, '_');
   const el = document.createElement('a');
-  el.textContent = 'backup this file';
   el.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(OPTS.html));
-  el.setAttribute('download', 'sst_backup_' + new Date().toISOString() + '.html');
-  html.insertAdjacentElement('afterend', el);
+  el.setAttribute('download', `sst_backup_${now}.html`);
+  el.click();
 }
 
+function importHTML() {
+  document.querySelector('#fileupload').click();
+}
+
+function importLoadedFile(file) {
+  OPTS.backup = OPTS.html;
+  OPTS.html = file.target.result;
+  saveOptions();
+}
+
+function upload(file) {
+  if (file) {
+    const reader = new FileReader();
+    reader.addEventListener('load', importLoadedFile);
+    reader.readAsText(file);
+    console.log('loading');
+  }
+}
+
+function uploadFile(e) {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  upload(file);
+}
+
+function uploadFiles(e) {
+  e.preventDefault();
+  const file = e.target.files[0];
+  upload(file);
+}
+
+
+function prepareListeners() {
+  document.getElementById('ok').addEventListener('click', ok);
+  document.getElementById('export').addEventListener('click', exportHTML);
+  document.getElementById('import').addEventListener('click', importHTML);
+
+  const importDropZone = document.getElementById('importdropzone');
+  importDropZone.addEventListener('dragover', e => e.preventDefault());
+  importDropZone.addEventListener('drop', uploadFile);
+
+  const fileupload = document.getElementById('fileupload');
+  fileupload.addEventListener('change', uploadFiles, false);
+}
 
 export async function loadOptions() {
   await loadOptionsWithPromise();
-  updatePageWithPrefs(OPTS);
-  prepareBackup(OPTS);
+  createPageWithPrefs(OPTS);
+  prepareListeners();
 }
 
 export function saveOptions() {
+  console.log('saving');
   updatePrefsWithPage();
-  STORE.set(OPTS, afterSave);
+  STORE.set(OPTS);
 }

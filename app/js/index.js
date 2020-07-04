@@ -640,12 +640,18 @@ export function prepareDrag() {
   document.addEventListener('dragenter', dragEnter);
 }
 
+function prepareCSSVariables(OPTS) {
+  document.documentElement.style.setProperty('--tiny', Number(OPTS.space) / 1000 + 'em');
+  document.documentElement.style.setProperty('--page-font-size', Number(OPTS.fontsize) + '%');
+}
+
 
 async function prepareAll() {
   await loadOptionsWithPromise();
   el = prepareElements('[id], body, main, aside, footer, #trash, #toolbar');
   prepareContent(OPTS.html);
   prepareBookmarks(OPTS, el.aside);
+  prepareCSSVariables(OPTS);
   prepareDrag();
   prepareFoldables();
   prepareFavicons();

@@ -1,4 +1,11 @@
+@import url("vars.css");
+
+:root {
+  font-size: var(--page-font-size);
+}
+
 body {
+  font-size: var(--page-font-size);
   background: var(--bg-mid);
   color: var(--fg-mid);
   display: flex;
@@ -27,36 +34,37 @@ header h1 {
   display: inline-block;
 }
 
-input[type=number] {
-  width: 4em;
-}
-
 label {
   padding: var(--medium);
-  margin-top: 1em;
+  margin: var(--small);
   display: flex;
   flex-direction: row-reverse;
   border: solid thin var(--bg-dark);
   border-radius: var(--small);
   text-align: left;
+  background: var(--overlay-light);
 }
 
 label>input {
   width: auto;
 }
 
+label>input[type=number] {
+  width: 3rem;
+  height: 3rem;
+  font-size: 125%;
+  text-align: end;
+  padding: 0;
+}
+
+label>input[type=range] {
+  width: 50%;
+  background: var(--key-col);
+}
+
 label>input[type=checkbox] {
-  width: 6em;
-}
-
-label>input[type=checkbox]:after {
-  margin-left: -0.5em;
-  height: 100%;
-  content: url(i/off.svg);
-}
-
-label>input[type=checkbox]:checked:after {
-  content: url(i/on.svg);
+  width: 3rem;
+  height: 3rem;
 }
 
 
@@ -68,9 +76,51 @@ label>p {
   flex-direction: column;
 }
 
-#save {
-  font-size: 150%;
-  margin-top: var(--large);
+button {
+  flex-grow: 0;
+  font-size: 125%;
   padding: var(--large);
+  border: none;
+  border-radius: var(--small);
+  background: var(--key-col);
+  color: var(--key-col-inv);
+  min-width: 6rem;
+  margin-left: 1em;
 }
 
+input[type="file"] {
+  display: contents;
+  visibility: hidden;
+}
+
+button:hover {
+  filter: brightness(150%);
+}
+
+
+section {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  align-content: flex-start;
+  background: var(--overlay-dark);
+  border: solid thin var(--fg-light-alpha);
+  flex-direction: column;
+  margin: var(--medium);
+  padding: var(--medium);
+  border-radius: var(--medium);
+}
+
+section div {
+  width: auto;
+  flex-grow: 1;
+  text-align: left;
+}
+
+section section {
+  margin: var(--small);
+  flex-direction: row;
+  border-radius: var(--small);
+  width: auto;
+  background: var(--overlay-light);
+}

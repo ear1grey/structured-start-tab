@@ -1,4 +1,3 @@
-import { loadOptions, saveOptions } from './options.mjs';
+import { loadOptions } from './options.mjs';
 
-document.addEventListener('DOMContentLoaded', loadOptions);
-document.getElementById('save').addEventListener('click', saveOptions);
+window.addEventListener('load', loadOptions);

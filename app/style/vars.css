@@ -26,7 +26,11 @@
 
   --bg-drop: #C00;
   --fg-drop: #FFF;
-
+  
+  --key-col:  #06C;
+  --key-col-inv:  #FFF;
+  
+  
   --overlay-light: rgba(255,255,255,0.5);
   --overlay-mid: rgba(255,255,255,0.3);
   --overlay-dark: rgba(0,0,0,0.2);
