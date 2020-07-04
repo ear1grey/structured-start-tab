@@ -585,13 +585,18 @@ function prepareListeners() {
 }
 
 function prepareContent(html) {
-  // 6 lines to do the same as innerHTML - keeps mozilla happy
   const parser = new DOMParser();
   const tempdoc = parser.parseFromString(html, 'text/html');
   const topLevel = tempdoc.querySelectorAll('body>*');
+  // clean page
+  while (el.main.firstElementChild) {
+    el.main.firstElementChild.remove();
+  }
+  // populate page
   for (const elem of topLevel) {
     el.main.append(elem);
   }
+  prepareFavicons();
   prepareListeners();
 }
 
@@ -654,7 +659,6 @@ async function prepareAll() {
   prepareCSSVariables(OPTS);
   prepareDrag();
   prepareFoldables();
-  prepareFavicons();
   prepareTrash();
   makeVisible();
   feedback('Structured Start Tab - Ready');
