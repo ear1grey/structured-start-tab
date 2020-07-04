@@ -4,6 +4,7 @@
 // eslint-disable-next-line import/prefer-default-export
 export const OPTS = {
   storage: 'local',
+  proportionalSections: true,
   showBookmarksSidebar: false,
   showBookmarksLimit: 20,
   space: 100,
