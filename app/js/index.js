@@ -554,6 +554,7 @@ const toggleFold = e => {
     foldMe.classList.toggle('folded');
     saveChanges();
   }
+  prepareDynamicFlex(el.main);
 };
 
 function editSection(e) {
@@ -650,6 +651,36 @@ function prepareCSSVariables(OPTS) {
   document.documentElement.style.setProperty('--page-font-size', Number(OPTS.fontsize) + '%');
 }
 
+function prepareDynamicFlex(where) {
+  const topLevelSections = where.querySelectorAll(':scope > section');
+  for (const child of topLevelSections) {
+    calculateDynamicFlex(child);
+  }
+}
+
+function calculateDynamicFlex(where) {
+  console.log(where.firstElementChild.textContent);
+  let total = 0;
+  const nav = where.querySelector('nav');
+  for (const child of nav.children) {
+    if (child.tagName === 'SECTION') {
+      if (child.classList.contains('folded')) {
+        total += 1;
+      } else {
+        total += Math.max(1, calculateDynamicFlex(child));
+      }
+    }
+    if (child.tagName === 'A') {
+      total += 1;
+    }
+  }
+  if (where.tagName === 'SECTION') {
+    where.dataset.size = total;
+  }
+  return total;
+}
+
+
 
 async function prepareAll() {
   await loadOptionsWithPromise();
@@ -661,6 +692,7 @@ async function prepareAll() {
   prepareFoldables();
   prepareTrash();
   makeVisible();
+  prepareDynamicFlex(el.main);
   feedback('Structured Start Tab - Ready');
 }
 

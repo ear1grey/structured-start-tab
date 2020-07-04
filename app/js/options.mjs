@@ -44,6 +44,7 @@ export function loadOptionsWithPromise() {
 // the OPTS object that gets stored.
 function updatePrefsWithPage() {
   getRadio('showBookmarksSidebar');
+  getRadio('proportionalSections');
   getValue('showBookmarksLimit');
   getValue('space');
   getValue('fontsize');
@@ -51,6 +52,7 @@ function updatePrefsWithPage() {
 
 function updatePageWithPrefs(prefs) {
   setRadio(prefs, 'showBookmarksSidebar');
+  setRadio(prefs, 'proportionalSections');
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
   setValue(prefs, 'fontsize');
@@ -87,6 +89,7 @@ function create(where, type, attrs, txt) {
 
 function createPageWithPrefs(prefs) {
   const settings = document.querySelector('#settings');
+  create(settings, 'checkbox', { id: 'proportionalSections' }, 'Proportional Sections.');
   create(settings, 'checkbox', { id: 'showBookmarksSidebar' }, 'Include a sidebar of most recent bookmarks.');
   create(settings, 'number', { id: 'showBookmarksLimit' }, 'Number of recent bookmarks to show.');
   create(settings, 'range', { id: 'space', max: 200, min: 0, step: 5 }, 'Space between items.');
