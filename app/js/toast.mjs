@@ -1,4 +1,4 @@
-import { OPTS } from "./defaults.mjs";
+import { OPTS } from './defaults.mjs';
 
 export function popup(msg) {
   if (OPTS.showToast > 0) {
@@ -8,7 +8,7 @@ export function popup(msg) {
     div.addEventListener('click', e => e.target.remove());
     div.addEventListener('webkitAnimationEnd', e => e.target.remove());
     div.textContent = msg;
-    document.querySelector('#toast').append(div);  
+    document.querySelector('#toast').append(div);
   }
 }
 
