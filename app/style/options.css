@@ -1,4 +1,5 @@
 @import url("vars.css");
+@import url("toast.css");
 
 :root {
   font-size: var(--page-font-size);

@@ -1,0 +1,27 @@
+.toast {
+  border-radius: 0.5rem;
+  background: #b3ffb3cd;
+  margin: 0.25rem 0.5rem;
+  animation: var(--toast-time) ease-in-out anim_open_flex forwards;
+  padding: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0em 0.5rem 0.5rem #0003;
+}
+
+#toast {
+  position: fixed;
+  bottom: 4rem;
+  right: 0;
+  width: 20em;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  justify-content: flex-end;
+}
+
+@keyframes anim_open_flex {
+  0%   { flex: 0; opacity: 0;}
+  5%   { flex: 1; opacity: 1;}
+  95%   { flex: 1; opacity: 1;}
+  100%   { flex: 0; opacity: 0;}
+ }

@@ -2,7 +2,10 @@
 
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
-import { OPTS } from './defaults.mjs'; const STORE = chrome.storage.local;
+import { OPTS } from './defaults.mjs';
+import * as toast from './toast.mjs';
+
+const STORE = chrome.storage.local;
 
 export function ok() {
   window.location = 'index.html';
@@ -43,6 +46,7 @@ export function loadOptionsWithPromise() {
 // incorporate the latest values of the page into
 // the OPTS object that gets stored.
 function updatePrefsWithPage() {
+  getValue('showToast');
   getRadio('showBookmarksSidebar');
   getRadio('proportionalSections');
   getValue('showBookmarksLimit');
@@ -51,6 +55,7 @@ function updatePrefsWithPage() {
 }
 
 function updatePageWithPrefs(prefs) {
+  setValue(prefs, 'showToast');
   setRadio(prefs, 'showBookmarksSidebar');
   setRadio(prefs, 'proportionalSections');
   setValue(prefs, 'showBookmarksLimit');
@@ -89,6 +94,7 @@ function create(where, type, attrs, txt) {
 
 function createPageWithPrefs(prefs) {
   const settings = document.querySelector('#settings');
+  create(settings, 'number', { id: 'showToast' }, 'Time (in seconds) each feedback message is shown.   Setting this to zero will disable messages.');
   create(settings, 'checkbox', { id: 'proportionalSections' }, 'Proportional Sections.');
   create(settings, 'checkbox', { id: 'showBookmarksSidebar' }, 'Include a sidebar of most recent bookmarks.');
   create(settings, 'number', { id: 'showBookmarksLimit' }, 'Number of recent bookmarks to show.');
@@ -154,10 +160,13 @@ export async function loadOptions() {
   await loadOptionsWithPromise();
   createPageWithPrefs(OPTS);
   prepareListeners();
+  toast.prepare();
+  toast.popup('Options Page Ready');
+
 }
 
 export function saveOptions() {
   console.log('saving');
   updatePrefsWithPage();
-  STORE.set(OPTS);
+  STORE.set(OPTS, () => toast.popup('Option change stored.'));
 }

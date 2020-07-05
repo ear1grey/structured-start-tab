@@ -1,5 +1,6 @@
 import { loadOptionsWithPromise } from './options.mjs';
 import { OPTS } from './defaults.mjs';
+import * as toast from './toast.mjs';
 
 const store = chrome.storage[OPTS.storage];
 const oneDay = 1000 * 60 * 60 * 24;
@@ -15,7 +16,7 @@ const getValue = (where) => document.querySelector(where).value;
 
 function linkClicked(e) {
   if (el.body.classList.contains('editing')) {
-    return feedback("You can't follow a link whilst editing something else.");
+    return toast.popup("You can't follow a link whilst editing something else.");
   }
   e.preventDefault();
   if (e.shiftKey) {
@@ -26,13 +27,14 @@ function linkClicked(e) {
 }
 
 function linkHover(e) {
-  e.currentTarget.dataset.feedback = feedback(e.target.dataset.info || e.target.dataset.href);
+  if (e.target.dataset.info) {
+    toast.popup(e.target.dataset.info);
+  }
+  feedback(e.target.dataset.href);
 }
 
 function linkHoverOut(e) {
-  const f = document.querySelector('#' + e.currentTarget.dataset.feedback);
-  if (f) f.remove();
-  delete e.currentTarget.dataset.feedback;
+  feedback('');
 }
 
 
@@ -82,7 +84,7 @@ function editCancel() {
     flash(el.editing);
     el.editing = null;
 
-    feedback('Edit cancelled.');
+    toast.popup('Edit cancelled.');
   }
 }
 
@@ -151,7 +153,7 @@ function saveChanges() {
   cleanTree(tree);
 
   OPTS.html = tree.body.innerHTML;
-  store.set(OPTS, () => feedback('Saved'));
+  store.set(OPTS, () => toast.popup('Saved'));
 }
 
 function cleanTree(tree) {
@@ -200,7 +202,7 @@ function detectKeydown(e) {
     }
     store.set(OPTS, () => {
       prepareContent(OPTS.html);
-      feedback('Undo');
+      toast.popup('Previous layout reinstated.');
     });
   }
 
@@ -235,20 +237,8 @@ function addPanel() {
   return div;
 }
 
-
-let lastMessage = '';
-let feedbackSeries = 0;
-
 function feedback(msg) {
-  if (msg && msg !== lastMessage) {
-    const p = document.createElement('p');
-    p.textContent = msg;
-    p.id = `f_${feedbackSeries++}`;
-    window.setTimeout(() => { if (p) p.remove(); }, 5000);
-    el.status.append(p);
-    lastMessage = msg;
-    return p.id;
-  }
+  el.status.textContent = msg;
 }
 
 
@@ -367,19 +357,19 @@ function dragStart(e) {
       dummy = createExampleLink();
       dummy.classList.add('dragging');
       dragging = dummy;
-      feedback('Drop in page to add link...');
+      toast.popup('Drop in page to add link...');
     } else {
       dummy = addPanel();
       dummy.classList.add('dragging');
       dragging = dummy;
-      feedback('Drop section where you want it...');
+      toast.popup('Drop section where you want it...');
     }
   } else {
     dragging = e.target;
     dragging.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.dropEffect = 'move';
-    feedback('Moving link... drop in page or cancel with Escape key.');
+    toast.popup('Moving link... drop in page or cancel with Escape key.');
   }
   original.parent = e.target.parentElement;
   original.sibling = e.target.nextElementSibling;
@@ -416,7 +406,7 @@ function dragOver(e) {
     }
     if (e.target === el.bin) { // gotta allow bin drops too
       e.preventDefault();
-      feedback('Drop here to delete the item.');
+      toast.popup('Drop here to delete the item.');
     }
   }
 }
@@ -437,7 +427,7 @@ function extractDataFromDrop(e) {
       url = u.toString();
       text = url;
     } catch (e) {
-      feedback('Not a link or URL.');
+      toast.popup('Not a link or URL.');
     }
   }
   if (url) {
@@ -456,7 +446,7 @@ function dragDrop(e) {
   if (e.target === el.bin) {
     el.trash.lastElementChild.append(dragging);
     saveChanges();
-    feedback(dragging.textContent + ' moved to trash.');
+    toast.popup(dragging.textContent + ' moved to trash.');
   } else {
     if (!dragStartedOnThisPage) {
       extractDataFromDrop(e);
@@ -484,7 +474,7 @@ function dragEnd(e) {
     } else {
       replaceElementInOriginalPosition();
     }
-    feedback('Cancelled.');
+    toast.popup('Drag cancelled.');
     dummy = null;
   }
   dragStartedOnThisPage = false;
@@ -545,7 +535,7 @@ const toggleFold = e => {
   if (el.body.classList.contains('editing')) return;
   const foldMe = findParentSection(e.target);
   if (foldMe === el.trash) {
-    feedback('Trash panel hidden.');
+    toast.popup('Trash panel hidden.');
     toggleTrash();
     saveChanges();
     return;
@@ -664,7 +654,6 @@ function prepareDynamicFlex(where) {
 }
 
 function calculateDynamicFlex(where) {
-  console.log(where.firstElementChild.textContent);
   let total = 0;
   const nav = where.querySelector('nav');
   for (const child of nav.children) {
@@ -685,9 +674,10 @@ function calculateDynamicFlex(where) {
   return total;
 }
 
+
 async function prepareAll() {
   await loadOptionsWithPromise();
-  el = prepareElements('[id], body, main, aside, footer, #trash, #toolbar');
+  el = prepareElements('[id], body, main, aside, footer, #trash, #toolbar, #toast');
   prepareContent(OPTS.html);
   prepareBookmarks(OPTS, el.aside);
   prepareCSSVariables(OPTS);
@@ -696,7 +686,8 @@ async function prepareAll() {
   prepareTrash();
   makeVisible();
   prepareDynamicFlex(el.main);
-  feedback('Structured Start Tab - Ready');
+  toast.prepare();
+  toast.popup('Structured Start Tab - Ready');
 }
 
 window.addEventListener('DOMContentLoaded', prepareAll);
