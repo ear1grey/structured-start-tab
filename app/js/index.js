@@ -465,6 +465,8 @@ function dragEnd(e) {
   el.body.classList.remove('dragOngoing');
   el.bin.classList.remove('over');
   if (dragging) {
+    dragging.classList.remove('dragging');
+    dragging.classList.remove('fresh');
     // event must have been cancelled because `dragging` should be reset on drop
     if (e.srcElement.classList.contains('new')) {
       if (dummy) {
