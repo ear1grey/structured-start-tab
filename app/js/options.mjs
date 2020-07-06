@@ -164,7 +164,6 @@ export async function loadOptions() {
   createPageWithPrefs(OPTS);
   prepareListeners();
   toast.prepare();
-  toast.popup('Options Page Ready');
 }
 
 export function saveOptions() {

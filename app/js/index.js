@@ -688,7 +688,6 @@ async function prepareAll() {
   prepareDynamicFlex(el.main);
   tooltip.prepare(OPTS);
   toast.prepare();
-  toast.popup('Structured Start Tab - Ready');
 }
 
 window.addEventListener('DOMContentLoaded', prepareAll);
