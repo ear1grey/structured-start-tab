@@ -4,7 +4,6 @@
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
 import { OPTS } from './defaults.mjs';
 import * as toast from './toast.mjs';
-import * as tooltip from './tooltip.mjs';
 
 const STORE = chrome.storage.local;
 

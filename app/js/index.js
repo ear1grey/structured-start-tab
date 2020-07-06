@@ -31,7 +31,7 @@ function linkHover(e) {
   feedback(e.target.dataset.href);
 }
 
-function linkHoverOut(e) {
+function linkHoverOut() {
   feedback('');
 }
 
