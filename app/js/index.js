@@ -1,6 +1,7 @@
 import { loadOptionsWithPromise } from './options.mjs';
 import { OPTS } from './defaults.mjs';
 import * as toast from './toast.mjs';
+import * as tooltip from './tooltip.mjs';
 
 const store = chrome.storage[OPTS.storage];
 const oneDay = 1000 * 60 * 60 * 24;
@@ -27,9 +28,6 @@ function linkClicked(e) {
 }
 
 function linkHover(e) {
-  if (e.target.dataset.info) {
-    toast.popup(e.target.dataset.info);
-  }
   feedback(e.target.dataset.href);
 }
 
@@ -688,6 +686,7 @@ async function prepareAll() {
   prepareTrash();
   makeVisible();
   prepareDynamicFlex(el.main);
+  tooltip.prepare(OPTS);
   toast.prepare();
   toast.popup('Structured Start Tab - Ready');
 }

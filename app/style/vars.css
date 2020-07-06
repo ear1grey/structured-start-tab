@@ -3,6 +3,8 @@
   --page-font: sans-serif;
   --page-font-size: 100%;
   --toast-time: 3s;
+  --tool-tip-top: 0;
+  --tool-tip-left: 0;
 
   /* Sizes */
 
@@ -55,7 +57,7 @@
     --fg-dark: #BBB; 
     --fg-mid: #DDD;
     --fg-light: #FFF;
-    --fg-light-alpha: #FFF7;
+    --fg-light-alpha: #0005;
 
     --bg-drop: #A00;
     --fg-drop: #CCC;  

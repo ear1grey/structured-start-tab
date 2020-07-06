@@ -1,6 +1,6 @@
 .toast {
   border-radius: 0.5rem;
-  background: #b3ffb3cd;
+  background: var(--fresh);
   margin: 0.25rem 0.5rem;
   animation: var(--toast-time) ease-in-out anim_open_flex forwards;
   padding: 0.5rem;

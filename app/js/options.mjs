@@ -4,6 +4,7 @@
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
 import { OPTS } from './defaults.mjs';
 import * as toast from './toast.mjs';
+import * as tooltip from './tooltip.mjs';
 
 const STORE = chrome.storage.local;
 
@@ -48,6 +49,7 @@ export function loadOptionsWithPromise() {
 function updatePrefsWithPage() {
   getValue('showToast');
   getRadio('showBookmarksSidebar');
+  getRadio('showToolTips');
   getRadio('proportionalSections');
   getValue('showBookmarksLimit');
   getValue('space');
@@ -57,6 +59,7 @@ function updatePrefsWithPage() {
 function updatePageWithPrefs(prefs) {
   setValue(prefs, 'showToast');
   setRadio(prefs, 'showBookmarksSidebar');
+  setRadio(prefs, 'showToolTips');
   setRadio(prefs, 'proportionalSections');
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
@@ -97,6 +100,7 @@ function createPageWithPrefs(prefs) {
   create(settings, 'number', { id: 'showToast' }, 'Time (in seconds) each feedback message is shown.   Setting this to zero will disable messages.');
   create(settings, 'checkbox', { id: 'proportionalSections' }, 'Proportional Sections.');
   create(settings, 'checkbox', { id: 'showBookmarksSidebar' }, 'Include a sidebar of most recent bookmarks.');
+  create(settings, 'checkbox', { id: 'showToolTips' }, 'Show helpful tooltips when hovering over things.');
   create(settings, 'number', { id: 'showBookmarksLimit' }, 'Number of recent bookmarks to show.');
   create(settings, 'range', { id: 'space', max: 200, min: 0, step: 5 }, 'Space between items.');
   create(settings, 'range', { id: 'fontsize', max: 150, min: 50, step: 10 }, 'Adjust font size.');

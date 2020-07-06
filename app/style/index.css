@@ -1,5 +1,6 @@
 @import url("vars.css");
 @import url("toast.css");
+@import url("tooltip.css");
 
 :root {
   font-size: var(--page-font-size);

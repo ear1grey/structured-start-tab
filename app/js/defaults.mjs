@@ -5,6 +5,7 @@
 export const OPTS = {
   storage: 'local',
   showToast: 5,
+  showToolTips: true,
   proportionalSections: true,
   showBookmarksSidebar: false,
   showBookmarksLimit: 20,
