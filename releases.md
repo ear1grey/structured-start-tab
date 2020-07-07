@@ -4,6 +4,7 @@ Every release for the foreseeable future will be an alpha level release.  This m
 
 ## Alpha Releases
 
+* 1.3.1 https://github.com/ear1grey/structured-start-tab/milestone/10?closed=1
 * 1.3.0 https://github.com/ear1grey/structured-start-tab/milestone/6?closed=1
 * 1.2.0 https://github.com/ear1grey/structured-start-tab/milestone/4?closed=1
 * 1.1.8 https://github.com/ear1grey/structured-start-tab/milestone/7?closed=1
