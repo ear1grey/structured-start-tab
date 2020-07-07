@@ -11,11 +11,11 @@ export function ok() {
   window.location = 'index.html';
 }
 
-function setRadio(prefs, what) {
+function setCheckBox(prefs, what) {
   document.getElementById(what).checked = prefs[what];
 }
 
-function getRadio(what) {
+function getCheckBox(what) {
   OPTS[what] = document.getElementById(what).checked;
 }
 
@@ -46,20 +46,22 @@ export function loadOptionsWithPromise() {
 // incorporate the latest values of the page into
 // the OPTS object that gets stored.
 function updatePrefsWithPage() {
+  getCheckBox('lock');
+  getCheckBox('showBookmarksSidebar');
+  getCheckBox('showToolTips');
+  getCheckBox('proportionalSections');
   getValue('showToast');
-  getRadio('showBookmarksSidebar');
-  getRadio('showToolTips');
-  getRadio('proportionalSections');
   getValue('showBookmarksLimit');
   getValue('space');
   getValue('fontsize');
 }
 
 function updatePageWithPrefs(prefs) {
+  setCheckBox(prefs, 'lock');
+  setCheckBox(prefs, 'showBookmarksSidebar');
+  setCheckBox(prefs, 'showToolTips');
+  setCheckBox(prefs, 'proportionalSections');
   setValue(prefs, 'showToast');
-  setRadio(prefs, 'showBookmarksSidebar');
-  setRadio(prefs, 'showToolTips');
-  setRadio(prefs, 'proportionalSections');
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
   setValue(prefs, 'fontsize');
@@ -96,11 +98,12 @@ function create(where, type, attrs, txt) {
 
 function createPageWithPrefs(prefs) {
   const settings = document.querySelector('#settings');
+  create(settings, 'checkbox', { id: 'lock' }, 'Lock page.', 'When locked, no drags can occur and no new links can be added.');
+  create(settings, 'checkbox', { id: 'showBookmarksSidebar' }, 'Include a sidebar of most recent bookmarks.');
+  create(settings, 'number', { id: 'showBookmarksLimit' }, 'Number of recent bookmarks to show.');
+  create(settings, 'checkbox', { id: 'showToolTips' }, 'Show helpful tooltips when hovering over things.');
   create(settings, 'number', { id: 'showToast' }, 'Time (in seconds) each feedback message is shown.   Setting this to zero will disable messages.');
   create(settings, 'checkbox', { id: 'proportionalSections' }, 'Proportional Sections.');
-  create(settings, 'checkbox', { id: 'showBookmarksSidebar' }, 'Include a sidebar of most recent bookmarks.');
-  create(settings, 'checkbox', { id: 'showToolTips' }, 'Show helpful tooltips when hovering over things.');
-  create(settings, 'number', { id: 'showBookmarksLimit' }, 'Number of recent bookmarks to show.');
   create(settings, 'range', { id: 'space', max: 200, min: 0, step: 5 }, 'Space between items.');
   create(settings, 'range', { id: 'fontsize', max: 150, min: 50, step: 10 }, 'Adjust font size.');
   updatePageWithPrefs(prefs);
@@ -164,7 +167,6 @@ export async function loadOptions() {
   createPageWithPrefs(OPTS);
   prepareListeners();
   toast.prepare();
-  toast.popup('Options Page Ready');
 }
 
 export function saveOptions() {

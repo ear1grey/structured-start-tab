@@ -125,3 +125,10 @@ section section {
   width: auto;
   background: var(--overlay-light);
 }
+
+#ok {
+  position: absolute;
+  top: var(--medium);
+  left: var(--medium);
+  margin: 0;
+}

@@ -3,10 +3,11 @@ let OPTS;
 
 const gap = 40;
 
-function reposition(e) {
+export function reposition(e, messageOverride) {
   if (!OPTS.showToolTips) return;
 
-  tip.textContent = e.target.dataset.info;
+
+  tip.textContent = messageOverride || e.target.dataset.info;
   tip.style.setProperty('visibility', 'inherit');
 
   let x = e.clientX;
@@ -23,7 +24,7 @@ function reposition(e) {
   document.documentElement.style.setProperty('--tool-tip-top', `${y}px`);
 }
 
-function hide() {
+export function hide() {
   tip.style.setProperty('visibility', 'hidden');
 }
 

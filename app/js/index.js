@@ -23,7 +23,9 @@ function linkClicked(e) {
   if (e.shiftKey) {
     editStart(e.target);
   } else {
-    window.location.href = e.currentTarget.dataset.href;
+    if (e.currentTarget.dataset.href) {
+      window.location.href = e.currentTarget.dataset.href;
+    }
   }
 }
 
@@ -226,11 +228,19 @@ function createExampleLink(text = 'Example', href = 'http://example.org') {
 }
 
 function addLink() {
+  if (OPTS.lock) {
+    toast.popup('Page locked.  Unlock it in the options page.');
+    return;
+  }
   const a = createExampleLink();
   el.main.append(a);
 }
 
 function addPanel() {
+  if (OPTS.lock) {
+    toast.popup('Page locked.  Unlock it in the options page.');
+    return;
+  }
   const div = cloneTemplate('#template_panel', el.main);
   return div;
 }
@@ -394,6 +404,10 @@ function dragEnter() {
 let dragStartedOnThisPage = false;
 /* respond when a drag begins */
 function dragStart(e) {
+  if (OPTS.lock) {
+    toast.popup('Page locked.  Unlock it in the options page.');
+    return;
+  }
   dragStartedOnThisPage = true;
   el.body.classList.add('dragOngoing');
   if (el.body.classList.contains('editing')) return;
@@ -418,6 +432,7 @@ function dragStart(e) {
   }
   original.parent = e.target.parentElement;
   original.sibling = e.target.nextElementSibling;
+  // setDragImage(e);  // <-- not sure I like disabling this or if I want it as an option
 }
 
 function flash(elem) {
@@ -425,8 +440,18 @@ function flash(elem) {
   window.setTimeout(() => { elem.classList.remove('flash'); }, 1000);
 }
 
+function setDragImage(e) {
+  const img = new Image(); 
+  img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+  e.dataTransfer.setDragImage(img, 1, 1);
+}
+
 /* respond if dropping here is ok */
 function dragOver(e) {
+  if (OPTS.lock) {
+    toast.popup('Page locked.  Unlock it in the options page.');
+    return;
+  }
   if (e.target === el.bin) {
     el.bin.classList.add('over');
   } else {
@@ -451,9 +476,10 @@ function dragOver(e) {
     }
     if (e.target === el.bin) { // gotta allow bin drops too
       e.preventDefault();
-      toast.popup('Drop here to delete the item.');
+      tooltip.reposition(e, 'Drop here to delete the item.');
     }
   }
+  prepareDynamicFlex(el.main);
 }
 
 function extractDataFromDrop(e) {
@@ -485,6 +511,10 @@ function extractDataFromDrop(e) {
 }
 
 function dragDrop(e) {
+  if (OPTS.lock) {
+    toast.popup('Page locked.  Unlock it in the options page.');
+    return;
+  }
   e.preventDefault();
   dragging.classList.remove('dragging');
   dragging.classList.remove('fresh');
@@ -507,6 +537,10 @@ function dragDrop(e) {
 
 
 function dragEnd(e) {
+  if (OPTS.lock) {
+    toast.popup('Page locked.  Unlock it in the options page.');
+    return;
+  }
   el.body.classList.remove('dragOngoing');
   el.bin.classList.remove('over');
   if (dragging) {
@@ -525,6 +559,7 @@ function dragEnd(e) {
     dummy = null;
   }
   dragStartedOnThisPage = false;
+  tooltip.hide();
 }
 
 export async function prepareBookmarks(OPTS, target) {
@@ -733,9 +768,9 @@ async function prepareAll() {
   prepareTrash();
   makeVisible();
   prepareDynamicFlex(el.main);
-  tooltip.prepare(OPTS);
   toast.prepare();
-  toast.popup('Structured Start Tab - Ready');
+  feedback('Thank you for using Structured Start Tab');
+  tooltip.prepare(OPTS);
 }
 
 window.addEventListener('DOMContentLoaded', prepareAll);
