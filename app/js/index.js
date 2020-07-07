@@ -440,11 +440,11 @@ function flash(elem) {
   window.setTimeout(() => { elem.classList.remove('flash'); }, 1000);
 }
 
-function setDragImage(e) {
-  const img = new Image(); 
-  img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-  e.dataTransfer.setDragImage(img, 1, 1);
-}
+// function setDragImage(e) {
+//   const img = new Image();
+//   img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+//   e.dataTransfer.setDragImage(img, 1, 1);
+// }
 
 /* respond if dropping here is ok */
 function dragOver(e) {
