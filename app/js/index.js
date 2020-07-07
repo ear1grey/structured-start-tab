@@ -290,12 +290,54 @@ function findNav(elem) {
   throw new Error("can't safely choose container");
 }
 
+/**
+ * recursively search up-tree to find the first parent that
+ * uses display: flex;
+ */
+function findParentWithFlex(elem) {
+  if (elem === document.body) return elem;
+  const style = window.getComputedStyle(elem);
+  const display = style.getPropertyValue('display');
+  return (display === 'flex') ? elem : findParentWithFlex(elem.parentElement);
+}
+
+/**
+ * When called, and passed an event this function will find the
+ * first parent that has a flex direction (row or column) and
+ * accordingly select width or height charactaristics of the target.
+ * The mouse X or Y position within the target are then compared
+ * to the target's width or height.  if the mouse is in the first
+ * half of the element, 'beforebegin' is returned, otherwise 'afterend'
+ */
+function calculatePositionWithinTarget(e) {
+  const parentWithFlex = findParentWithFlex(e.target.parentElement.parentElement);
+  const style = window.getComputedStyle(parentWithFlex);
+  const flexDir = style.getPropertyValue('flex-direction');
+
+  let widthOrHeight, xOrY, offset;
+  if (flexDir === 'row') {
+    widthOrHeight = 'width';
+    xOrY = 'clientX';
+    offset = 'x';
+  } else {
+    widthOrHeight = 'height';
+    xOrY = 'clientY';
+    offset = 'y';
+  }
+
+  const parentRect = e.target.getBoundingClientRect();
+  const width = parentRect[widthOrHeight];
+  const position = e[xOrY] - parentRect[offset];
+
+  return (position * 2 < width) ? 'beforebegin' : 'afterend';
+}
 
 /*
  * add a placeholder element to the position where the
  * current thing would be dropped
  */
-function moveElement(tgt) {
+function moveElement(e) {
+  const tgt = e.target;
   if (dragging === tgt) return; // can't drop on self
 
   const nav = findNav(tgt);
@@ -311,9 +353,14 @@ function moveElement(tgt) {
     if (dragging.contains(tgt)) return; // can't drop *inside* self
     // if (nav.parentElement === dragging) return; // can't drop *inside* self
     // dropping on a heading inserted before that heading's parent
-    if (tgt.tagName === 'H1') return tgt.parentElement.parentElement.insertBefore(dragging, tgt.parentElement);
+    if (tgt.tagName === 'H1') {
+      const beforeOrAfter = calculatePositionWithinTarget(e);
+      return tgt.parentElement.insertAdjacentElement(beforeOrAfter, dragging);
+    }
+
     if (tgt.tagName === 'A') return tgt.insertAdjacentElement(position, dragging);
     if (tgt.tagName === 'MAIN') return nav.append(dragging);
+
     if (nav.children.length === 0) return nav.prepend(dragging);
   }
 }
@@ -388,7 +435,7 @@ function dragOver(e) {
   if (checkDragIsWithin(e.target, el.main)) {
     e.preventDefault();
     if (!el.toolbar.contains(e.target)) {
-      moveElement(e.target);
+      moveElement(e);
     }
   } else {
     // when outside the drop zone, temporary moves are undone
