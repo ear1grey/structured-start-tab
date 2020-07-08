@@ -4,14 +4,15 @@ Every release for the foreseeable future will be an alpha level release.  This m
 
 ## Alpha Releases
 
-* 1.3.1 https://github.com/ear1grey/structured-start-tab/milestone/10?closed=1
-* 1.3.0 https://github.com/ear1grey/structured-start-tab/milestone/6?closed=1
-* 1.2.0 https://github.com/ear1grey/structured-start-tab/milestone/4?closed=1
-* 1.1.8 https://github.com/ear1grey/structured-start-tab/milestone/7?closed=1
-* 1.1.7 https://github.com/ear1grey/structured-start-tab/milestone/3?closed=1
-* 1.1.6 https://github.com/ear1grey/structured-start-tab/milestone/2?closed=1
-* 1.1.5 https://github.com/ear1grey/structured-start-tab/milestone/1?closed=1
-* 1.1.4 https://github.com/ear1grey/structured-start-tab/milestone/5?closed=1
+* 1.4.0 [Options Upgrade](https://github.com/ear1grey/structured-start-tab/milestone/13?closed=1)
+* 1.3.1 [UI Tweaks](https://github.com/ear1grey/structured-start-tab/milestone/10?closed=1)
+* 1.3.0 [Layout & Toast](https://github.com/ear1grey/structured-start-tab/milestone/6?closed=1)
+* 1.2.0 [Options Upgrade](https://github.com/ear1grey/structured-start-tab/milestone/4?closed=1)
+* 1.1.8 [Icons](https://github.com/ear1grey/structured-start-tab/milestone/7?closed=1)
+* 1.1.7 [Minor UX Tweaks](https://github.com/ear1grey/structured-start-tab/milestone/3?closed=1)
+* 1.1.6 [Minor fixes](https://github.com/ear1grey/structured-start-tab/milestone/2?closed=1)
+* 1.1.5 [First Alpha Release](https://github.com/ear1grey/structured-start-tab/milestone/1?closed=1)
+* 1.1.4 Pre Alpha Staging
 * 1.1.3 Panel style editing added
 * 1.1.2 Drag and drop panel creation and nesting
 * 1.1.1 Better default page, better page flow for narrow pages
