@@ -4,12 +4,9 @@
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
 import { OPTS } from './defaults.mjs';
 import * as toast from './toast.mjs';
+import * as util from './util.mjs';
 
 const STORE = chrome.storage.local;
-
-export function ok() {
-  window.location = 'index.html';
-}
 
 function setCheckBox(prefs, what) {
   document.getElementById(what).checked = prefs[what];
@@ -91,21 +88,24 @@ function create(where, type, attrs, txt) {
   if (txt) {
     elem.querySelector('[name=text]').textContent = txt;
   }
-  elem.addEventListener('change', saveOptions);
+  elem.addEventListener('input', saveOptions);
 
   return elem;
 }
 
 function createPageWithPrefs(prefs) {
   const settings = document.querySelector('#settings');
-  create(settings, 'checkbox', { id: 'lock' }, 'Lock page.', 'When locked, no drags can occur and no new links can be added.');
-  create(settings, 'checkbox', { id: 'showBookmarksSidebar' }, 'Include a sidebar of most recent bookmarks.');
-  create(settings, 'number', { id: 'showBookmarksLimit' }, 'Number of recent bookmarks to show.');
-  create(settings, 'checkbox', { id: 'showToolTips' }, 'Show helpful tooltips when hovering over things.');
-  create(settings, 'number', { id: 'showToast' }, 'Time (in seconds) each feedback message is shown.   Setting this to zero will disable messages.');
-  create(settings, 'checkbox', { id: 'proportionalSections' }, 'Proportional Sections.');
-  create(settings, 'range', { id: 'space', max: 200, min: 0, step: 5 }, 'Space between items.');
-  create(settings, 'range', { id: 'fontsize', max: 150, min: 50, step: 10 }, 'Adjust font size.');
+  const layout = create(settings, 'section', {}, 'Layout');
+  const book = create(settings, 'section', {}, 'Bookmarks');
+  const feed = create(settings, 'section', {}, 'Messages & Feedback');
+  create(book, 'checkbox', { id: 'showBookmarksSidebar' }, 'Include a sidebar of most recent bookmarks.');
+  create(book, 'number', { id: 'showBookmarksLimit' }, 'Number of recent bookmarks to show.');
+  create(feed, 'checkbox', { id: 'showToolTips' }, 'Show helpful tooltips when hovering over things.');
+  create(feed, 'number', { id: 'showToast' }, 'Time (in seconds) each feedback message is shown.   Setting this to zero will disable messages.');
+  create(layout, 'checkbox', { id: 'lock' }, 'Lock page.', 'When locked, no drags can occur and no new links can be added.');
+  create(layout, 'checkbox', { id: 'proportionalSections' }, 'Proportional Sections.');
+  create(layout, 'range', { id: 'space', max: 200, min: 0, step: 5 }, 'Space between items.');
+  create(layout, 'range', { id: 'fontsize', max: 150, min: 50, step: 10 }, 'Adjust font size.');
   updatePageWithPrefs(prefs);
 }
 
@@ -150,7 +150,6 @@ function uploadFiles(e) {
 
 
 function prepareListeners() {
-  document.getElementById('ok').addEventListener('click', ok);
   document.getElementById('export').addEventListener('click', exportHTML);
   document.getElementById('import').addEventListener('click', importHTML);
 
@@ -166,6 +165,7 @@ export async function loadOptions() {
   await loadOptionsWithPromise();
   createPageWithPrefs(OPTS);
   prepareListeners();
+  util.prepareCSSVariables(OPTS);
   toast.prepare();
 }
 

@@ -4,7 +4,6 @@
     "name": "Structured Start Tab",
     "description": "Show a structured page when a new tab is opened.",
     "author": "Rich Boakes",
-
     "permissions": [
         "storage",
         "bookmarks",

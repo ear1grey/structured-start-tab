@@ -2,24 +2,27 @@
 @import url("toast.css");
 
 :root {
-  font-size: var(--page-font-size);
+  --toast-offset: 0.5rem;
 }
 
 body {
-  font-size: var(--page-font-size);
-  background: var(--bg-mid);
+  background: var(--bg-light);
   color: var(--fg-mid);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-header, main {
-  max-width: var(--page-width);
-}
+h1, h2 {
+  padding: 0 var(--large); 
 
-main {
-  text-align: right;
+}
+h1 { font-size: 1.25rem;}
+h2 { font-size: 1.1rem;}
+
+header, main, #backup {
+  width: 100%;
+  max-width: var(--page-width);
 }
 
 header {
@@ -36,14 +39,13 @@ header h1 {
 }
 
 label {
-  padding: var(--medium);
-  margin: var(--small);
   display: flex;
+  padding: var(--large);
+  background: var(--bg-light);
   flex-direction: row-reverse;
-  border: solid thin var(--bg-dark);
-  border-radius: var(--small);
+  border-top: solid thin var(--bg-dark);
   text-align: left;
-  background: var(--overlay-light);
+  align-items: center;
 }
 
 label>input {
@@ -51,9 +53,8 @@ label>input {
 }
 
 label>input[type=number] {
-  width: 3rem;
-  height: 3rem;
-  font-size: 125%;
+  width: 2rem;
+  height: 2rem;
   text-align: end;
   padding: 0;
 }
@@ -64,8 +65,8 @@ label>input[type=range] {
 }
 
 label>input[type=checkbox] {
-  width: 3rem;
-  height: 3rem;
+  width: 1rem;
+  height: 1rem;
 }
 
 
@@ -99,31 +100,30 @@ button:hover {
 }
 
 
-section {
+section, footer {
   display: flex;
   flex: 1 1 auto;
   align-items: stretch;
   align-content: flex-start;
-  background: var(--overlay-dark);
-  border: solid thin var(--fg-light-alpha);
+  background: var(--bg-mid);
   flex-direction: column;
-  margin: var(--medium);
-  padding: var(--medium);
+  margin-bottom: var(--massive);
   border-radius: var(--medium);
+  box-shadow: 0rem 0.125rem 0.25rem var(--fg-light-alpha);
 }
 
-section div {
+label, section {
+  overflow: hidden;
+}
+
+#backup label {
+  flex-direction: row;
+}
+
+#backup label div {
   width: auto;
   flex-grow: 1;
   text-align: left;
-}
-
-section section {
-  margin: var(--small);
-  flex-direction: row;
-  border-radius: var(--small);
-  width: auto;
-  background: var(--overlay-light);
 }
 
 #ok {

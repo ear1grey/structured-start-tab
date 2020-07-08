@@ -52,7 +52,6 @@ main { grid-area: main; margin-bottom: 4em;}
   grid-area: edit;
   height: 0em;
   display: none;
-  transition: height var(--speed) linear;
   z-index: 2000;
 }
 
@@ -217,7 +216,6 @@ main a {
   margin: var(--tiny);
   padding: var(--medium);
   min-height: 1.5rem;
-  transition: all calc(var(--speed)*2) ease-in-out;
   text-align: center;
   text-decoration: none;
   overflow: hidden;
@@ -242,7 +240,6 @@ a:focus {
   color: #fff;
   box-shadow: 0 0 calc(var(--small) * 4) calc(var(--small) * 2) var(--overlay-light);
   outline: none;
-  transition: all calc(var(--speed)/2) ease-in-out;
 }
 
 a:hover {
