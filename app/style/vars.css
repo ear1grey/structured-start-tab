@@ -2,13 +2,15 @@
   --speed: 0.1s;
   --page-font: sans-serif;
   --page-font-size: 100%;
+  --toast-width: 20rem;
   --toast-time: 3s;
+  --toast-offset: 4rem;
   --tool-tip-top: 0;
   --tool-tip-left: 0;
 
   /* Sizes */
 
-  --page-width: 40rem;
+  --page-width: 30rem;
 
   --tiny: 0.1rem;
   --small: calc( var(--tiny) * 2 );
@@ -25,7 +27,7 @@
 
   --bg-dark: #BBB; 
   --bg-mid: #DDD;
-  --bg-light: #FFF;
+  --bg-light: #F7F7F7;
 
   --bg-drop: #C00;
   --fg-drop: #FFF;

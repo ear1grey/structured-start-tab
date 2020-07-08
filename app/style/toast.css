@@ -1,6 +1,8 @@
+
 .toast {
   border-radius: 0.5rem;
-  background: var(--fresh);
+  background: var(--bg-light);
+  color: var(--fg-dark);
   margin: 0.25rem 0.5rem;
   animation: var(--toast-time) ease-in-out anim_open_flex forwards;
   padding: 0.5rem;
@@ -10,13 +12,13 @@
 
 #toast {
   position: fixed;
-  bottom: 4rem;
+  bottom: var(--toast-offset);
   right: 0;
-  width: 20em;
   display: flex;
   flex-direction: column;
   height: auto;
   justify-content: flex-end;
+  width: calc(var(--toast-width));
 }
 
 @keyframes anim_open_flex {

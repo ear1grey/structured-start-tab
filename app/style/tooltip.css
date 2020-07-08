@@ -9,5 +9,5 @@
   background: var(--bg-mid);
   color: var(--fg-light);
   border: var(--fg-light) solid thin;
-  max-width: 10em; 
+  max-width: var(--toast-width); 
 }

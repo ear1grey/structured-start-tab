@@ -2,6 +2,7 @@ import { loadOptionsWithPromise } from './options.mjs';
 import { OPTS } from './defaults.mjs';
 import * as toast from './toast.mjs';
 import * as tooltip from './tooltip.mjs';
+import * as util from './util.mjs';
 
 const store = chrome.storage[OPTS.storage];
 const oneDay = 1000 * 60 * 60 * 24;
@@ -91,7 +92,6 @@ function editCancel() {
 function setFavicon(el, url) {
   let favicon = el.querySelector('img.favicon');
   if (!favicon) {
-    console.log('!');
     favicon = document.createElement('img');
     favicon.className = 'favicon';
     el.prepend(favicon);
@@ -169,11 +169,6 @@ function cleanTree(tree) {
 function treeFromHTML(html) {
   const parser = new DOMParser();
   return parser.parseFromString(html, 'text/html');
-}
-
-function makeVisible() {
-  el.main.classList.add('visible');
-  el.aside.classList.add('visible');
 }
 
 function detectKeyup(e) {
@@ -644,6 +639,20 @@ function prepareFoldables(selectors = 'main') {
   elems.forEach(e => e.addEventListener('click', editSection));
 }
 
+function storageChanged(changes, namespace) {
+  for (const key in changes) {
+    OPTS[key] = changes[key].newValue;
+    if (key === 'html') {
+      prepareMain(OPTS);
+      toast.popup('Page updates were received from another tab.');
+    } else {
+      util.prepareCSSVariables(OPTS);
+      prepareDynamicFlex(el.main);
+      prepareBookmarks(OPTS, el.aside);
+    }
+  }
+}
+
 
 function prepareListeners() {
   const anchors = document.querySelectorAll('a');
@@ -655,6 +664,8 @@ function prepareListeners() {
 
   el.addlink.addEventListener('click', addLink);
   el.addpanel.addEventListener('click', addPanel);
+
+  chrome.storage.onChanged.addListener(storageChanged);
 }
 
 function prepareContent(html) {
@@ -718,11 +729,6 @@ export function prepareDrag() {
   document.addEventListener('dragenter', dragEnter);
 }
 
-function prepareCSSVariables(OPTS) {
-  document.documentElement.style.setProperty('--tiny', Number(OPTS.space) / 1000 + 'em');
-  document.documentElement.style.setProperty('--page-font-size', Number(OPTS.fontsize) + '%');
-}
-
 function prepareDynamicFlex(where) {
   if (OPTS.proportionalSections) {
     const topLevelSections = where.querySelectorAll(':scope > section');
@@ -756,18 +762,20 @@ function calculateDynamicFlex(where) {
   return total;
 }
 
+function prepareMain(OPTS) {
+  prepareContent(OPTS.html);
+  prepareDrag();
+  prepareFoldables();
+  prepareDynamicFlex(el.main);
+}
 
 async function prepareAll() {
   await loadOptionsWithPromise();
   el = prepareElements('[id], body, main, aside, footer, #trash, #toolbar, #toast');
-  prepareContent(OPTS.html);
   prepareBookmarks(OPTS, el.aside);
-  prepareCSSVariables(OPTS);
-  prepareDrag();
-  prepareFoldables();
+  util.prepareCSSVariables(OPTS);
+  prepareMain(OPTS);
   prepareTrash();
-  makeVisible();
-  prepareDynamicFlex(el.main);
   toast.prepare();
   feedback('Thank you for using Structured Start Tab');
   tooltip.prepare(OPTS);
