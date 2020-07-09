@@ -18,7 +18,7 @@ const getValue = (where) => document.querySelector(where).value;
 
 function linkClicked(e) {
   if (el.body.classList.contains('editing')) {
-    return toast.popup("You can't follow a link whilst editing something else.");
+    toast.html('editing', "<h1>You're still editing.</h1><p>You can't follow a link whilst editing something else.</p>");
   }
   e.preventDefault();
   if (e.shiftKey) {
@@ -85,7 +85,7 @@ function editCancel() {
     flash(el.editing);
     el.editing = null;
 
-    toast.popup('Edit cancelled.');
+    toast.html('editcancelled', '<h1>Edit cancelled.</h1>');
   }
 }
 
@@ -153,7 +153,7 @@ function saveChanges() {
   cleanTree(tree);
 
   OPTS.html = tree.body.innerHTML;
-  store.set(OPTS, () => toast.popup('Saved'));
+  store.set(OPTS);
 }
 
 function cleanTree(tree) {
@@ -197,7 +197,7 @@ function detectKeydown(e) {
     }
     store.set(OPTS, () => {
       prepareContent(OPTS.html);
-      toast.popup('Previous layout reinstated.');
+      toast.html('undo', '<h1>Undo.</h1><p>The previous layout has been reinstated.</p>');
     });
   }
 
@@ -224,7 +224,7 @@ function createExampleLink(text = 'Example', href = 'http://example.org') {
 
 function addLink() {
   if (OPTS.lock) {
-    toast.popup('Page locked.  Unlock it in the options page.');
+    toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
     return;
   }
   const a = createExampleLink();
@@ -233,7 +233,7 @@ function addLink() {
 
 function addPanel() {
   if (OPTS.lock) {
-    toast.popup('Page locked.  Unlock it in the options page.');
+    toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
     return;
   }
   const div = cloneTemplate('#template_panel', el.main);
@@ -400,7 +400,7 @@ let dragStartedOnThisPage = false;
 /* respond when a drag begins */
 function dragStart(e) {
   if (OPTS.lock) {
-    toast.popup('Page locked.  Unlock it in the options page.');
+    toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
     return;
   }
   dragStartedOnThisPage = true;
@@ -411,19 +411,19 @@ function dragStart(e) {
       dummy = createExampleLink();
       dummy.classList.add('dragging');
       dragging = dummy;
-      toast.popup('Drop in page to add link...');
+      toast.html('addlink', '<h1>Adding a link&hellip;.</h1><p>Drop anywhere in the page to add it, or press Escape to cancel.</p>');
     } else {
       dummy = addPanel();
       dummy.classList.add('dragging');
       dragging = dummy;
-      toast.popup('Drop section where you want it...');
+      toast.html('addpanel', '<h1>Adding a panel&hellip;.</h1><p>Drop anywhere in the page to add it, or press Escape to cancel.</p>');
     }
   } else {
     dragging = e.target;
     dragging.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.dropEffect = 'move';
-    toast.popup('Moving link... drop in page or cancel with Escape key.');
+    toast.html('moving', '<h1>Moving&hellip;</h1><p>Drop anywhere in the page or cancel with the Escape key.</p>');
   }
   original.parent = e.target.parentElement;
   original.sibling = e.target.nextElementSibling;
@@ -444,7 +444,7 @@ function flash(elem) {
 /* respond if dropping here is ok */
 function dragOver(e) {
   if (OPTS.lock) {
-    toast.popup('Page locked.  Unlock it in the options page.');
+    toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
     return;
   }
   if (e.target === el.bin) {
@@ -471,7 +471,7 @@ function dragOver(e) {
     }
     if (e.target === el.bin) { // gotta allow bin drops too
       e.preventDefault();
-      tooltip.reposition(e, 'Drop here to delete the item.');
+      tooltip.reposition(e, 'Drop trash here.');
     }
   }
   prepareDynamicFlex(el.main);
@@ -493,7 +493,7 @@ function extractDataFromDrop(e) {
       url = u.toString();
       text = url;
     } catch (e) {
-      toast.popup('Not a link or URL.');
+      toast.html('notlink', '<h1>Not a link or URL.</h1><p>Only links from other pages can be imported.</p>');
     }
   }
   if (url) {
@@ -507,7 +507,7 @@ function extractDataFromDrop(e) {
 
 function dragDrop(e) {
   if (OPTS.lock) {
-    toast.popup('Page locked.  Unlock it in the options page.');
+    toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
     return;
   }
   e.preventDefault();
@@ -516,7 +516,7 @@ function dragDrop(e) {
   if (e.target === el.bin) {
     el.trash.lastElementChild.append(dragging);
     saveChanges();
-    toast.popup(dragging.textContent + ' moved to trash.');
+    toast.html('locked', '<h1>Moved.</h1><p>Your item is now in the trash.</p>');
   } else {
     if (!dragStartedOnThisPage) {
       extractDataFromDrop(e);
@@ -533,7 +533,7 @@ function dragDrop(e) {
 
 function dragEnd(e) {
   if (OPTS.lock) {
-    toast.popup('Page locked.  Unlock it in the options page.');
+    toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
     return;
   }
   el.body.classList.remove('dragOngoing');
@@ -550,7 +550,7 @@ function dragEnd(e) {
     } else {
       replaceElementInOriginalPosition();
     }
-    toast.popup('Drag cancelled.');
+    toast.html('cancel', '<h1>Drag cancelled.</h1>');
     dummy = null;
   }
   dragStartedOnThisPage = false;
@@ -612,7 +612,7 @@ const toggleFold = e => {
   if (el.body.classList.contains('editing')) return;
   const foldMe = findParentSection(e.target);
   if (foldMe === el.trash) {
-    toast.popup('Trash panel hidden.');
+    toast.html('locked', '<h1>Trash panel hidden.</h1>');
     toggleTrash();
     saveChanges();
     return;
@@ -644,7 +644,7 @@ function storageChanged(changes, namespace) {
     OPTS[key] = changes[key].newValue;
     if (key === 'html') {
       prepareMain(OPTS);
-      toast.popup('Page updates were received from another tab.');
+      toast.html('locked', '<h1>Storage updated.</h1>');
     } else {
       util.prepareCSSVariables(OPTS);
       prepareDynamicFlex(el.main);

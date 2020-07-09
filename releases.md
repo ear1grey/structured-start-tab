@@ -4,6 +4,8 @@ Every release for the foreseeable future will be an alpha level release.  This m
 
 ## Alpha Releases
 
+* 1.4.2 Improved toast formatting (a precursor to i18n).
+* 1.4.1 Link to facebook discussion for support.
 * 1.4.0 [Options Upgrade](https://github.com/ear1grey/structured-start-tab/milestone/13?closed=1)
 * 1.3.1 [UI Tweaks](https://github.com/ear1grey/structured-start-tab/milestone/10?closed=1)
 * 1.3.0 [Layout & Toast](https://github.com/ear1grey/structured-start-tab/milestone/6?closed=1)
