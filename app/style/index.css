@@ -55,57 +55,76 @@ main { grid-area: main; margin-bottom: 4em;}
   z-index: 2000;
 }
 
-body.editing #edit {
+
+dialog::backdrop {
+  background: rgba(66,66,66, 0.5) ;
+}
+
+dialog {
   display: flex;
   height: auto;
   overflow: visible;
+  flex-direction: column;
 }
 
-#edit>* {
+dialog>* {
   flex: 1 1 auto;
   padding: 1rem;
 } 
 
 
-#edit {
-  align-items: center;
+dialog {
+  align-items: left;
   align-content: stretch;
-  width: 100%;
 }
 
-#edit * {
+dialog * {
   padding: var(--medium);
   flex-grow: 0;
   display: flex;
 }
 
-#edit dl {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-} 
-
-
-#edit input {
-  flex-grow: 1;
+dialog input {
   background: var(--bg-light);
   color: var(--fg-dark);
-  height: 2em;
 }
 
-#edit textarea {
+
+dialog input[type=string] {
+  flex-grow: 1;
+  height: 2rem;
+  min-width: 30rem;
+}
+
+dialog input[type=color] {
+  padding: 0;
+  flex-grow: 1;
+  height: 2rem;
+}
+
+
+dialog textarea {
   background: var(--bg-light);
   color: var(--fg-dark);
-  min-height: 8em;
-  min-width: 30em;
-  width: 100%;
+  flex-grow: 1;
+  min-height: 8rem;
+  min-width: 30rem;
 }
 
-#edit button {
-  padding: var(--massive);
+dialog #okcancel {
+  flex-direction: row-reverse;
+}
+
+dialog button {
+  padding: var(--large);
   margin: var(--large);
   background: var(--bg-dark);
   border-radius: var(--medium);
+  width: 10rem;
+}
+
+dialog label h2 {
+  width: 10rem;
 }
 
 body {
@@ -199,7 +218,7 @@ main section.folded>h1 {
 
 
 h1, h2, main a {
-  border: 0.125em solid transparent;
+  border: 0.125rem solid transparent;
   padding: 0.05rem;
   margin-top: var(--small);
   background: transparent;
@@ -274,8 +293,8 @@ main.editing a:hover:not(.dragging) {
   text-decoration: none;
   display: flex;
   align-items: center;
-  padding-left: 1em;
-  padding-right: 1em;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 
@@ -305,8 +324,8 @@ main.editing a:hover:not(.dragging) {
 
 #status p{
   flex-shrink: 0;
-  padding: 1em;
-  height: 1em;
+  padding: 1rem;
+  height: 1rem;
   background: var(--bg-mid);
 }
 
@@ -336,9 +355,13 @@ main.editing a:hover:not(.dragging) {
   display: flex;
 }
 
+#trash.folded *:not(:first-child) {
+  display: none;
+}
+
 #bin.over {
-background: var(--bg-drop);
-color: var(--fg-drop);
+  background: var(--bg-drop);
+  color: var(--fg-drop);
 }
 
 
@@ -367,8 +390,8 @@ footer {
 }
 
 .favicon {
-  width: 1em;
-  height: 1em;
+  width: 1rem;
+  height: 1rem;
   flex-shrink: 0;
   margin-right: var(--small);
 }
@@ -382,6 +405,19 @@ footer {
   cursor: pointer;
 }
 
+dialog {
+  background: var(--bg-mid);
+  color: var(--fg-mid);
+  margin: auto;
+  padding: var(--large);
+  box-shadow: 0 var(--medium) var(--large) var(--fg-mid);
+  border-radius: var(--medium);
+}
+
+color-switch {
+  padding: 0;
+  flex-grow: 1;
+}
 
 [data-size="1"] { flex-grow: 1; }
 [data-size="2"] { flex-grow: 2; }

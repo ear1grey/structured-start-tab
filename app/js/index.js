@@ -13,13 +13,34 @@ let dragging;
 let dummy;
 const original = {};
 
-const putValue = (where, what) => { document.querySelector(where).value = what; };
-const getValue = (where) => document.querySelector(where).value;
+function setValue(where, what, open = false) {
+  const elem = document.querySelector(where);
+  elem.value = what;
+  if (open) elem.open = true;
+}
+
+function getValue(where) {
+  return document.querySelector(where).value;
+}
+
+function setColorValue(where, what) {
+  const elem = document.querySelector(where);
+  if (what[0] === '!') {
+    elem.value = what.slice(1);
+  } else {
+    elem.value = what;
+    elem.open = true;
+  }
+}
+
+function getColorValue(where) {
+  const elem = document.querySelector(where);
+  const color = elem.value;
+  const open = elem.hasAttribute('open') ? '' : '!';
+  return open + color;
+}
 
 function linkClicked(e) {
-  if (el.body.classList.contains('editing')) {
-    toast.html('editing', "<h1>You're still editing.</h1><p>You can't follow a link whilst editing something else.</p>");
-  }
   e.preventDefault();
   if (e.shiftKey) {
     editStart(e.target);
@@ -38,55 +59,69 @@ function linkHoverOut() {
   feedback('');
 }
 
+function toHex(x, m = 1) {
+  return ('0' + parseInt(m * x, 10).toString(16)).slice(-2);
+}
+
+function translateColor(rgba) {
+  const parts = rgba.split('(')[1].split(')')[0].split(',');
+  const converted = [
+    toHex(parts[0]),
+    toHex(parts[1]),
+    toHex(parts[2]),
+    toHex(parts[3], 255),
+  ];
+  const result = '#' + converted.join('');
+  return result;
+}
 
 function editStart(elem) {
   el.edit.textContent = ''; // reset
+  let dialog;
+  const style = window.getComputedStyle(elem);
   if (elem.tagName === 'A') {
-    cloneTemplate('#template_edit_link', el.edit);
-    putValue('#editname', elem.textContent);
-    putValue('#editurl', elem.dataset.href);
+    dialog = cloneToDialog('#template_edit_link');
+    setValue('#editname', elem.textContent);
+    setValue('#editurl', elem.dataset.href);
   } else {
     if (elem.tagName === 'SECTION') {
-      cloneTemplate('#template_edit_panel', el.edit);
-      putValue('#editname', elem.firstElementChild.textContent);
-      putValue('#editstyle', elem.getAttribute('style'));
+      dialog = cloneToDialog('#template_edit_panel');
+      setValue('#editname', elem.firstElementChild.textContent);
     } else {
       return;
     }
   }
+
+  const bgcol = elem.dataset.bg ? elem.dataset.bg : '!' + translateColor(style.backgroundColor);
+  const fgcol = elem.dataset.fg ? elem.dataset.fg : '!' + translateColor(style.color);
+  setColorValue('#bgcol', bgcol);
+  setColorValue('#fgcol', fgcol);
+
+  dialog.addEventListener('close', closeDialog);
+  dialog.addEventListener('cancel', editCancel);
+  dialog.showModal();
   el.editing = elem;
-  el.body.classList.add('editing');
   elem.classList.add('edited');
 
   document.querySelector('#editok').addEventListener('click', editOk);
   document.querySelector('#editcancel').addEventListener('click', editCancel);
 
   el.editname = document.querySelector('#editname');
-  flash(el.editname);
-  flash(elem);
-  el.main.setAttribute('disabled', true);
-  el.aside.setAttribute('disabled', true);
-  el.toolbar.setAttribute('disabled', true);
-  el.editname.focus();
-  el.editname.select();
 }
 
-
 function editCancel() {
-  if (el.body.classList.contains('editing')) {
-    el.body.classList.remove('editing');
-    el.edit.textContent = '';
+  toast.html('editcancelled', '<h1>Edit cancelled.</h1>');
+  closeDialog();
+}
 
-    el.main.removeAttribute('disabled');
-    el.aside.removeAttribute('disabled');
-    el.toolbar.removeAttribute('disabled');
-
+function closeDialog() {
+  el.dialog.close();
+  el.dialog.remove();
+  if (el.editing) {
     el.editing.classList.remove('edited');
     flash(el.editing);
-    el.editing = null;
-
-    toast.html('editcancelled', '<h1>Edit cancelled.</h1>');
   }
+  el.editing = null;
 }
 
 function setFavicon(el, url) {
@@ -114,6 +149,7 @@ function removeFavicons(root) {
   }
 }
 
+const createStyleString = (n, v) => v[0] === '!' ? '' : `${n}:${v};`;
 
 // store the updated version
 function editOk() {
@@ -121,26 +157,25 @@ function editOk() {
     el.editing.textContent = getValue('#editname');
     el.editing.dataset.href = getValue('#editurl');
     setFavicon(el.editing, getValue('#editurl'));
-    el.editing.classList.remove('edited');
   } else {
     if (el.editing.tagName === 'SECTION') {
       el.editing.firstElementChild.textContent = getValue('#editname');
-      el.editing.setAttribute('style', getValue('#editstyle'));
-      el.editing.classList.remove('edited');
     } else {
       return;
     }
   }
 
-  el.main.removeAttribute('disabled');
-  el.aside.removeAttribute('disabled');
-  el.toolbar.removeAttribute('disabled');
+  el.editing.dataset.bg = getColorValue('#bgcol');
+  el.editing.dataset.fg = getColorValue('#fgcol');
+  let styleString = '';
+  styleString += createStyleString('background', el.editing.dataset.bg);
+  styleString += createStyleString('color', el.editing.dataset.fg);
+  el.editing.style = styleString;
 
-
-  el.body.classList.remove('editing');
+  el.dialog.close();
   saveChanges();
-
   flash(el.editing);
+  el.editing.classList.remove('edited');
   el.editing = null;
 }
 
@@ -171,19 +206,7 @@ function treeFromHTML(html) {
   return parser.parseFromString(html, 'text/html');
 }
 
-function detectKeyup(e) {
-  if (e.key === 'Meta') {
-    el.main.classList.remove('editing');
-  }
-}
-
 function detectKeydown(e) {
-  if (e.key === 'Meta') {
-    el.main.classList.add('editing');
-  } else {
-    el.main.classList.remove('editing');
-  }
-
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
     const saveButton = document.querySelector('#editok');
     if (saveButton) saveButton.click();
@@ -639,7 +662,7 @@ function prepareFoldables(selectors = 'main') {
   elems.forEach(e => e.addEventListener('click', editSection));
 }
 
-function storageChanged(changes, namespace) {
+function storageChanged(changes) {
   for (const key in changes) {
     OPTS[key] = changes[key].newValue;
     if (key === 'html') {
@@ -660,7 +683,6 @@ function prepareListeners() {
     addAnchorListeners(a);
   }
   document.addEventListener('keydown', detectKeydown);
-  document.addEventListener('keyup', detectKeyup);
 
   el.addlink.addEventListener('click', addLink);
   el.addpanel.addEventListener('click', addPanel);
@@ -686,13 +708,34 @@ function prepareContent(html) {
 
 function toggleTrash() {
   // ensure trash is the last thing on the screen
-  el.trash.parentElement.append(el.trash);
+  el.main.append(el.trash);
   el.trash.classList.toggle('open');
   if (el.trash.classList.contains('open')) {
     el.trash.scrollIntoView({ behavior: 'smooth' });
   } else {
     el.main.scrollIntoView({ behavior: 'smooth' });
   }
+}
+
+
+function clearDialog() {
+  while (el.dialog.firstElementChild) {
+    el.dialog.firstElementChild.remove();
+  }
+}
+
+
+function cloneToDialog(selector) {
+  el.dialog = document.createElement('dialog');
+  el.dialog.id = 'dialog';
+  document.body.append(el.dialog);
+
+  const template = document.querySelector(selector);
+  const clone = document.importNode(template.content, true);
+
+  clearDialog();
+  el.dialog.append(clone);
+  return el.dialog;
 }
 
 function cloneTemplate(selector, where) {

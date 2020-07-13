@@ -21,6 +21,7 @@
 <div id=edit>
 </div>
 
+<script defer async type=module src="./js/color-switch/index.js"></script>
 <script defer type=module src=./js/index.js></script>
 
 <template id=template_trash>
@@ -37,7 +38,54 @@
   </section>
 </template>
 
+
 <template id=template_edit_link>
+  <h1>Edit Link</h1>
+  <label>
+    <h2>Name</h2>
+    <input id=editname type=string placeholder='Item Name'>
+  </label>
+  <label>
+    <h2>Link</h2>
+    <input id=editurl type=string placeholder='URL'>
+  </label>
+  <label>
+    <h2>Background</h2>
+    <color-switch id=bgcol auto="Automatic" manual="Manual" value='#000000'></color-switch>
+  </label>
+  <label>
+    <h2>Text</h2>
+    <color-switch id=fgcol auto="Automatic" manual="Manual" value='#000000'></color-switch>
+  </label>
+  <div id=okcancel>
+    <button id=editok value="ok">OK</button>
+    <button id=editcancel value="cancel">Cancel</button>  
+  </div>
+</template>
+
+
+<template id=template_edit_panel>
+  <h1 id=editpanel>Editing Panel</h1>
+  <label>
+    <h2>Name</h2>
+    <input id=editname type=string placeholder='Panel Name'>
+  </label>
+  <label>
+    <h2>Background</h2>
+    <color-switch id=bgcol auto="Automatic" manual="Manual" value='#000000'></color-switch>
+  </label>
+  <label>
+    <h2>Text</h2>
+    <color-switch id=fgcol auto="Automatic" manual="Manual" value='#000000'></color-switch>
+  </label>
+  <div id=okcancel>
+    <button id=editok value="ok">OK</button>
+    <button id=editcancel value="cancel">Cancel</button>  
+  </div>
+</template>
+
+
+<template id=template_edit_link_orig>
   <h1 id=editheading>Editing Link</h1>
   <dl>
     <dt>Name</dt>
@@ -45,12 +93,12 @@
     <dt>Link</dt>
     <dd><input id=editurl type=string placeholder='URL'></dd>
   </dl>
-  <button id=editok value="ok">Save</button>
+  <button id=editok value="ok">OK</button>
   <button id=editcancel value="cancel">Cancel</button>
 </template>
 
 
-<template id=template_edit_panel>
+<template id=template_edit_panel_orig>
   <h1 id=editpanel>Editing Panel</h1>
   <dl>
     <dt>Name</dt>
