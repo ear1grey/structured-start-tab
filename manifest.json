@@ -7,8 +7,13 @@
     "permissions": [
         "storage",
         "bookmarks",
-        "chrome://favicon/"
-    ],
+        "chrome://favicon/",
+        "contextMenus"
+        ],
+    "background": {
+        "persistent": false,
+        "scripts": ["app/js/background.js"]
+        },
     "icons": {
         "16": "app/style/i/16.png",
         "48": "app/style/i/48.png",

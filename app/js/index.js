@@ -179,8 +179,10 @@ function editOk() {
   el.editing = null;
 }
 
-function saveChanges() {
-  OPTS.backup = OPTS.html;
+function saveChanges(makeBackup = true) {
+  if (makeBackup) {
+    OPTS.backup = OPTS.html;
+  }
 
   const html = document.querySelector('main').innerHTML;
   const tree = treeFromHTML(html);
@@ -667,7 +669,8 @@ function storageChanged(changes) {
     OPTS[key] = changes[key].newValue;
     if (key === 'html') {
       prepareMain(OPTS);
-      toast.html('locked', '<h1>Storage updated.</h1>');
+//      toast.html('locked', '<h1>Storage updated.</h1>');
+      // TODO have a tick to show if changes are saved
     } else {
       util.prepareCSSVariables(OPTS);
       prepareDynamicFlex(el.main);
@@ -752,7 +755,6 @@ function prepareTrash() {
     el.trash.id = 'trash';
   }
   el.trash.classList.add('invisible');
-
   el.bin.addEventListener('click', toggleTrash);
 }
 
@@ -805,6 +807,26 @@ function calculateDynamicFlex(where) {
   return total;
 }
 
+function emptyTrash() {
+  el.trash = document.querySelector('#trash');
+  el.trash.remove();
+  delete el.trash;
+  prepareTrash();
+  saveChanges(false);
+}
+
+function receiveBackgroundMessages(m) {
+  switch (m.item) {
+    case 'emptytrash': emptyTrash(); break;
+    case 'togglebookmarks': toggleBookmarks(); break;
+    default: break;
+  }
+}
+
+function prepareBackgroundListener() {
+  chrome.runtime.onMessage.addListener(receiveBackgroundMessages);
+}
+
 function prepareMain(OPTS) {
   prepareContent(OPTS.html);
   prepareDrag();
@@ -819,6 +841,7 @@ async function prepareAll() {
   util.prepareCSSVariables(OPTS);
   prepareMain(OPTS);
   prepareTrash();
+  prepareBackgroundListener();
   toast.prepare();
   feedback('Thank you for using Structured Start Tab');
   tooltip.prepare(OPTS);
