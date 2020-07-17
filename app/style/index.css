@@ -20,16 +20,73 @@
 body {
   display: grid;
   grid-template-columns: calc(100vw - var(--bookmark-width)) var(--bookmark-width);
-  grid-template-rows: min-content auto;
-  grid-template-areas: "edit edit" "main bookmarks";
-  min-height: 100vh;
+  grid-template-rows: auto;
+  grid-template-areas: "main sidebar";
+  height: 100vh;
   width: 100vw;
   background: var(--bg-mid);
   color: var(--fg-mid);
+  font-family: var(--page-font);
+  overflow: hidden;
 }
 
-main { grid-area: main; margin-bottom: 4em;}
-.bookmarks { grid-area: bookmarks; }
+main {
+  grid-area: main;
+  overflow: scroll;
+}
+
+#sidebar {
+  grid-area: sidebar;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+main>section, #sidebar {
+  padding: var(--small);
+}
+
+#sidebar section {
+  flex-direction: column;
+}
+
+#bookmarks {
+  flex-grow: 1;
+  overflow: scroll;
+}
+
+#bookmarksnav {
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: scroll;
+}
+
+#toolbar {
+  flex-grow: 0;
+}
+
+#toolbar nav {
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+#toolbar a {
+  flex-grow: 1;
+  cursor: pointer;
+  padding: var(--small);
+  margin: var(--small);
+  background-color: var(--overlay-dark);
+  border-radius: var(--tiny);
+  min-height: var(--button-min-height);
+  padding: var(--large);
+  text-decoration: none;;
+}
+
+#toolbar a#bin {
+  min-height: 8rem;
+}
 
 #toolbar[disabled],
 [disabled] h1,
@@ -54,7 +111,6 @@ main { grid-area: main; margin-bottom: 4em;}
   display: none;
   z-index: 2000;
 }
-
 
 dialog::backdrop {
   background: rgba(66,66,66, 0.5) ;
@@ -127,12 +183,6 @@ dialog label h2 {
   width: 10rem;
 }
 
-body {
-  font-family: var(--page-font);
-  flex-direction: row;
-  position: relative;
-}
-
 section>h1 {
   flex-grow: 0;
 }
@@ -146,7 +196,7 @@ section.hide>h1 {
 section>nav {
   display: flex;
   flex: 1 1 auto;
-  background: var(--overlay-light);
+  background: transparent;
 }
 
 section>nav:empty {
@@ -186,15 +236,6 @@ section section {
   width: min-content;
 }
 
-section nav {
-  flex: 1 1 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: stretch;
-  background: transparent;
-  flex-wrap: wrap;
-}
-
 section section nav {
   flex-wrap: wrap;
 }
@@ -224,7 +265,7 @@ h1, h2, main a {
   background: transparent;
 }
 
-.bookmarks a, 
+a, 
 main a {
   display: flex;
   align-items: center;
@@ -243,16 +284,15 @@ main a {
   cursor: pointer;
 }
 
-.bookmarks a {
-  margin: var(--bookmark-margin);
-  padding: var(--bookmark-padding);
-  border-width: var(--bookmark-border);
+#bookmarksnav a {
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
-main>a {
-  max-width: 10em;
-  border: solid var(--fg-light) thin;
+#bookmarksnav a.fresh {
+  background: var(--fresh);
 }
+
 
 a:focus {
   background: rgba(0, 0, 0, 0.4);
@@ -266,9 +306,8 @@ a:hover {
 }
 
 a:active {
-  filter: invert();
+  transform: scale(0.95);
 }
-
 
 
 a.metamouseover:not(.dragging),
@@ -276,26 +315,6 @@ main.editing a:hover:not(.dragging) {
   cursor: move;
 }
 
-#toolbar {
-  position: fixed;
-  bottom: 0;
-  background: var(--bg-mid);
-  height: 3em;
-  width: 100vw;
-  box-shadow: 0 0 var(--large) var(--small) black;
-  display: flex;
-  flex: 0 0 auto;
-}
-
-
-#toolbar>* {
-  height: 100%;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
 
 
 #statuswrapper {
@@ -377,14 +396,6 @@ main.editing a:hover:not(.dragging) {
   border-style: solid;
 }
 
-.bookmarks a {
-  background: var(--bookmark);
-}
-
-.bookmarks a.fresh {
-  background: var(--fresh);
-}
-
 footer {
   background: var(--bg-light);
 }
@@ -400,10 +411,7 @@ footer {
   cursor: copy;
 }
 
-#toolbar>a,
-#bin {
-  cursor: pointer;
-}
+
 
 dialog {
   background: var(--bg-mid);

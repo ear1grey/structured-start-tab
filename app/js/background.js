@@ -10,6 +10,13 @@ const menuItems = [
   },
 ];
 
+const urls = [
+  chrome.runtime.getURL('app/index.html'),
+  chrome.runtime.getURL('app/options.html'),
+  'chrome://newtab/',
+];
+
+
 // message sender used whenever any of our
 // menu items* are clicked.
 // * currently any of 1. 
@@ -26,5 +33,18 @@ function menuInstaller() {
   }
 }
 
+function commandReceived(command) {
+  chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
+    if (tabs.length === 0) return;
+    chrome.tabs.get(tabs[0].id, tab => {
+      if (urls.includes(tab.url)) {
+        chrome.tabs.sendMessage(tab.id, { item: command });
+      }
+    });
+  });
+}
+
 chrome.runtime.onInstalled.addListener(menuInstaller);
 chrome.contextMenus.onClicked.addListener(menuClicked);
+
+chrome.commands.onCommand.addListener(commandReceived);

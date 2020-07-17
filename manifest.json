@@ -5,6 +5,7 @@
     "description": "Show a structured page when a new tab is opened.",
     "author": "Rich Boakes",
     "permissions": [
+        "tabs",
         "storage",
         "bookmarks",
         "chrome://favicon/",
@@ -29,5 +30,14 @@
     "web_accessible_resources": [
         "data/*",
         "chrome://settings/strings.js"
-    ]
+    ],
+    "commands": {
+        "toggle-sidebar": {
+            "suggested_key": {
+                "default": "Ctrl+B",
+                "mac": "Command+B"
+            },
+            "description": "Toggle Sidebar"
+        }
+    }
 }

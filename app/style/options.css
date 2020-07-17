@@ -1,10 +1,6 @@
 @import url("vars.css");
 @import url("toast.css");
 
-:root {
-  --toast-offset: 0.5rem;
-}
-
 body {
   background: var(--bg-light);
   color: var(--fg-mid);

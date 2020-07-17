@@ -6,17 +6,26 @@
 <main>
 </main>
 
-<aside class=bookmarks>
-</aside>
 
-<div id=toolbar>
-  <a class="new" draggable="true" id=addlink data-info="New link: click or drag.">✚ 🔗</a>
-  <a class="new" draggable="true" id=addpanel data-info="New panel: click or drag.">✚ 🔲</a>
-  <div id=statuswrapper><div id=status></div></div>
-  <a data-href="https://www.facebook.com/structuredstarttab/" data-info="Your questions and suggestions please.">Suggestions</a>
-  <a id=bin data-info="Click to toggle the trash section open or closed.  Drag links or panels here to move them to the trash.">Trash</a>
-  <a id=options data-href=options.html data-info="Open the options page.">Options</a>
-</div>
+<aside id=sidebar>
+
+  <section id=toolbar>
+    <h1>Structured Start Tab</h1>
+    <nav id=toolbarnav>
+      <a class="new" draggable="true" id=addlink data-info="New link: click or drag.">Add link</a>
+      <a class="new" draggable="true" id=addpanel data-info="New panel: click or drag.">Add panel</a>
+      <a id=options href=options.html data-info="Open the options page.">Options</a>
+      <a id=bin data-info="Click to toggle the trash section open or closed.  Drag links or panels here to move them to the trash.">Trash</a>  
+    </nav>
+  </section>
+  
+  <section id=bookmarks>
+    <h1>Bookmarks</h1>
+    <nav id=bookmarksnav>
+    </nav>  
+  </section>
+
+</aside>
 
 <div id=edit>
 </div>

@@ -1,3 +1,5 @@
+const version = '1.6.0';
+
 import { loadOptionsWithPromise } from './options.mjs';
 import { OPTS } from './defaults.mjs';
 import * as toast from './toast.mjs';
@@ -41,22 +43,10 @@ function getColorValue(where) {
 }
 
 function linkClicked(e) {
-  e.preventDefault();
   if (e.shiftKey) {
+    e.preventDefault();
     editStart(e.target);
-  } else {
-    if (e.currentTarget.dataset.href) {
-      window.location.href = e.currentTarget.dataset.href;
-    }
   }
-}
-
-function linkHover(e) {
-  feedback(e.target.dataset.href);
-}
-
-function linkHoverOut() {
-  feedback('');
 }
 
 function toHex(x, m = 1) {
@@ -82,7 +72,7 @@ function editStart(elem) {
   if (elem.tagName === 'A') {
     dialog = cloneToDialog('#template_edit_link');
     setValue('#editname', elem.textContent);
-    setValue('#editurl', elem.dataset.href);
+    setValue('#editurl', elem.href);
   } else {
     if (elem.tagName === 'SECTION') {
       dialog = cloneToDialog('#template_edit_panel');
@@ -138,7 +128,7 @@ function setFavicon(el, url) {
 function prepareFavicons() {
   const links = el.main.querySelectorAll('a');
   for (const a of links) {
-    setFavicon(a, a.dataset.href);
+    setFavicon(a, a.href);
   }
 }
 
@@ -155,7 +145,7 @@ const createStyleString = (n, v) => v[0] === '!' ? '' : `${n}:${v};`;
 function editOk() {
   if (el.editing.tagName === 'A') {
     el.editing.textContent = getValue('#editname');
-    el.editing.dataset.href = getValue('#editurl');
+    el.editing.href = getValue('#editurl');
     setFavicon(el.editing, getValue('#editurl'));
   } else {
     if (el.editing.tagName === 'SECTION') {
@@ -226,10 +216,6 @@ function detectKeydown(e) {
     });
   }
 
-  if (e.code === 'KeyB' && (e.metaKey || e.ctrlKey)) {
-    toggleBookmarks(false);
-  }
-
   if (e.code === 'Escape') {
     if (el.body.classList.contains('editing')) {
       editCancel();
@@ -239,7 +225,7 @@ function detectKeydown(e) {
 
 function createExampleLink(text = 'Example', href = 'http://example.org') {
   const a = document.createElement('a');
-  a.dataset.href = href;
+  a.href = href;
   a.textContent = text;
   a.draggable = true;
   setFavicon(a, href);
@@ -266,7 +252,7 @@ function addPanel() {
 }
 
 function feedback(msg) {
-  el.status.textContent = msg;
+  //el.status.textContent = msg;
 }
 
 
@@ -278,12 +264,12 @@ function feedback(msg) {
  * iff link has links - recurse
  * iff link has no links - inject
  */
-export function buildBookmarks(data, target, count) {
+export function buildBookmarks(OPTS, data, target, count) {
   target.textContent = '';
   for (const x of data) {
     if (count === 0) break;
 
-    const indoc = document.querySelector(`[data-href="${x.url}"]`);
+    const indoc = OPTS.hideBookmarksInPage && document.querySelector(`[href="${x.url}"]`);
     if (indoc || x.dateAdded < Date.now() - twoWeeks) {
       // bookmark is already in doc, or its older
       // than three weeks, so skip it.
@@ -300,10 +286,9 @@ export function buildBookmarks(data, target, count) {
   }
 }
 
+// TODO this can be done with a single listener and check the target
 function addAnchorListeners(a) {
   a.addEventListener('click', linkClicked);
-  a.addEventListener('mouseenter', linkHover);
-  a.addEventListener('mouseleave', linkHoverOut);
 }
 
 
@@ -522,7 +507,7 @@ function extractDataFromDrop(e) {
     }
   }
   if (url) {
-    dragging.dataset.href = url;
+    dragging.href = url;
     setFavicon(dragging, url);
     dragging.textContent = text;
   } else {
@@ -588,14 +573,14 @@ export async function prepareBookmarks(OPTS, target) {
     const bp = new Promise(resolve => {
       chrome.bookmarks.getRecent(count + 20, resolve);
     });
-    buildBookmarks(await bp, target, count);
+    buildBookmarks(OPTS, await bp, target, count);
   }
   showBookmarks(OPTS.showBookmarksSidebar);
 }
 
 function toggleBookmarks() {
   OPTS.showBookmarksSidebar = !OPTS.showBookmarksSidebar;
-  prepareBookmarks(OPTS, el.aside);
+  prepareBookmarks(OPTS, el.bookmarksnav);
   showBookmarks(OPTS.showBookmarksSidebar);
   saveChanges();
 }
@@ -674,7 +659,7 @@ function storageChanged(changes) {
     } else {
       util.prepareCSSVariables(OPTS);
       prepareDynamicFlex(el.main);
-      prepareBookmarks(OPTS, el.aside);
+      prepareBookmarks(OPTS, el.bookmarksnav);
     }
   }
 }
@@ -819,6 +804,7 @@ function receiveBackgroundMessages(m) {
   switch (m.item) {
     case 'emptytrash': emptyTrash(); break;
     case 'togglebookmarks': toggleBookmarks(); break;
+    case 'toggle-sidebar': toggleBookmarks(); break;
     default: break;
   }
 }
@@ -834,17 +820,26 @@ function prepareMain(OPTS) {
   prepareDynamicFlex(el.main);
 }
 
+/** Migration for pre-1.6 versions that used data-href */
+function migrateLinks() {
+  for (const o of document.querySelectorAll('[data-href]')) {
+    o.href = o.dataset.href;
+    delete o.dataset.href;
+  }
+}
+
 async function prepareAll() {
   await loadOptionsWithPromise();
-  el = prepareElements('[id], body, main, aside, footer, #trash, #toolbar, #toast');
-  prepareBookmarks(OPTS, el.aside);
+  el = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
+  prepareBookmarks(OPTS, el.bookmarksnav);
   util.prepareCSSVariables(OPTS);
   prepareMain(OPTS);
   prepareTrash();
   prepareBackgroundListener();
   toast.prepare();
-  feedback('Thank you for using Structured Start Tab');
+  toast.popup(`Structured Start Tab v${version}`);
   tooltip.prepare(OPTS);
+  migrateLinks();
 }
 
 window.addEventListener('DOMContentLoaded', prepareAll);

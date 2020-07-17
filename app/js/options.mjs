@@ -7,6 +7,7 @@ import * as toast from './toast.mjs';
 import * as util from './util.mjs';
 
 const STORE = chrome.storage.local;
+const prefNames = [];
 
 function setCheckBox(prefs, what) {
   document.getElementById(what).checked = prefs[what];
@@ -45,6 +46,7 @@ export function loadOptionsWithPromise() {
 function updatePrefsWithPage() {
   getCheckBox('lock');
   getCheckBox('showBookmarksSidebar');
+  getCheckBox('hideBookmarksInPage');
   getCheckBox('showToolTips');
   getCheckBox('proportionalSections');
   getValue('showToast');
@@ -56,6 +58,7 @@ function updatePrefsWithPage() {
 function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'lock');
   setCheckBox(prefs, 'showBookmarksSidebar');
+  setCheckBox(prefs, 'hideBookmarksInPage');
   setCheckBox(prefs, 'showToolTips');
   setCheckBox(prefs, 'proportionalSections');
   setValue(prefs, 'showToast');
@@ -99,6 +102,7 @@ function createPageWithPrefs(prefs) {
   const book = create(settings, 'section', {}, 'Bookmarks');
   const feed = create(settings, 'section', {}, 'Messages & Feedback');
   create(book, 'checkbox', { id: 'showBookmarksSidebar' }, 'Include a sidebar of most recent bookmarks.');
+  create(book, 'checkbox', { id: 'hideBookmarksInPage' }, 'Omit bookmarks that are already in the page.');
   create(book, 'number', { id: 'showBookmarksLimit' }, 'Number of recent bookmarks to show.');
   create(feed, 'checkbox', { id: 'showToolTips' }, 'Show helpful tooltips when hovering over things.');
   create(feed, 'number', { id: 'showToast' }, 'Time (in seconds) each feedback message is shown.   Setting this to zero will disable messages.');
@@ -108,6 +112,7 @@ function createPageWithPrefs(prefs) {
   create(layout, 'range', { id: 'fontsize', max: 150, min: 50, step: 10 }, 'Adjust font size.');
   updatePageWithPrefs(prefs);
 }
+
 
 function exportHTML() {
   const now = (new Date()).toISOString().slice(0, 10).replace(/-/g, '_');
@@ -159,7 +164,17 @@ function prepareListeners() {
 
   const fileupload = document.getElementById('fileupload');
   fileupload.addEventListener('change', uploadFiles, false);
+
+  chrome.runtime.onMessage.addListener(receiveBackgroundMessages);
+  chrome.storage.onChanged.addListener(updateOptions);
 }
+
+export async function updateOptions() {
+  await loadOptionsWithPromise();
+  updatePageWithPrefs(OPTS);
+  util.prepareCSSVariables(OPTS);
+}
+
 
 export async function loadOptions() {
   await loadOptionsWithPromise();
@@ -174,3 +189,16 @@ export function saveOptions() {
   updatePrefsWithPage();
   STORE.set(OPTS, () => toast.popup('Option change stored.'));
 }
+
+function toggleBookmarks() {
+  document.querySelector('#showBookmarksSidebar').click();
+}
+
+function receiveBackgroundMessages(m) {
+  switch (m.item) {
+//    case 'emptytrash': emptyTrash(); break;
+    case 'toggle-sidebar': toggleBookmarks(); break;
+    default: break;
+  }
+}
+

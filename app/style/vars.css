@@ -2,9 +2,14 @@
   --speed: 0.1s;
   --page-font: sans-serif;
   --page-font-size: 100%;
+
+  --button-min-height: 3rem;
+  --trash-min-height: calc( var(--button-min-height * 2));
+  
   --toast-width: 20rem;
   --toast-time: 3s;
-  --toast-offset: 4rem;
+  --toast-offset: 0.5rem;
+  
   --tool-tip-top: 0;
   --tool-tip-left: 0;
 
@@ -17,6 +22,8 @@
   --medium: calc( var(--tiny) * 4 );
   --large: calc( var(--tiny) * 8 );
   --massive: calc( var(--tiny) * 32 );
+
+
   
   /* Colours */
 
@@ -38,7 +45,7 @@
   
   --overlay-light: rgba(255,255,255,0.5);
   --overlay-mid: rgba(255,255,255,0.3);
-  --overlay-dark: rgba(0,0,0,0.2);
+  --overlay-dark: rgba(0,0,0,0.1);
 
   --edit-border: #A00;
 
