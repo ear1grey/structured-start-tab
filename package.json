@@ -13,8 +13,7 @@
     "lint": "eslint app/js/*.js",
     "zip": "rm sst.zip;find . -name '.DS_Store' -type f -delete;zip -u -9 -v -r sst.zip app manifest.json release.md; echo 'bump versions in releases.md, manifest.json and package.json...'"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/ear1grey/structured-start-tab.git"
