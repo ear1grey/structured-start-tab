@@ -1,10 +1,10 @@
-const version = '1.6.0';
-
 import { loadOptionsWithPromise } from './options.mjs';
 import { OPTS } from './defaults.mjs';
 import * as toast from './toast.mjs';
 import * as tooltip from './tooltip.mjs';
 import * as util from './util.mjs';
+
+const version = '1.6.0';
 
 const store = chrome.storage[OPTS.storage];
 const oneDay = 1000 * 60 * 60 * 24;
@@ -227,7 +227,6 @@ function createExampleLink(text = 'Example', href = 'http://example.org') {
   const a = document.createElement('a');
   a.href = href;
   a.textContent = text;
-  a.draggable = true;
   setFavicon(a, href);
   addAnchorListeners(a);
   return a;
@@ -250,11 +249,6 @@ function addPanel() {
   const div = cloneTemplate('#template_panel', el.main);
   return div;
 }
-
-function feedback(msg) {
-  //el.status.textContent = msg;
-}
-
 
 /**
  * Accept an array of things that are either containers or links
@@ -654,7 +648,6 @@ function storageChanged(changes) {
     OPTS[key] = changes[key].newValue;
     if (key === 'html') {
       prepareMain(OPTS);
-//      toast.html('locked', '<h1>Storage updated.</h1>');
       // TODO have a tick to show if changes are saved
     } else {
       util.prepareCSSVariables(OPTS);
@@ -747,10 +740,10 @@ function prepareTrash() {
  * make all links within a doc draggable
  */
 export function prepareDrag() {
-  const links = document.querySelectorAll('main a, .bookmarks a');
-  for (const link of links) {
-    link.draggable = true;
-  }
+  // const links = document.querySelectorAll('main a, .bookmarks a');
+  // for (const link of links) {
+  //   link.draggable = true;
+  // }
 
   document.addEventListener('dragstart', dragStart);
   document.addEventListener('dragover', dragOver);
@@ -820,11 +813,19 @@ function prepareMain(OPTS) {
   prepareDynamicFlex(el.main);
 }
 
-/** Migration for pre-1.6 versions that used data-href */
+/** Migration **/
 function migrateLinks() {
+  /* pre 1.6 used data-href */
   for (const o of document.querySelectorAll('[data-href]')) {
     o.href = o.dataset.href;
     delete o.dataset.href;
+  }
+
+  /* anchors are draggable anyway and shoudl not have the attr set
+   * this was erroneously done before 1.6 */
+  for (const o of document.querySelectorAll('a[draggable]')) {
+    console.log(o);
+    o.removeAttribute('draggable');
   }
 }
 
