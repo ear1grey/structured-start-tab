@@ -1,20 +1,23 @@
-import { loadOptionsWithPromise } from './options.js';
+import { loadOptionsWithPromise, simulateClick, cloneTemplate } from './options.js';
 import { OPTS } from './defaults.js';
 import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
 const version = '1.6.0';
-const store = chrome.storage[OPTS.storage];
+const storage = OPTS.storage;
+const store = chrome.storage[storage];
 const oneDay = 1000 * 60 * 60 * 24;
 const fourDays = oneDay * 4;
 const twoWeeks = oneDay * 14;
-let el = {};
+let dialog;
 let dragging;
 let dummy;
+let els;
+;
 const original = {};
 function setValue(where, what, open = false) {
     const elem = document.querySelector(where);
-    elem.value = what;
+    elem.value = what ?? "";
     if (open)
         elem.dataset.open = "true";
 }
@@ -40,7 +43,9 @@ function getColorValue(where) {
 function linkClicked(e) {
     if (e.shiftKey) {
         e.preventDefault();
-        editStart(e.target);
+        if (e.target instanceof HTMLElement) {
+            editStart(e.target);
+        }
     }
 }
 function toHex(x, m = 1) {
@@ -58,17 +63,16 @@ function translateColor(rgba) {
     return result;
 }
 function editStart(elem) {
-    el.edit.textContent = ''; // reset
-    let dialog;
+    els.edit.textContent = ''; // reset
     const style = window.getComputedStyle(elem);
-    if (elem.tagName === 'A') {
-        dialog = cloneToDialog('#template_edit_link');
+    if (elem instanceof HTMLAnchorElement) {
+        cloneToDialog('#template_edit_link');
         setValue('#editname', elem.textContent);
         setValue('#editurl', elem.href);
     }
     else {
         if (elem.tagName === 'SECTION') {
-            dialog = cloneToDialog('#template_edit_panel');
+            cloneToDialog('#template_edit_panel');
             setValue('#editname', elem.firstElementChild.textContent);
         }
         else {
@@ -82,36 +86,36 @@ function editStart(elem) {
     dialog.addEventListener('close', closeDialog);
     dialog.addEventListener('cancel', editCancel);
     dialog.showModal();
-    el.editing = elem;
+    els.editing = elem;
     elem.classList.add('edited');
     document.querySelector('#editok').addEventListener('click', editOk);
     document.querySelector('#editcancel').addEventListener('click', editCancel);
-    el.editname = document.querySelector('#editname');
+    els.editname = document.querySelector('#editname');
 }
 function editCancel() {
     toast.html('editcancelled', '<h1>Edit cancelled.</h1>');
     closeDialog();
 }
 function closeDialog() {
-    el.dialog.close();
-    el.dialog.remove();
-    if (el.editing) {
-        el.editing.classList.remove('edited');
-        flash(el.editing);
+    dialog.close();
+    dialog.remove();
+    if (els.editing) {
+        els.editing.classList.remove('edited');
+        flash(els.editing);
     }
-    el.editing = null;
+    delete els.editing;
 }
-function setFavicon(el, url) {
-    let favicon = el.querySelector('img.favicon');
+function setFavicon(elem, url) {
+    let favicon = elem.querySelector('img.favicon');
     if (!favicon) {
         favicon = document.createElement('img');
         favicon.className = 'favicon';
-        el.prepend(favicon);
+        elem.prepend(favicon);
     }
     favicon.src = 'chrome://favicon/' + url;
 }
 function prepareFavicons() {
-    const links = el.main.querySelectorAll('a');
+    const links = els.main.querySelectorAll('a');
     for (const a of links) {
         setFavicon(a, a.href);
     }
@@ -125,36 +129,36 @@ function removeFavicons(root) {
 const createStyleString = (n, v) => v[0] === '!' ? '' : `${n}:${v};`;
 // store the updated version
 function editOk() {
-    if (el.editing.tagName === 'A') {
-        el.editing.textContent = getValue('#editname');
-        el.editing.href = getValue('#editurl');
-        setFavicon(el.editing, getValue('#editurl'));
+    if (els.editing instanceof HTMLAnchorElement) {
+        els.editing.textContent = getValue('#editname');
+        els.editing.href = getValue('#editurl');
+        setFavicon(els.editing, getValue('#editurl'));
     }
     else {
-        if (el.editing.tagName === 'SECTION') {
-            el.editing.firstElementChild.textContent = getValue('#editname');
+        if (els.editing.tagName === 'SECTION') {
+            els.editing.firstElementChild.textContent = getValue('#editname');
         }
         else {
             return;
         }
     }
-    el.editing.dataset.bg = getColorValue('#bgcol');
-    el.editing.dataset.fg = getColorValue('#fgcol');
+    els.editing.dataset.bg = getColorValue('#bgcol');
+    els.editing.dataset.fg = getColorValue('#fgcol');
     let styleString = '';
-    styleString += createStyleString('background', el.editing.dataset.bg);
-    styleString += createStyleString('color', el.editing.dataset.fg);
-    el.editing.style = styleString;
-    el.dialog.close();
+    styleString += createStyleString('background', els.editing.dataset.bg);
+    styleString += createStyleString('color', els.editing.dataset.fg);
+    els.editing.setAttribute("style", styleString);
+    dialog.close();
     saveChanges();
-    flash(el.editing);
-    el.editing.classList.remove('edited');
-    el.editing = null;
+    flash(els.editing);
+    els.editing.classList.remove('edited');
+    delete els.editing;
 }
 function saveChanges(makeBackup = true) {
     if (makeBackup) {
         OPTS.backup = OPTS.html;
     }
-    const html = document.querySelector('main').innerHTML;
+    const html = els.main.innerHTML;
     const tree = treeFromHTML(html);
     removeFavicons(tree);
     cleanTree(tree);
@@ -175,9 +179,7 @@ function treeFromHTML(html) {
 }
 function detectKeydown(e) {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-        const saveButton = document.querySelector('#editok');
-        if (saveButton)
-            saveButton.click();
+        simulateClick('#editok');
     }
     if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey)) {
         if (OPTS.backup) {
@@ -191,7 +193,7 @@ function detectKeydown(e) {
         });
     }
     if (e.code === 'Escape') {
-        if (el.body.classList.contains('editing')) {
+        if (els.body.classList.contains('editing')) {
             editCancel();
         }
     }
@@ -210,14 +212,14 @@ function addLink() {
         return;
     }
     const a = createExampleLink();
-    el.main.append(a);
+    els.main.append(a);
 }
 function addPanel() {
     if (OPTS.lock) {
         toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
         return;
     }
-    const div = cloneTemplate('#template_panel', el.main);
+    const div = cloneTemplateToTarget('#template_panel', els.main);
     return div;
 }
 /**
@@ -234,7 +236,7 @@ export function buildBookmarks(OPTS, data, target, count) {
         if (count === 0)
             break;
         const indoc = OPTS.hideBookmarksInPage && document.querySelector(`[href="${x.url}"]`);
-        if (indoc || x.dateAdded < Date.now() - twoWeeks) {
+        if (indoc || x.dateAdded && x.dateAdded < Date.now() - twoWeeks) {
             // bookmark is already in doc, or its older
             // than three weeks, so skip it.
             // TODO make this an option?
@@ -242,8 +244,8 @@ export function buildBookmarks(OPTS, data, target, count) {
         else {
             count--;
             const a = createExampleLink(x.title, x.url);
-            a.id = window.btoa(Date.now() * Math.random()).slice(-8).toLowerCase();
-            if (x.dateAdded > Date.now() - fourDays) {
+            a.id = window.btoa(String(Date.now() * Math.random())).slice(-8).toLowerCase();
+            if (x.dateAdded && x.dateAdded > Date.now() - fourDays) {
                 a.classList.add('fresh');
             }
             target.append(a);
@@ -256,13 +258,29 @@ function addAnchorListeners(a) {
 }
 /* For a given elem, if it's not a container element, return its parent. */
 function findNav(elem) {
+    let result;
     switch (elem.tagName) {
-        case 'SECTION': return elem.children[1];
-        case 'H1': return elem.nextElementSibling;
-        case 'NAV': return elem;
-        case 'A': return elem.parentElement;
-        case 'MAIN': return elem;
-        case 'IMG': return elem.parentElement.parentElement;
+        case 'SECTION':
+            result = elem.children[1];
+            break;
+        case 'H1':
+            result = elem.nextElementSibling;
+            break;
+        case 'NAV':
+            result = elem;
+            break;
+        case 'A':
+            result = elem.parentElement;
+            break;
+        case 'MAIN':
+            result = elem;
+            break;
+        case 'IMG':
+            result = elem.parentElement?.parentElement;
+            break;
+    }
+    if (result) {
+        return result;
     }
     throw new Error("can't safely choose container");
 }
@@ -286,23 +304,20 @@ function findParentWithFlex(elem) {
  * half of the element, 'beforebegin' is returned, otherwise 'afterend'
  */
 function calculatePositionWithinTarget(e) {
-    const parentWithFlex = findParentWithFlex(e.target.parentElement.parentElement);
+    const target = e.target;
+    const parentWithFlex = findParentWithFlex(target.parentElement.parentElement);
     const style = window.getComputedStyle(parentWithFlex);
     const flexDir = style.getPropertyValue('flex-direction');
-    let widthOrHeight, xOrY, offset;
+    const parentRect = target.getBoundingClientRect();
+    let width, position;
     if (flexDir === 'row') {
-        widthOrHeight = 'width';
-        xOrY = 'clientX';
-        offset = 'x';
+        width = parentRect.width;
+        position = e.clientX - parentRect.x;
     }
     else {
-        widthOrHeight = 'height';
-        xOrY = 'clientY';
-        offset = 'y';
+        width = parentRect.height;
+        position = e.clientY - parentRect.y;
     }
-    const parentRect = e.target.getBoundingClientRect();
-    const width = parentRect[widthOrHeight];
-    const position = e[xOrY] - parentRect[offset];
     return (position * 2 < width) ? 'beforebegin' : 'afterend';
 }
 /*
@@ -311,7 +326,7 @@ function calculatePositionWithinTarget(e) {
  */
 function moveElement(e) {
     const tgt = e.target;
-    if (dragging === tgt)
+    if (!dragging || dragging === tgt)
         return; // can't drop on self
     const nav = findNav(tgt);
     const position = tgt === dragging.nextElementSibling ? 'afterend' : 'beforebegin';
@@ -356,7 +371,7 @@ function replaceElementInOriginalPosition() {
     else {
         original.parent.append(dragging);
     }
-    dragging = null;
+    dragging = undefined;
 }
 function dragEnter() {
     dragging = dragging || createExampleLink('💧');
@@ -370,11 +385,12 @@ function dragStart(e) {
         return;
     }
     dragStartedOnThisPage = true;
-    el.body.classList.add('dragOngoing');
-    if (el.body.classList.contains('editing'))
+    els.body.classList.add('dragOngoing');
+    if (els.body.classList.contains('editing'))
         return;
-    if (e.target.classList.contains('new')) {
-        if (e.target.id === 'addlink') {
+    const target = e.target;
+    if (target.classList.contains('new')) {
+        if (target.id === 'addlink') {
             dummy = createExampleLink();
             dummy.classList.add('dragging');
             dragging = dummy;
@@ -388,14 +404,14 @@ function dragStart(e) {
         }
     }
     else {
-        dragging = e.target;
+        dragging = target;
         dragging.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.dropEffect = 'move';
         toast.html('moving', '<h1>Moving&hellip;</h1><p>Drop anywhere in the page or cancel with the Escape key.</p>');
     }
-    original.parent = e.target.parentElement;
-    original.sibling = e.target.nextElementSibling;
+    original.parent = target.parentElement;
+    original.sibling = target.nextElementSibling;
     // setDragImage(e);  // <-- not sure I like disabling this or if I want it as an option
 }
 function flash(elem) {
@@ -413,23 +429,24 @@ function dragOver(e) {
         toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
         return;
     }
-    if (e.target === el.bin) {
-        el.bin.classList.add('over');
+    if (e.target === els.bin) {
+        els.bin.classList.add('over');
     }
     else {
-        el.bin.classList.remove('over');
+        els.bin.classList.remove('over');
     }
-    if (checkDragIsWithin(e.target, el.main)) {
+    const target = e.target;
+    if (checkDragIsWithin(target, els.main)) {
         e.preventDefault();
-        if (!el.toolbar.contains(e.target)) {
+        if (!els.toolbar.contains(target)) {
             moveElement(e);
         }
     }
     else {
         // when outside the drop zone, temporary moves are undone
         // and the dragged element returns to its original spot
-        if (original.parent === el.toolbar) {
-            el.main.append(dragging);
+        if (original.parent === els.toolbar) {
+            els.main.append(dragging);
         }
         else {
             if (original.sibling) {
@@ -439,12 +456,12 @@ function dragOver(e) {
                 original.parent.append(dragging);
             }
         }
-        if (e.target === el.bin) { // gotta allow bin drops too
+        if (e.target === els.bin) { // gotta allow bin drops too
             e.preventDefault();
             tooltip.reposition(e, 'Drop trash here.');
         }
     }
-    prepareDynamicFlex(el.main);
+    prepareDynamicFlex(els.main);
 }
 function extractDataFromDrop(e) {
     const html = e.dataTransfer.getData('text/html');
@@ -454,8 +471,10 @@ function extractDataFromDrop(e) {
         const parser = new DOMParser();
         const tdoc = parser.parseFromString(html, 'text/html');
         const link = tdoc.querySelector('a');
-        url = link.href;
-        text = link.textContent;
+        if (link) {
+            url = link.href;
+            text = link.textContent;
+        }
     }
     else {
         try {
@@ -484,8 +503,8 @@ function dragDrop(e) {
     e.preventDefault();
     dragging.classList.remove('dragging');
     dragging.classList.remove('fresh');
-    if (e.target === el.bin) {
-        el.trash.lastElementChild.append(dragging);
+    if (e.target === els.bin) {
+        els.trash.lastElementChild.append(dragging);
         saveChanges();
         toast.html('locked', '<h1>Moved.</h1><p>Your item is now in the trash.</p>');
     }
@@ -506,8 +525,8 @@ function dragEnd(e) {
         toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
         return;
     }
-    el.body.classList.remove('dragOngoing');
-    el.bin.classList.remove('over');
+    els.body.classList.remove('dragOngoing');
+    els.bin.classList.remove('over');
     if (dragging) {
         dragging.classList.remove('dragging');
         dragging.classList.remove('fresh');
@@ -529,9 +548,9 @@ function dragEnd(e) {
 }
 export async function prepareBookmarks(OPTS, target) {
     if (OPTS.showBookmarksSidebar) {
-        const count = JSON.parse(OPTS.showBookmarksLimit);
+        const count = OPTS.showBookmarksLimit;
         const bp = new Promise(resolve => {
-            chrome.bookmarks.getRecent(count + 20, resolve);
+            chrome.bookmarks.getRecent(20 + count, resolve);
         });
         buildBookmarks(OPTS, await bp, target, count);
     }
@@ -539,7 +558,7 @@ export async function prepareBookmarks(OPTS, target) {
 }
 function toggleBookmarks() {
     OPTS.showBookmarksSidebar = !OPTS.showBookmarksSidebar;
-    prepareBookmarks(OPTS, el.bookmarksnav);
+    prepareBookmarks(OPTS, els.bookmarksnav);
     showBookmarks(OPTS.showBookmarksSidebar);
     saveChanges();
 }
@@ -565,42 +584,48 @@ function showBookmarks(visible = true) {
 function prepareElements(selectors = '[id]') {
     const el = {};
     const elems = document.querySelectorAll(selectors);
-    elems.forEach(e => { el[e.id ? e.id : e.tagName.toLowerCase()] = e; });
+    elems.forEach(e => {
+        el[e.id ? e.id : e.tagName.toLowerCase()] = e;
+    });
     return el;
 }
-const findParentSection = elem => {
+function findParentSection(elem) {
     if (!elem)
         return null;
     return elem.tagName === 'SECTION' ? elem : elem.parentElement;
-};
-const toggleFold = e => {
-    if (e.target.tagName === 'A')
+}
+;
+function toggleFold(e) {
+    if (!(e.target instanceof HTMLAnchorElement))
         return;
-    if (el.body.classList.contains('editing'))
+    if (els.body.classList.contains('editing'))
         return;
     const foldMe = findParentSection(e.target);
-    if (foldMe === el.trash) {
+    if (foldMe === els.trash) {
         toast.html('locked', '<h1>Trash panel hidden.</h1>');
         toggleTrash();
         saveChanges();
         return;
     }
-    if (foldMe.tagName === 'SECTION') {
+    if (foldMe?.tagName === 'SECTION') {
         foldMe.classList.toggle('folded');
         saveChanges();
     }
-    prepareDynamicFlex(el.main);
-};
+    prepareDynamicFlex(els.main);
+}
+;
 function editSection(e) {
-    if (e.target.tagName === 'A')
+    const target = e.target;
+    if (target.tagName === 'A')
         return;
-    if (el.body.classList.contains('editing'))
+    if (els.body.classList.contains('editing'))
         return;
-    const foldMe = findParentSection(e.target);
-    if (foldMe === el.trash)
+    const foldMe = findParentSection(target);
+    if (foldMe === els.trash)
         return;
-    if (e.shiftKey && foldMe.tagName === 'SECTION')
+    if (e.shiftKey && foldMe instanceof HTMLElement && foldMe?.tagName === 'SECTION') {
         editStart(foldMe);
+    }
 }
 /** add a fold button to the page if necessary */
 function prepareFoldables(selectors = 'main') {
@@ -617,8 +642,8 @@ function storageChanged(changes) {
         }
         else {
             util.prepareCSSVariables(OPTS);
-            prepareDynamicFlex(el.main);
-            prepareBookmarks(OPTS, el.bookmarksnav);
+            prepareDynamicFlex(els.main);
+            prepareBookmarks(OPTS, els.bookmarksnav);
         }
     }
 }
@@ -628,8 +653,8 @@ function prepareListeners() {
         addAnchorListeners(a);
     }
     document.addEventListener('keydown', detectKeydown);
-    el.addlink.addEventListener('click', addLink);
-    el.addpanel.addEventListener('click', addPanel);
+    els.addlink.addEventListener('click', addLink);
+    els.addpanel.addEventListener('click', addPanel);
     chrome.storage.onChanged.addListener(storageChanged);
 }
 function prepareContent(html) {
@@ -637,56 +662,60 @@ function prepareContent(html) {
     const tempdoc = parser.parseFromString(html, 'text/html');
     const topLevel = tempdoc.querySelectorAll('body>*');
     // clean page
-    while (el.main.firstElementChild) {
-        el.main.firstElementChild.remove();
+    while (els.main.firstElementChild) {
+        els.main.firstElementChild.remove();
     }
     // populate page
     for (const elem of topLevel) {
-        el.main.append(elem);
+        els.main.append(elem);
     }
     prepareFavicons();
     prepareListeners();
 }
 function toggleTrash() {
     // ensure trash is the last thing on the screen
-    el.main.append(el.trash);
-    el.trash.classList.toggle('open');
-    if (el.trash.classList.contains('open')) {
-        el.trash.scrollIntoView({ behavior: 'smooth' });
+    els.main.append(els.trash);
+    els.trash.classList.toggle('open');
+    if (els.trash.classList.contains('open')) {
+        els.trash.scrollIntoView({ behavior: 'smooth' });
     }
     else {
-        el.main.scrollIntoView({ behavior: 'smooth' });
+        els.main.scrollIntoView({ behavior: 'smooth' });
     }
 }
 function clearDialog() {
-    while (el.dialog.firstElementChild) {
-        el.dialog.firstElementChild.remove();
+    while (dialog?.firstElementChild) {
+        dialog.firstElementChild.remove();
     }
 }
 function cloneToDialog(selector) {
-    el.dialog = document.createElement('dialog');
-    el.dialog.id = 'dialog';
-    document.body.append(el.dialog);
+    dialog = document.createElement('dialog');
+    dialog.id = 'dialog';
+    document.body.append(dialog);
     const template = document.querySelector(selector);
+    if (!(template instanceof HTMLTemplateElement)) {
+        throw new Error("Failed to clone. Selector " + selector + " in dialog must point to a template.");
+    }
     const clone = document.importNode(template.content, true);
+    if (!clone) {
+        throw new Error("Failed to clone " + selector + " in dialog.  Template needs children to continue.  Sad.");
+    }
     clearDialog();
-    el.dialog.append(clone);
-    return el.dialog;
+    dialog.append(clone);
 }
-function cloneTemplate(selector, where) {
-    const template = document.querySelector(selector);
-    const clone = document.importNode(template.content, true);
+function cloneTemplateToTarget(selector, where) {
+    const clone = cloneTemplate(selector);
     where.append(clone);
     return where.lastElementChild;
 }
 function prepareTrash() {
-    el.trash = el.trash || document.querySelector('#trash');
-    if (!el.trash) {
-        el.trash = cloneTemplate('#template_trash', el.main);
-        el.trash.id = 'trash';
+    els.trash = els.trash || document.querySelector('#trash');
+    if (!els.trash) {
+        els.trash = cloneTemplateToTarget('#template_trash', els.main);
+        els.trash.id = 'trash';
     }
-    el.trash.classList.add('invisible');
-    el.bin.addEventListener('click', toggleTrash);
+    els.trash.classList.add('invisible');
+    els.bin.addEventListener('click', toggleTrash);
 }
 /*
  * make all links within a doc draggable
@@ -710,35 +739,36 @@ function prepareDynamicFlex(where) {
         }
     }
     else {
-        const elems = el.main.querySelectorAll('[data-size]');
+        const elems = els.main.querySelectorAll('[data-size]');
         elems.forEach(el => { el.removeAttribute('data-size'); });
     }
 }
 function calculateDynamicFlex(where) {
     let total = 0;
     const nav = where.querySelector('nav');
-    for (const child of nav.children) {
-        if (child.tagName === 'SECTION') {
-            if (child.classList.contains('folded')) {
+    if (nav) {
+        for (const child of nav.children) {
+            if (child.tagName === 'SECTION') {
+                if (child.classList.contains('folded')) {
+                    total += 1;
+                }
+                else {
+                    total += Math.max(1, calculateDynamicFlex(child));
+                }
+            }
+            if (child.tagName === 'A') {
                 total += 1;
             }
-            else {
-                total += Math.max(1, calculateDynamicFlex(child));
-            }
-        }
-        if (child.tagName === 'A') {
-            total += 1;
         }
     }
     if (where.tagName === 'SECTION') {
-        where.dataset.size = total;
+        where.dataset.size = String(total);
     }
     return total;
 }
 function emptyTrash() {
-    el.trash = document.querySelector('#trash');
-    el.trash.remove();
-    delete el.trash;
+    delete els.trash;
+    document.querySelector('#trash')?.remove();
     prepareTrash();
     saveChanges(false);
 }
@@ -763,12 +793,12 @@ function prepareMain(OPTS) {
     prepareContent(OPTS.html);
     prepareDrag();
     prepareFoldables();
-    prepareDynamicFlex(el.main);
+    prepareDynamicFlex(els.main);
 }
 /** Migration **/
 function migrateLinks() {
     /* pre 1.6 used data-href */
-    for (const o of document.querySelectorAll('[data-href]')) {
+    for (const o of document.querySelectorAll('a[data-href]')) {
         o.href = o.dataset.href;
         delete o.dataset.href;
     }
@@ -781,8 +811,8 @@ function migrateLinks() {
 }
 async function prepareAll() {
     await loadOptionsWithPromise();
-    el = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
-    prepareBookmarks(OPTS, el.bookmarksnav);
+    els = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
+    prepareBookmarks(OPTS, els.bookmarksnav);
     util.prepareCSSVariables(OPTS);
     prepareMain(OPTS);
     prepareTrash();

@@ -3,7 +3,7 @@
 
 export interface Options {
   [index:string]: any,
-  storage: string,
+  storage: "local"|"sync",
   showToast: number,
   showToolTips: boolean,
   lock: boolean,

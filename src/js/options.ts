@@ -37,7 +37,11 @@ export function loadOptionsWithPromise() {
         reject(chrome.runtime.lastError.message);
       } else {
         for (const key in items) {
-          OPTS[key] = items[key];
+          if (typeof OPTS[key] ==='number') {
+            OPTS[key] = Number(items[key]);
+          } else {
+            OPTS[key] = items[key];
+          }
         }
         resolve(items);
       }
@@ -75,7 +79,7 @@ interface NonEmptyDocumentFragment extends DocumentFragment {
   lastElementChild:HTMLElement
 }
 
-function cloneTemplate(selector:string):NonEmptyDocumentFragment {
+export function cloneTemplate(selector:string):NonEmptyDocumentFragment {
   const template = document.querySelector(selector) as HTMLTemplateElement;
   if (template && template.content.lastElementChild) {
     return document.importNode(template.content, true) as NonEmptyDocumentFragment;
@@ -229,7 +233,7 @@ export function saveOptions() {
   STORE.set(OPTS, () => toast.popup('Option change stored.'));
 }
 
-function simulateClick(selector:string) {
+export function simulateClick(selector:string) {
   const inp = document.querySelector(selector);
   if (inp instanceof HTMLElement) {
     inp.click();
