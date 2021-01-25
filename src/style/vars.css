@@ -5,11 +5,11 @@
 
   --button-min-height: 3rem;
   --trash-min-height: calc( var(--button-min-height * 2));
-  
+
   --toast-width: 20rem;
   --toast-time: 3s;
   --toast-offset: 0.5rem;
-  
+
   --tool-tip-top: 0;
   --tool-tip-left: 0;
 
@@ -21,28 +21,29 @@
   --small: calc( var(--tiny) * 2 );
   --medium: calc( var(--tiny) * 4 );
   --large: calc( var(--tiny) * 8 );
+  --huge: calc( var(--tiny) * 16 );
   --massive: calc( var(--tiny) * 32 );
 
 
-  
+
   /* Colours */
 
-  --fg-dark: #111; 
+  --fg-dark: #111;
   --fg-mid: #333;
   --fg-light: #555;
   --fg-light-alpha: #5557;
 
-  --bg-dark: #BBB; 
+  --bg-dark: #BBB;
   --bg-mid: #DDD;
   --bg-light: #F7F7F7;
 
   --bg-drop: #C00;
   --fg-drop: #FFF;
-  
+
   --key-col:  #06C;
   --key-col-inv:  #FFF;
-  
-  
+
+
   --overlay-light: rgba(255,255,255,0.5);
   --overlay-mid: rgba(255,255,255,0.3);
   --overlay-dark: rgba(0,0,0,0.1);
@@ -59,16 +60,16 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-dark: #111; 
+    --bg-dark: #111;
     --bg-mid: #333;
     --bg-light: #555;
 
-    --fg-dark: #BBB; 
+    --fg-dark: #BBB;
     --fg-mid: #DDD;
     --fg-light: #FFF;
     --fg-light-alpha: #0005;
 
     --bg-drop: #A00;
-    --fg-drop: #CCC;  
+    --fg-drop: #CCC;
   }
 }
