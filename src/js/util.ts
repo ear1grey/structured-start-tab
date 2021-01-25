@@ -1,4 +1,4 @@
-import { Options } from './defaults';
+import { Options } from './defaults.js';
 
 export function prepareCSSVariables(OPTS: Options) {
   document.documentElement.style.setProperty('--tiny', Number(OPTS.space) / 1000 + 'em');

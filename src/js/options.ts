@@ -71,12 +71,21 @@ function updatePageWithPrefs(prefs:Options) {
   setValue(prefs, 'fontsize');
 }
 
-function cloneTemplate(selector:string) {
-  const template = <HTMLTemplateElement> document.querySelector(selector);
-  if (template) {
-    return document.importNode(template.content, true);
+interface NonEmptyDocumentFragment extends DocumentFragment {
+  lastElementChild:HTMLElement
+}
+
+function cloneTemplate(selector:string):NonEmptyDocumentFragment {
+  const template = document.querySelector(selector) as HTMLTemplateElement;
+  if (template && template.content.lastElementChild) {
+    return document.importNode(template.content, true) as NonEmptyDocumentFragment;
   }
   throw new Error("Template not found!");
+}
+
+interface ElAttrs {
+  // id:string,
+  [key:string]:string
 }
 
 /**
@@ -86,20 +95,27 @@ function cloneTemplate(selector:string) {
   * @param attrs - to be added to the input element (e.g. max, min)
   * @param txt - text for the label
   */
-function create(where:HTMLElement, type:string, attrs:object, txt:string) {
+function create(where:Element, type:string, attrs:ElAttrs, txt:string):Element {
 
-  let elem:DocumentFragment = cloneTemplate('#template_' + type);
+  let elem = cloneTemplate('#template_' + type);
   where.append(elem);
 
-  const elemInDoc:Element|null = where.lastElementChild;
+  const elemInDoc = where.lastElementChild as Element;
   if (elemInDoc) {
-    elemInDoc.setAttribute('for', attrs.id);
+    if (attrs.id) {
+      elemInDoc.setAttribute('for', attrs.id);
+    }
     const input = elemInDoc.querySelector('[name=input]');
-    for (const [attr, val] of Object.entries(attrs)) {
-      input[attr] = val;
+    if (input) {
+      for (const [attr, val] of Object.entries(attrs)) {
+        input.setAttribute(attr, val);
+      }
     }
     if (txt) {
-      elemInDoc.querySelector('[name=text]').textContent = txt;
+      const txtElem = elemInDoc.querySelector('[name=text]');
+      if (txtElem) {
+        txtElem.textContent = txt;
+      }
     }
     elemInDoc.addEventListener('input', saveOptions);
   }
@@ -107,20 +123,22 @@ function create(where:HTMLElement, type:string, attrs:object, txt:string) {
   return elemInDoc;
 }
 
-function createPageWithPrefs(prefs) {
+function createPageWithPrefs(prefs:Options) {
   const settings = document.querySelector('#settings');
-  const layout = create(settings, 'section', {}, 'Layout');
-  const book = create(settings, 'section', {}, 'Bookmarks');
-  const feed = create(settings, 'section', {}, 'Messages & Feedback');
-  create(book, 'checkbox', { id: 'showBookmarksSidebar' }, 'Include a sidebar of most recent bookmarks.');
-  create(book, 'checkbox', { id: 'hideBookmarksInPage' }, 'Omit bookmarks that are already in the page.');
-  create(book, 'number', { id: 'showBookmarksLimit' }, 'Number of recent bookmarks to show.');
-  create(feed, 'checkbox', { id: 'showToolTips' }, 'Show helpful tooltips when hovering over things.');
-  create(feed, 'number', { id: 'showToast' }, 'Time (in seconds) each feedback message is shown.   Setting this to zero will disable messages.');
-  create(layout, 'checkbox', { id: 'lock' }, 'Lock page.', 'When locked, no drags can occur and no new links can be added.');
-  create(layout, 'checkbox', { id: 'proportionalSections' }, 'Proportional Sections.');
-  create(layout, 'range', { id: 'space', max: 200, min: 0, step: 5 }, 'Space between items.');
-  create(layout, 'range', { id: 'fontsize', max: 150, min: 50, step: 10 }, 'Adjust font size.');
+  if (settings) {
+    const layout = create(settings, 'section', {}, 'Layout');
+    const book = create(settings, 'section', {}, 'Bookmarks');
+    const feed = create(settings, 'section', {}, 'Messages & Feedback');
+    create(book, 'checkbox', { id: 'showBookmarksSidebar' }, 'Include a sidebar of most recent bookmarks.');
+    create(book, 'checkbox', { id: 'hideBookmarksInPage' }, 'Omit bookmarks that are already in the page.');
+    create(book, 'number', { id: 'showBookmarksLimit' }, 'Number of recent bookmarks to show.');
+    create(feed, 'checkbox', { id: 'showToolTips' }, 'Show helpful tooltips when hovering over things.');
+    create(feed, 'number', { id: 'showToast' }, 'Time (in seconds) each feedback message is shown.   Setting this to zero will disable messages.');
+    create(layout, 'checkbox', { id: 'lock' }, 'Lock page.  When locked, no drags can occur and no new links can be added.');
+    create(layout, 'checkbox', { id: 'proportionalSections' }, 'Proportional Sections.');
+    create(layout, 'range', { id: 'space', max: "200", min: "0", step: "5" }, 'Space between items.');
+    create(layout, 'range', { id: 'fontsize', max: "150", min: "50", step: "10" }, 'Adjust font size.');
+  }
   updatePageWithPrefs(prefs);
 }
 
@@ -134,16 +152,18 @@ function exportHTML() {
 }
 
 function importHTML() {
-  document.querySelector('#fileupload').click();
+  simulateClick('#fileupload');
 }
 
-function importLoadedFile(file) {
-  OPTS.backup = OPTS.html;
-  OPTS.html = file.target.result;
-  saveOptions();
+function importLoadedFile(file:ProgressEvent<FileReader>) {
+  if (file.target && typeof file.target.result === 'string') {
+    OPTS.backup = OPTS.html;
+    OPTS.html = file.target.result;
+    saveOptions();
+  }
 }
 
-function upload(file) {
+function upload(file:File|null) {
   if (file) {
     const reader = new FileReader();
     reader.addEventListener('load', importLoadedFile);
@@ -152,29 +172,37 @@ function upload(file) {
   }
 }
 
-function uploadFile(e) {
+function uploadFile(e:DragEvent) {
   e.preventDefault();
-  const file = e.dataTransfer.files[0];
-  upload(file);
+  if (e.dataTransfer) {
+    const file = e.dataTransfer.files[0];
+    upload(file);
+  }
 }
 
-function uploadFiles(e) {
+interface HTMLInputEvent extends Event {
+  target: HTMLInputElement & EventTarget;
+}
+
+function uploadFiles(e:Event) {
   e.preventDefault();
-  const file = e.target.files[0];
+  const target = e.target as HTMLInputElement;
+  const file = target.files && target.files[0];
   upload(file);
 }
 
 
 function prepareListeners() {
-  document.getElementById('export').addEventListener('click', exportHTML);
-  document.getElementById('import').addEventListener('click', importHTML);
+  // ! ensures that if any of these elems don't exist a NPE is thrown.
+  document.getElementById('export')!.addEventListener('click', exportHTML);
+  document.getElementById('import')!.addEventListener('click', importHTML);
 
   const importDropZone = document.getElementById('importdropzone');
-  importDropZone.addEventListener('dragover', e => e.preventDefault());
-  importDropZone.addEventListener('drop', uploadFile);
+  importDropZone!.addEventListener('dragover', e => e.preventDefault());
+  importDropZone!.addEventListener('drop', uploadFile);
 
   const fileupload = document.getElementById('fileupload');
-  fileupload.addEventListener('change', uploadFiles, false);
+  fileupload!.addEventListener('change', uploadFiles, false);
 
   chrome.runtime.onMessage.addListener(receiveBackgroundMessages);
   chrome.storage.onChanged.addListener(updateOptions);
@@ -201,11 +229,18 @@ export function saveOptions() {
   STORE.set(OPTS, () => toast.popup('Option change stored.'));
 }
 
-function toggleBookmarks() {
-  document.querySelector('#showBookmarksSidebar').click();
+function simulateClick(selector:string) {
+  const inp = document.querySelector(selector);
+  if (inp instanceof HTMLElement) {
+    inp.click();
+  }
 }
 
-function receiveBackgroundMessages(m) {
+function toggleBookmarks() {
+  simulateClick('#showBookmarksSidebar');
+}
+
+function receiveBackgroundMessages(m:{item:string}) {
   switch (m.item) {
 //    case 'emptytrash': emptyTrash(); break;
     case 'toggle-sidebar': toggleBookmarks(); break;

@@ -1,4 +1,4 @@
-import { Options } from './defaults';
+import { Options } from './defaults.js';
 
 let tip: HTMLElement;
 let OPTS: Options;
