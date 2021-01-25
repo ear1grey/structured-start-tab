@@ -18,16 +18,17 @@ const fourDays = oneDay * 4;
 const twoWeeks = oneDay * 14;
 
 let dialog:HTMLDialogElement|undefined;
-let dragging:HTMLElement|undefined;
-let dummy:HTMLElement;
 let els:Elems;
 
-interface Original {
-  sibling?:HTMLElement,
-  parent?:HTMLElement
+interface Dragging {
+  el: HTMLElement,
+  dummy?: HTMLElement,
+  sibling?: Element | null,
+  parent?: HTMLElement | null,
+  startedOnThisPage?: boolean,
 };
 
-const original:Original = {};
+let dragging: Dragging | undefined;
 
 function setValue(where:string, what:string|null, open = false) {
   const elem:HTMLInputElement = <HTMLInputElement> document.querySelector(where);
@@ -256,13 +257,17 @@ function addLink() {
   els.main.append(a);
 }
 
+function createPanel() {
+  const div = cloneTemplateToTarget('#template_panel', els.main);
+  return div;
+}
+
 function addPanel() {
   if (OPTS.lock) {
     toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
     return;
   }
-  const div = cloneTemplateToTarget('#template_panel', els.main);
-  return div;
+  return createPanel();
 }
 
 /**
@@ -362,30 +367,30 @@ function calculatePositionWithinTarget(e:DragEvent) {
  */
 function moveElement(e:DragEvent) {
   const tgt = e.target! as HTMLElement;
-  if (!dragging || dragging === tgt) return; // can't drop on self
+  if (!dragging || dragging.el === tgt) return; // can't drop on self
 
   const nav = findNav(tgt);
-  const position = tgt === dragging.nextElementSibling ? 'afterend' : 'beforebegin';
+  const position = tgt === dragging.el.nextElementSibling ? 'afterend' : 'beforebegin';
 
-  if (dragging.tagName === 'A') {
-    if (tgt.tagName === 'H1') return nav.prepend(dragging);
-    if (tgt.tagName === 'A') return tgt.insertAdjacentElement(position, dragging);
-    if (nav.children.length === 0) return nav.prepend(dragging);
+  if (dragging.el.tagName === 'A') {
+    if (tgt.tagName === 'H1') return nav.prepend(dragging.el);
+    if (tgt.tagName === 'A') return tgt.insertAdjacentElement(position, dragging.el);
+    if (nav.children.length === 0) return nav.prepend(dragging.el);
   }
 
-  if (dragging.tagName === 'SECTION') {
-    if (dragging.contains(tgt)) return; // can't drop *inside* self
+  if (dragging.el.tagName === 'SECTION') {
+    if (dragging.el.contains(tgt)) return; // can't drop *inside* self
     // if (nav.parentElement === dragging) return; // can't drop *inside* self
     // dropping on a heading inserted before that heading's parent
     if (tgt.tagName === 'H1') {
       const beforeOrAfter = calculatePositionWithinTarget(e);
-      return tgt.parentElement!.insertAdjacentElement(beforeOrAfter, dragging);
+      return tgt.parentElement!.insertAdjacentElement(beforeOrAfter, dragging.el);
     }
 
-    if (tgt.tagName === 'A') return tgt.insertAdjacentElement(position, dragging);
-    if (tgt.tagName === 'MAIN') return nav.append(dragging);
+    if (tgt.tagName === 'A') return tgt.insertAdjacentElement(position, dragging.el);
+    if (tgt.tagName === 'MAIN') return nav.append(dragging.el);
 
-    if (nav.children.length === 0) return nav.prepend(dragging);
+    if (nav.children.length === 0) return nav.prepend(dragging.el);
   }
 }
 
@@ -402,51 +407,65 @@ function checkDragIsWithin(target:HTMLElement, preferred:HTMLElement):boolean {
 
 
 function replaceElementInOriginalPosition() {
-  if (original.sibling) {
-    original.parent.insertBefore(dragging, original.sibling);
+  if (!dragging || !dragging.parent) return;
+
+  if (dragging.sibling) {
+    dragging.parent.insertBefore(dragging.el, dragging.sibling);
   } else {
-    original.parent.append(dragging);
+    dragging.parent.append(dragging.el);
   }
-  dragging = undefined;
 }
 
 function dragEnter() {
-  dragging = dragging || createExampleLink('💧');
-  dragging.classList.add('dragging');
+  if (!dragging) {
+    dragging = {
+      el: createExampleLink('💧'),
+    }
+  }
+  dragging.el.classList.add('dragging');
 }
 
-let dragStartedOnThisPage = false;
 /* respond when a drag begins */
 function dragStart(e:DragEvent) {
   if (OPTS.lock) {
     toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
     return;
   }
-  dragStartedOnThisPage = true;
   els.body.classList.add('dragOngoing');
   if (els.body.classList.contains('editing')) return;
+
   const target = e.target! as HTMLElement;
+
+  let el, dummy;
   if (target.classList.contains('new')) {
     if (target.id === 'addlink') {
       dummy = createExampleLink();
       dummy.classList.add('dragging');
-      dragging = dummy;
+      el = dummy;
       toast.html('addlink', '<h1>Adding a link&hellip;.</h1><p>Drop anywhere in the page to add it, or press Escape to cancel.</p>');
     } else {
-      dummy = addPanel();
+      // addpanel
+      dummy = createPanel();
       dummy.classList.add('dragging');
-      dragging = dummy;
+      el = dummy;
       toast.html('addpanel', '<h1>Adding a panel&hellip;.</h1><p>Drop anywhere in the page to add it, or press Escape to cancel.</p>');
     }
   } else {
-    dragging = target;
-    dragging.classList.add('dragging');
+    el = target;
+    el.classList.add('dragging');
     e.dataTransfer!.effectAllowed = 'move';
     e.dataTransfer!.dropEffect = 'move';
     toast.html('moving', '<h1>Moving&hellip;</h1><p>Drop anywhere in the page or cancel with the Escape key.</p>');
   }
-  original.parent = target.parentElement!;
-  original.sibling = target.nextElementSibling;
+
+  dragging = {
+    el,
+    dummy,
+    parent: target.parentElement,
+    sibling: target.nextElementSibling,
+    startedOnThisPage: true,
+  }
+
   // setDragImage(e);  // <-- not sure I like disabling this or if I want it as an option
 }
 
@@ -463,16 +482,20 @@ function flash(elem:HTMLElement) {
 
 /* respond if dropping here is ok */
 function dragOver(e:DragEvent) {
+  if (!dragging) return;
+
   if (OPTS.lock) {
     toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
     return;
   }
-  if (e.target === els.bin) {
+
+  const target = e.target! as HTMLElement;
+
+  if (!dragging.dummy && target === els.bin) {
     els.bin.classList.add('over');
   } else {
     els.bin.classList.remove('over');
   }
-  const target = e.target! as HTMLElement;
 
   if (checkDragIsWithin(target, els.main)) {
     e.preventDefault();
@@ -480,16 +503,13 @@ function dragOver(e:DragEvent) {
       moveElement(e);
     }
   } else {
-    // when outside the drop zone, temporary moves are undone
-    // and the dragged element returns to its original spot
-    if (original.parent === els.toolbar) {
-      els.main.append(dragging);
+    // when outside the drop zone, temporary moves are undone,
+    // real dragged element returns to its original spot
+    // and dummy drag element is added to main so it's visible
+    if (dragging.parent === els.toolbarnav) {
+      els.main.append(dragging.el);
     } else {
-      if (original.sibling) {
-        original.parent.insertBefore(dragging, original.sibling);
-      } else {
-        original.parent.append(dragging);
-      }
+      replaceElementInOriginalPosition();
     }
     if (e.target === els.bin) { // gotta allow bin drops too
       e.preventDefault();
@@ -500,8 +520,11 @@ function dragOver(e:DragEvent) {
 }
 
 function extractDataFromDrop(e:DragEvent) {
+  if (!dragging || !(dragging.el instanceof HTMLAnchorElement)) return;
+
   const html = e.dataTransfer!.getData('text/html');
   const plainText = e.dataTransfer!.getData('text/plain');
+
   let url, text;
   if (html) {
     const parser = new DOMParser();
@@ -517,68 +540,68 @@ function extractDataFromDrop(e:DragEvent) {
       url = u.toString();
       text = url;
     } catch (e) {
-      toast.html('notlink', '<h1>Not a link or URL.</h1><p>Only links from other pages can be imported.</p>');
+      toast.html('notlink', '<h1>Not a link or URL.</h1><p>Only links can be imported from other pages.</p>');
     }
   }
+
   if (url) {
-    dragging.href = url;
-    setFavicon(dragging, url);
-    dragging.textContent = text;
+    dragging.el.href = url;
+    setFavicon(dragging.el, url);
+    dragging.el.textContent = text || '';
   } else {
-    dragging.remove();
+    dragging.el.remove();
   }
 }
 
-function dragDrop(e) {
+function dragDrop(e: DragEvent) {
+  if (!dragging) return;
+
   if (OPTS.lock) {
     toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
     return;
   }
   e.preventDefault();
-  dragging.classList.remove('dragging');
-  dragging.classList.remove('fresh');
-  if (e.target === els.bin) {
-    els.trash.lastElementChild.append(dragging);
+  dragging.el.classList.remove('dragging');
+  dragging.el.classList.remove('fresh');
+  if (e.target === els.bin && !dragging.dummy) {
+    els.trash.lastElementChild?.append(dragging.el);
     saveChanges();
     toast.html('locked', '<h1>Moved.</h1><p>Your item is now in the trash.</p>');
   } else {
-    if (!dragStartedOnThisPage) {
+    if (!dragging.startedOnThisPage) {
       extractDataFromDrop(e);
     }
     // handle all cases
     saveChanges();
   }
-  original.parent = null;
-  original.sibling = null;
-  dummy = null;
-  dragging = null;
 }
 
 
-function dragEnd(e) {
+function dragEnd(e: DragEvent) {
+  if (!dragging) return;
+
   if (OPTS.lock) {
     toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
     return;
   }
+
   els.body.classList.remove('dragOngoing');
   els.bin.classList.remove('over');
-  if (dragging) {
-    dragging.classList.remove('dragging');
-    dragging.classList.remove('fresh');
-    // event must have been cancelled because `dragging` should be reset on drop
-    if (e.srcElement.classList.contains('new')) {
-      if (dummy) {
-        dummy.remove();
-        dummy = null;
-      }
-    } else {
-      replaceElementInOriginalPosition();
-    }
-    toast.html('cancel', '<h1>Drag cancelled.</h1>');
-    dummy = null;
+
+  dragging.el.classList.remove('dragging');
+  dragging.el.classList.remove('fresh');
+  // event must have been cancelled because `dragging` should be reset on drop
+
+  if (dragging.dummy) {
+    dragging.dummy.remove();
+  } else {
+    replaceElementInOriginalPosition();
   }
-  dragStartedOnThisPage = false;
+
+  dragging = undefined;
+
   tooltip.hide();
+  toast.html('cancel', '<h1>Drag cancelled.</h1>');
 }
 
 export async function prepareBookmarks(OPTS:Options, target:HTMLElement) {
@@ -857,14 +880,14 @@ function prepareMain(OPTS:Options) {
 /** Migration **/
 function migrateLinks() {
   /* pre 1.6 used data-href */
-  for (const o of document.querySelectorAll('a[data-href]') as NodeListOf<HTMLAnchorElement>) {
+  for (const o of els.main.querySelectorAll('a[data-href]') as NodeListOf<HTMLAnchorElement>) {
     o.href = o.dataset.href!;
     delete o.dataset.href;
   }
 
   /* anchors are draggable anyway and shoudl not have the attr set
    * this was erroneously done before 1.6 */
-  for (const o of document.querySelectorAll('a[draggable]')) {
+  for (const o of els.main.querySelectorAll('a[draggable]')) {
     console.log(o);
     o.removeAttribute('draggable');
   }
