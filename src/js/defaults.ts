@@ -1,8 +1,23 @@
 // default options - these are reverted to
 // if there are no options in the browser's sync store.
 
+export interface Options {
+  [index:string]: any,
+  storage: string,
+  showToast: number,
+  showToolTips: boolean,
+  lock: boolean,
+  proportionalSections: boolean,
+  showBookmarksSidebar: boolean,
+  hideBookmarksInPage: boolean,
+  showBookmarksLimit: number,
+  space: number,
+  fontsize: number,
+  html: string,
+}
+
 // eslint-disable-next-line import/prefer-default-export
-export const OPTS = {
+export const OPTS: Options = {
   storage: 'local',
   showToast: 5,
   showToolTips: true,

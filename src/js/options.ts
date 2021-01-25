@@ -2,32 +2,36 @@
 
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
-import { OPTS } from './defaults.mjs';
-import * as toast from './toast.mjs';
-import * as util from './util.mjs';
+import { OPTS, Options } from './defaults.js';
+import * as toast from './toast.js';
+import * as util from './util.js';
 
 const STORE = chrome.storage.local;
 const prefNames = [];
 
-function setCheckBox(prefs, what) {
-  document.getElementById(what).checked = prefs[what];
+function setCheckBox(prefs:Options, what:string) {
+  const elem = <HTMLInputElement> document.getElementById(what);
+  elem.checked = <boolean> prefs[what];
 }
 
-function getCheckBox(what) {
-  OPTS[what] = document.getElementById(what).checked;
+function getCheckBox(what:string) {
+  const elem = <HTMLInputElement> document.getElementById(what);
+  OPTS[what] = elem.checked;
 }
 
-function setValue(prefs, what, defaultValue = 0) {
-  document.getElementById(what).value = prefs[what] || defaultValue;
+function setValue(prefs:Options, what:string, defaultValue = 0) {
+  const elem = <HTMLInputElement> document.getElementById(what);
+  elem.value = prefs[what] || defaultValue;
 }
 
-function getValue(what) {
-  OPTS[what] = document.getElementById(what).value;
+function getValue(what:string) {
+  const elem = <HTMLInputElement> document.getElementById(what);
+  OPTS[what] = elem.value;
 }
 
 export function loadOptionsWithPromise() {
   return new Promise((resolve, reject) => {
-    STORE.get(OPTS, (items) => {
+    STORE.get(OPTS, items => {
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError.message);
         reject(chrome.runtime.lastError.message);
@@ -55,7 +59,7 @@ function updatePrefsWithPage() {
   getValue('fontsize');
 }
 
-function updatePageWithPrefs(prefs) {
+function updatePageWithPrefs(prefs:Options) {
   setCheckBox(prefs, 'lock');
   setCheckBox(prefs, 'showBookmarksSidebar');
   setCheckBox(prefs, 'hideBookmarksInPage');
@@ -67,9 +71,12 @@ function updatePageWithPrefs(prefs) {
   setValue(prefs, 'fontsize');
 }
 
-function cloneTemplate(selector) {
-  const template = document.querySelector(selector);
-  return document.importNode(template.content, true);
+function cloneTemplate(selector:string) {
+  const template = <HTMLTemplateElement> document.querySelector(selector);
+  if (template) {
+    return document.importNode(template.content, true);
+  }
+  throw new Error("Template not found!");
 }
 
 /**
@@ -79,21 +86,25 @@ function cloneTemplate(selector) {
   * @param attrs - to be added to the input element (e.g. max, min)
   * @param txt - text for the label
   */
-function create(where, type, attrs, txt) {
-  let elem = cloneTemplate('#template_' + type);
-  where.append(elem);
-  elem = where.lastElementChild;
-  elem.setAttribute('for', attrs.id);
-  const input = elem.querySelector('[name=input]');
-  for (const [attr, val] of Object.entries(attrs)) {
-    input[attr] = val;
-  }
-  if (txt) {
-    elem.querySelector('[name=text]').textContent = txt;
-  }
-  elem.addEventListener('input', saveOptions);
+function create(where:HTMLElement, type:string, attrs:object, txt:string) {
 
-  return elem;
+  let elem:DocumentFragment = cloneTemplate('#template_' + type);
+  where.append(elem);
+
+  const elemInDoc:Element|null = where.lastElementChild;
+  if (elemInDoc) {
+    elemInDoc.setAttribute('for', attrs.id);
+    const input = elemInDoc.querySelector('[name=input]');
+    for (const [attr, val] of Object.entries(attrs)) {
+      input[attr] = val;
+    }
+    if (txt) {
+      elemInDoc.querySelector('[name=text]').textContent = txt;
+    }
+    elemInDoc.addEventListener('input', saveOptions);
+  }
+
+  return elemInDoc;
 }
 
 function createPageWithPrefs(prefs) {

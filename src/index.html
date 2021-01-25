@@ -1,0 +1,120 @@
+<!doctype html>
+<meta charset=utf8>
+<title>Structured Start Tab</title>
+<link rel="stylesheet" href="style/index.css">
+
+<main>
+</main>
+
+
+<aside id=sidebar>
+
+  <section id=toolbar>
+    <h1>Structured Start Tab</h1>
+    <nav id=toolbarnav>
+      <a class="new" draggable="true" id=addlink data-info="New link: click or drag.">Add link</a>
+      <a class="new" draggable="true" id=addpanel data-info="New panel: click or drag.">Add panel</a>
+      <a id=options href=options.html data-info="Open the options page.">Options</a>
+      <a id=bin data-info="Click to toggle the trash section open or closed.  Drag links or panels here to move them to the trash.">Trash</a>  
+    </nav>
+  </section>
+  
+  <section id=bookmarks>
+    <h1>Bookmarks</h1>
+    <nav id=bookmarksnav>
+    </nav>  
+  </section>
+
+</aside>
+
+<div id=edit>
+</div>
+
+<script defer async type=module src="./js/color-switch/index.js"></script>
+<script defer type=module src=./js/index.js></script>
+
+<template id=template_trash>
+  <section id=trash>
+    <h1>Trash</h1>
+    <nav></nav>
+  </section>
+</template>
+
+<template id=template_panel>
+  <section draggable=true>
+    <h1>Panel</h1>
+    <nav></nav>
+  </section>
+</template>
+
+
+<template id=template_edit_link>
+  <h1>Edit Link</h1>
+  <label>
+    <h2>Name</h2>
+    <input id=editname type=string placeholder='Item Name'>
+  </label>
+  <label>
+    <h2>Link</h2>
+    <input id=editurl type=string placeholder='URL'>
+  </label>
+  <label>
+    <h2>Background</h2>
+    <color-switch id=bgcol auto="Automatic" manual="Manual" value='#000000'></color-switch>
+  </label>
+  <label>
+    <h2>Text</h2>
+    <color-switch id=fgcol auto="Automatic" manual="Manual" value='#000000'></color-switch>
+  </label>
+  <div id=okcancel>
+    <button id=editok value="ok">OK</button>
+    <button id=editcancel value="cancel">Cancel</button>  
+  </div>
+</template>
+
+
+<template id=template_edit_panel>
+  <h1 id=editpanel>Editing Panel</h1>
+  <label>
+    <h2>Name</h2>
+    <input id=editname type=string placeholder='Panel Name'>
+  </label>
+  <label>
+    <h2>Background</h2>
+    <color-switch id=bgcol auto="Automatic" manual="Manual" value='#000000'></color-switch>
+  </label>
+  <label>
+    <h2>Text</h2>
+    <color-switch id=fgcol auto="Automatic" manual="Manual" value='#000000'></color-switch>
+  </label>
+  <div id=okcancel>
+    <button id=editok value="ok">OK</button>
+    <button id=editcancel value="cancel">Cancel</button>  
+  </div>
+</template>
+
+
+<template id=template_edit_link_orig>
+  <h1 id=editheading>Editing Link</h1>
+  <dl>
+    <dt>Name</dt>
+    <dd><input id=editname type=string placeholder='Item Name'></dd>
+    <dt>Link</dt>
+    <dd><input id=editurl type=string placeholder='URL'></dd>
+  </dl>
+  <button id=editok value="ok">OK</button>
+  <button id=editcancel value="cancel">Cancel</button>
+</template>
+
+
+<template id=template_edit_panel_orig>
+  <h1 id=editpanel>Editing Panel</h1>
+  <dl>
+    <dt>Name</dt>
+    <dd><input id=editname type=string placeholder='Panel Name'></dd>
+    <dt>Style</dt>
+    <dd><textarea id=editstyle type=string placeholder='style, e.g. background: teal; color: white;'></textarea></dd>
+  </dl>
+  <button id=editok value="ok">Save</button>
+  <button id=editcancel value="cancel">Cancel</button>
+</template>

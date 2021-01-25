@@ -1,13 +1,14 @@
-let tip;
-let OPTS;
+import { Options } from './defaults';
+
+let tip: HTMLElement;
+let OPTS: Options;
 
 const gap = 40;
 
-export function reposition(e, messageOverride) {
+export function reposition(e: MouseEvent, messageOverride?: string) {
   if (!OPTS.showToolTips) return;
 
-
-  tip.textContent = messageOverride || e.target.dataset.info;
+  tip.textContent = messageOverride ?? (e.target as HTMLElement).dataset.info ?? "";
   tip.style.setProperty('visibility', 'inherit');
 
   let x = e.clientX;
@@ -28,9 +29,9 @@ export function hide() {
   tip.style.setProperty('visibility', 'hidden');
 }
 
-export function prepare(O, selector = '[data-info]') {
+export function prepare(O: Options, selector = '[data-info]') {
   OPTS = O;
-  const things = document.querySelectorAll(selector);
+  const things = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
 
   for (const thing of things) {
     thing.addEventListener('mousemove', reposition);
