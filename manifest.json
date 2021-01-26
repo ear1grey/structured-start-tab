@@ -34,8 +34,8 @@
     "commands": {
         "toggle-sidebar": {
             "suggested_key": {
-                "default": "Ctrl+B",
-                "mac": "Command+B"
+                "default": "Ctrl+Shift+B",
+                "mac": "MacCtrl+Shift+B"
             },
             "description": "Toggle Sidebar"
         }
