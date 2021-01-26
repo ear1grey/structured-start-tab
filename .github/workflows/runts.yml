@@ -23,4 +23,4 @@ jobs:
       - name: npm install
         run: npm install
       - name: tsc
-        uses: icrawl/action-tsc@v1
+        run: tsc
