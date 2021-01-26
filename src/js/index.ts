@@ -903,6 +903,7 @@ async function prepareAll() {
   prepareBackgroundListener();
   toast.prepare();
   toast.popup(`Structured Start Tab v${version}`);
+  toast.popup(`Ctrl+Shift+B: Toggle Sidebar`);
   tooltip.prepare(OPTS);
   migrateLinks();
 }
