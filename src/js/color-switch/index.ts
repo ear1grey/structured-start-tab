@@ -103,9 +103,6 @@ export class ColorSwitch extends HTMLElement {
 
     const main = create(div, 'main', {id: 'main'});
 
-    // decide which one of them is selected
-    this.openOrClose();
-
     // color input
     const value = this.value.slice(0,7);
     const col = create(main, 'label', {id: 'col', for: 'pik'}, 'Colour');
@@ -130,6 +127,8 @@ export class ColorSwitch extends HTMLElement {
       intrans
     };
 
+    // decide which one of them is selected
+    this.openOrClose();
   }
 }
 
