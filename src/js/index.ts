@@ -657,7 +657,7 @@ function findParentSection(elem?:Element) {
 };
 
 function toggleFold(e:Event) {
-  if (!(e.target instanceof HTMLAnchorElement)) return;
+  if (!(e.target instanceof HTMLElement)) return;
   if (els.body.classList.contains('editing')) return;
   const foldMe = findParentSection(e.target);
   if (foldMe === els.trash) {
