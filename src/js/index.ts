@@ -26,14 +26,14 @@ interface Dragging {
   sibling?: Element | null,
   parent?: HTMLElement | null,
   startedOnThisPage?: boolean,
-};
+}
 
 let dragging: Dragging | undefined;
 
 function setValue(where:string, what:string|null, open = false) {
   const elem:HTMLInputElement = <HTMLInputElement> document.querySelector(where);
-  elem.value = what ?? "";
-  if (open) elem.dataset.open = "true";
+  elem.value = what ?? '';
+  if (open) elem.dataset.open = 'true';
 }
 
 function getValue(where:string) {
@@ -46,7 +46,7 @@ function setColorValue(where:string, what:string) {
     elem.value = what.slice(1);
   } else {
     elem.value = what;
-    elem.dataset.open = "true";
+    elem.dataset.open = 'true';
   }
 }
 
@@ -71,7 +71,7 @@ function toHex(x:number, m = 1) {
 }
 
 function translateColor(rgba:string) {
-  let parts = rgba.split('(')[1].split(')')[0].split(',');
+  const parts = rgba.split('(')[1].split(')')[0].split(',');
   const converted = [
     toHex(Number(parts[0])),
     toHex(Number(parts[1])),
@@ -177,7 +177,7 @@ function editOk() {
   let styleString = '';
   styleString += createStyleString('background', els.editing.dataset.bg);
   styleString += createStyleString('color', els.editing.dataset.fg);
-  els.editing.setAttribute("style", styleString);
+  els.editing.setAttribute('style', styleString);
 
   dialog!.close();
   saveChanges();
@@ -278,13 +278,13 @@ function addPanel() {
  * iff link has links - recurse
  * iff link has no links - inject
  */
-export function buildBookmarks(OPTS:Options, data:chrome.bookmarks.BookmarkTreeNode[], target:HTMLElement, count:number) {
+export function buildBookmarks(OPTS:Options, data:chrome.bookmarks.BookmarkTreeNode[], target:HTMLElement, count:number) :void {
   target.textContent = '';
   for (const x of data) {
     if (count === 0) break;
 
     const indoc = OPTS.hideBookmarksInPage && document.querySelector(`[href="${x.url}"]`);
-    if (indoc || x.dateAdded && x.dateAdded < Date.now() - twoWeeks) {
+    if (indoc || (x.dateAdded && x.dateAdded < Date.now() - twoWeeks)) {
       // bookmark is already in doc, or its older
       // than three weeks, so skip it.
       // TODO make this an option?
@@ -310,12 +310,12 @@ function addAnchorListeners(a:HTMLElement) {
 function findNav(elem:HTMLElement) {
   let result;
   switch (elem.tagName) {
-    case 'SECTION': result = elem.children[1];break;
-    case 'H1': result = elem.nextElementSibling;break;
-    case 'NAV': result = elem;break;
-    case 'A': result = elem.parentElement;break;
-    case 'MAIN': result = elem;break;
-    case 'IMG': result = elem.parentElement?.parentElement;break;
+    case 'SECTION': result = elem.children[1]; break;
+    case 'H1': result = elem.nextElementSibling; break;
+    case 'NAV': result = elem; break;
+    case 'A': result = elem.parentElement; break;
+    case 'MAIN': result = elem; break;
+    case 'IMG': result = elem.parentElement?.parentElement; break;
   }
   if (result) {
     return result;
@@ -327,7 +327,7 @@ function findNav(elem:HTMLElement) {
  * recursively search up-tree to find the first parent that
  * uses display: flex;
  */
-function findParentWithFlex(elem:HTMLElement):HTMLElement{
+function findParentWithFlex(elem:HTMLElement):HTMLElement {
   if (elem === document.body) return elem;
   const style = window.getComputedStyle(elem);
   const display = style.getPropertyValue('display');
@@ -420,7 +420,7 @@ function dragEnter() {
   if (!dragging) {
     dragging = {
       el: createExampleLink('💧'),
-    }
+    };
   }
   dragging.el.classList.add('dragging');
 }
@@ -464,7 +464,7 @@ function dragStart(e:DragEvent) {
     parent: target.parentElement,
     sibling: target.nextElementSibling,
     startedOnThisPage: true,
-  }
+  };
 
   // setDragImage(e);  // <-- not sure I like disabling this or if I want it as an option
 }
@@ -577,7 +577,7 @@ function dragDrop(e: DragEvent) {
 }
 
 
-function dragEnd(e: DragEvent) {
+function dragEnd() {
   if (!dragging) return;
 
   if (OPTS.lock) {
@@ -604,7 +604,7 @@ function dragEnd(e: DragEvent) {
   toast.html('cancel', '<h1>Drag cancelled.</h1>');
 }
 
-export async function prepareBookmarks(OPTS:Options, target:HTMLElement) {
+export async function prepareBookmarks(OPTS:Options, target:HTMLElement) :Promise<void> {
   if (OPTS.showBookmarksSidebar) {
     const count = OPTS.showBookmarksLimit;
     const bp = new Promise<chrome.bookmarks.BookmarkTreeNode[]>(resolve => {
@@ -654,7 +654,7 @@ function prepareElements(selectors = '[id]') :Elems {
 function findParentSection(elem?:Element) {
   if (!elem) return null;
   return elem.tagName === 'SECTION' ? elem : elem.parentElement;
-};
+}
 
 function toggleFold(e:Event) {
   if (!(e.target instanceof HTMLElement)) return;
@@ -671,7 +671,7 @@ function toggleFold(e:Event) {
     saveChanges();
   }
   prepareDynamicFlex(els.main);
-};
+}
 
 function editSection(e:Event & {shiftKey?:boolean}) {
   const target = e.target! as HTMLElement;
@@ -697,7 +697,9 @@ interface Changes {
 
 function storageChanged(changes:Changes) {
   for (const key in changes) {
-    OPTS[key] = changes[key].newValue;
+    // typecasting to avoid linter problems, this is expected to be rewritten
+    // as part of https://github.com/ear1grey/structured-start-tab/issues/83
+    (OPTS[key as keyof Options] as unknown) = changes[key].newValue;
     if (key === 'html') {
       prepareMain(OPTS);
       // TODO have a tick to show if changes are saved
@@ -757,10 +759,10 @@ function clearDialog() {
   }
 }
 
-interface PregnantHTMLElement extends HTMLDialogElement {
-  lastElementChild:HTMLElement,
-  firstElementChild:HTMLElement
-}
+// interface PregnantHTMLElement extends HTMLDialogElement {
+//   lastElementChild:HTMLElement,
+//   firstElementChild:HTMLElement
+// }
 
 function cloneToDialog(selector:string) {
   dialog = document.createElement('dialog');
@@ -770,13 +772,13 @@ function cloneToDialog(selector:string) {
   const template = document.querySelector(selector) as HTMLTemplateElement;
 
   if (!(template instanceof HTMLTemplateElement)) {
-    throw new Error("Failed to clone. Selector "+selector+" in dialog must point to a template.");
+    throw new Error('Failed to clone. Selector ' + selector + ' in dialog must point to a template.');
   }
 
   const clone = document.importNode(template.content, true);
 
   if (!clone) {
-    throw new Error("Failed to clone "+selector+" in dialog.  Template needs children to continue.  Sad.");
+    throw new Error('Failed to clone ' + selector + ' in dialog.  Template needs children to continue.  Sad.');
   }
 
   clearDialog();
@@ -784,7 +786,7 @@ function cloneToDialog(selector:string) {
 }
 
 function cloneTemplateToTarget(selector:string, where:HTMLElement) {
-  const clone = cloneTemplate(selector)
+  const clone = cloneTemplate(selector);
   where.append(clone);
   return where.lastElementChild! as HTMLElement;
 }
@@ -802,7 +804,7 @@ function prepareTrash() {
 /*
  * make all links within a doc draggable
  */
-export function prepareDrag() {
+export function prepareDrag() :void {
   // const links = document.querySelectorAll('main a, .bookmarks a');
   // for (const link of links) {
   //   link.draggable = true;
@@ -830,7 +832,7 @@ function prepareDynamicFlex(where:HTMLElement) {
 function calculateDynamicFlex(where:HTMLElement) {
   let total = 0;
   const nav = where.querySelector('nav');
-  if(nav) {
+  if (nav) {
     for (const child of nav.children) {
       if (child.tagName === 'SECTION') {
         if (child.classList.contains('folded')) {
@@ -903,7 +905,7 @@ async function prepareAll() {
   prepareBackgroundListener();
   toast.prepare();
   toast.popup(`Structured Start Tab v${version}`);
-  toast.popup(`Ctrl+Shift+B: Toggle Sidebar`);
+  toast.popup('Ctrl+Shift+B: Toggle Sidebar');
   tooltip.prepare(OPTS);
   migrateLinks();
 }

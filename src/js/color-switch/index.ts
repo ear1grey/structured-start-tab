@@ -11,7 +11,7 @@ interface ElAttrs {
   [key:string]:string
 }
 
-function create(where:HTMLElement|DocumentFragment, what:"input", attrs:ElAttrs, text?:string) :HTMLInputElement;
+function create(where:HTMLElement|DocumentFragment, what:'input', attrs:ElAttrs, text?:string) :HTMLInputElement;
 function create(where:HTMLElement|DocumentFragment, what:string, attrs:ElAttrs, text?:string) :HTMLElement;
 
 function create(where:HTMLElement|DocumentFragment, what:string, attrs:ElAttrs = {}, text?:string) {
@@ -21,7 +21,7 @@ function create(where:HTMLElement|DocumentFragment, what:string, attrs:ElAttrs =
     x.setAttribute(key, attrs[key]);
   }
 
-  if (text) x.textContent=text;
+  if (text) x.textContent = text;
   return x;
 }
 
@@ -31,46 +31,63 @@ interface Elements {
   [key:string]:HTMLElement
 }
 
-export class ColorSwitch extends HTMLElement {
+type OptionalString = string|undefined;
 
-  get open() { return this.hasAttribute('open'); };
-  get value() { return this.getAttribute('value') ?? ""; }
-  get auto() { return this.getAttribute('auto')?? undefined; }
-  get manual() { return this.getAttribute('manual') ?? undefined; }
+export class ColorSwitch extends HTMLElement {
+  get value() :string {
+    return this.getAttribute('value') ?? '';
+  }
+
+  set value(val:string) {
+    if (val) {
+      this.setAttribute('value', val);
+      this.el.incol.value = this.value.slice(0, 7);
+      this.el.intrans.value = String(parseInt(this.value.slice(7, 9), 16));
+    }
+  }
+
+  get auto() :OptionalString {
+    return this.getAttribute('auto') ?? undefined;
+  }
+
+  set auto(val:OptionalString) {
+    if (val) { this.setAttribute('auto', val); }
+  }
+
+  get manual() :OptionalString {
+    return this.getAttribute('manual') ?? undefined;
+  }
+
+  set manual(val:OptionalString) {
+    if (val) { this.setAttribute('manual', val); }
+  }
+
+  get open() :boolean {
+    return this.hasAttribute('open');
+  }
 
   set open(val:boolean) {
     if (val) {
-      this.dataset.open = "true";
+      this.dataset.open = 'true';
     } else {
       delete this.dataset.open;
     }
     this.openOrClose();
   }
 
-  set value(val) {
-    if (val) {
-      this.setAttribute('value', val);
-      this.el.incol.value = this.value.slice(0,7);
-      this.el.intrans.value = String(parseInt(this.value.slice(7,9), 16));
-    }
-  }
 
-  set auto(val) { if (val) { this.setAttribute('auto', val); } }
-  set manual(val) { if (val) { this.setAttribute('manual', val); } }
-
-
-  updateValue() {
-    this.value = this.el.incol.value + ("0"+Number(this.el.intrans.value).toString(16)).slice(-2);
+  updateValue() :void {
+    this.value = this.el.incol.value + ('0' + Number(this.el.intrans.value).toString(16)).slice(-2);
     this.open = this.el.manual.classList.contains('on');
   }
 
-  openOrClose() {
+  openOrClose() :void {
     if (this.open) {
       this.el.manual.setAttribute('class', 'on');
       this.el.auto.removeAttribute('class');
       this.el.main.setAttribute('class', 'on');
     } else {
-      this.el.manual.removeAttribute("class");
+      this.el.manual.removeAttribute('class');
       this.el.auto.setAttribute('class', 'on');
       this.el.main.removeAttribute('class');
     }
@@ -83,35 +100,35 @@ export class ColorSwitch extends HTMLElement {
     const shadow = this.attachShadow({ mode: 'open' });
     attachStyleSheet(shadow);
 
-    const div = create(shadow, 'div', {id: 'top'});
+    const div = create(shadow, 'div', { id: 'top' });
 
     // top buttons
-    const auto = create(div, 'label', {id: 'auto', for: 'auto'}, this.auto);
-    const manual = create(div, 'label', {id: 'manual', for: 'manual'}, this.manual);
+    const auto = create(div, 'label', { id: 'auto', for: 'auto' }, this.auto);
+    const manual = create(div, 'label', { id: 'manual', for: 'manual' }, this.manual);
     auto.addEventListener('click', () => {
       this.el.auto.setAttribute('class', 'on');
       this.el.manual.removeAttribute('class');
       this.el.main.removeAttribute('class');
       this.open = false;
-    })
+    });
     manual.addEventListener('click', () => {
       this.el.manual.setAttribute('class', 'on');
       this.el.auto.removeAttribute('class');
       this.el.main.setAttribute('class', 'on');
       this.open = true;
-    })
+    });
 
-    const main = create(div, 'main', {id: 'main'});
+    const main = create(div, 'main', { id: 'main' });
 
     // color input
-    const value = this.value.slice(0,7);
-    const col = create(main, 'label', {id: 'col', for: 'pik'}, 'Colour');
-    const incol = create(main, 'input', {id: 'pik', type: 'color', value});
+    const value = this.value.slice(0, 7);
+    const col = create(main, 'label', { id: 'col', for: 'pik' }, 'Colour');
+    const incol = create(main, 'input', { id: 'pik', type: 'color', value });
 
     // tranparency input
-    const transValue = String(parseInt(this.value.slice(7,9), 16));
-    const trans = create(main, 'label', {id: 'col', for: 'trs'}, 'Tranparency');
-    const intrans = create(main, 'input', { id: 'trs', type: 'range', min:"0", max:"255", value: transValue });
+    const transValue = String(parseInt(this.value.slice(7, 9), 16));
+    const trans = create(main, 'label', { id: 'col', for: 'trs' }, 'Tranparency');
+    const intrans = create(main, 'input', { id: 'trs', type: 'range', min: '0', max: '255', value: transValue });
 
     incol.addEventListener('input', this.updateValue.bind(this));
     intrans.addEventListener('input', this.updateValue.bind(this));
@@ -124,7 +141,7 @@ export class ColorSwitch extends HTMLElement {
       col,
       incol,
       trans,
-      intrans
+      intrans,
     };
 
     // decide which one of them is selected

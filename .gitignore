@@ -3,3 +3,4 @@ node_modules
 .vscode
 releases
 app
+.eslintrc.reference.json

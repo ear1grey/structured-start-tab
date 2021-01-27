@@ -2,34 +2,33 @@
 
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
-import { OPTS, Options } from './defaults.js';
+import { OPTS, Options, BooleanOpts, NumberOpts } from './defaults.js';
 import * as toast from './toast.js';
 import * as util from './util.js';
 
 const STORE = chrome.storage.local;
-const prefNames = [];
 
-function setCheckBox(prefs:Options, what:string) {
+function setCheckBox(prefs:Options, what: keyof BooleanOpts) {
   const elem = <HTMLInputElement> document.getElementById(what);
-  elem.checked = <boolean> prefs[what];
+  elem.checked = prefs[what];
 }
 
-function getCheckBox(what:string) {
+function getCheckBox(what: keyof BooleanOpts) {
   const elem = <HTMLInputElement> document.getElementById(what);
   OPTS[what] = elem.checked;
 }
 
-function setValue(prefs:Options, what:string, defaultValue = 0) {
+function setValue(prefs:Options, what: keyof NumberOpts, defaultValue = 0) {
   const elem = <HTMLInputElement> document.getElementById(what);
-  elem.value = prefs[what] || defaultValue;
+  elem.valueAsNumber = prefs[what] || defaultValue;
 }
 
-function getValue(what:string) {
+function getValue(what: keyof NumberOpts) {
   const elem = <HTMLInputElement> document.getElementById(what);
-  OPTS[what] = elem.value;
+  OPTS[what] = elem.valueAsNumber;
 }
 
-export function loadOptionsWithPromise() {
+export function loadOptionsWithPromise() :Promise<void> {
   return new Promise((resolve, reject) => {
     STORE.get(OPTS, items => {
       if (chrome.runtime.lastError) {
@@ -37,13 +36,14 @@ export function loadOptionsWithPromise() {
         reject(chrome.runtime.lastError.message);
       } else {
         for (const key in items) {
-          if (typeof OPTS[key] ==='number') {
-            OPTS[key] = Number(items[key]);
+          // typecasting in order to remove warnings about "any"; this is planned to be rebuilt completely
+          if (typeof OPTS[key as keyof Options] === 'number') {
+            (OPTS[key as keyof Options] as number) = Number(items[key]);
           } else {
-            OPTS[key] = items[key];
+            (OPTS[key as keyof Options] as string) = items[key];
           }
         }
-        resolve(items);
+        resolve();
       }
     });
   });
@@ -84,7 +84,7 @@ export function cloneTemplate(selector:string):NonEmptyDocumentFragment {
   if (template && template.content.lastElementChild) {
     return document.importNode(template.content, true) as NonEmptyDocumentFragment;
   }
-  throw new Error("Template not found!");
+  throw new Error('Template not found!');
 }
 
 interface ElAttrs {
@@ -100,8 +100,7 @@ interface ElAttrs {
   * @param txt - text for the label
   */
 function create(where:Element, type:string, attrs:ElAttrs, txt:string):Element {
-
-  let elem = cloneTemplate('#template_' + type);
+  const elem = cloneTemplate('#template_' + type);
   where.append(elem);
 
   const elemInDoc = where.lastElementChild as Element;
@@ -140,8 +139,8 @@ function createPageWithPrefs(prefs:Options) {
     create(feed, 'number', { id: 'showToast' }, 'Time (in seconds) each feedback message is shown.   Setting this to zero will disable messages.');
     create(layout, 'checkbox', { id: 'lock' }, 'Lock page.  When locked, no drags can occur and no new links can be added.');
     create(layout, 'checkbox', { id: 'proportionalSections' }, 'Proportional Sections.');
-    create(layout, 'range', { id: 'space', max: "200", min: "0", step: "5" }, 'Space between items.');
-    create(layout, 'range', { id: 'fontsize', max: "150", min: "50", step: "10" }, 'Adjust font size.');
+    create(layout, 'range', { id: 'space', max: '200', min: '0', step: '5' }, 'Space between items.');
+    create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, 'Adjust font size.');
   }
   updatePageWithPrefs(prefs);
 }
@@ -184,10 +183,6 @@ function uploadFile(e:DragEvent) {
   }
 }
 
-interface HTMLInputEvent extends Event {
-  target: HTMLInputElement & EventTarget;
-}
-
 function uploadFiles(e:Event) {
   e.preventDefault();
   const target = e.target as HTMLInputElement;
@@ -212,14 +207,14 @@ function prepareListeners() {
   chrome.storage.onChanged.addListener(updateOptions);
 }
 
-export async function updateOptions() {
+export async function updateOptions() :Promise<void> {
   await loadOptionsWithPromise();
   updatePageWithPrefs(OPTS);
   util.prepareCSSVariables(OPTS);
 }
 
 
-export async function loadOptions() {
+export async function loadOptions() :Promise<void> {
   await loadOptionsWithPromise();
   createPageWithPrefs(OPTS);
   prepareListeners();
@@ -227,13 +222,13 @@ export async function loadOptions() {
   toast.prepare();
 }
 
-export function saveOptions() {
+export function saveOptions() :void {
   console.log('saving');
   updatePrefsWithPage();
   STORE.set(OPTS, () => toast.popup('Option change stored.'));
 }
 
-export function simulateClick(selector:string) {
+export function simulateClick(selector:string) :void {
   const inp = document.querySelector(selector);
   if (inp instanceof HTMLElement) {
     inp.click();
@@ -246,9 +241,8 @@ function toggleBookmarks() {
 
 function receiveBackgroundMessages(m:{item:string}) {
   switch (m.item) {
-//    case 'emptytrash': emptyTrash(); break;
+    //    case 'emptytrash': emptyTrash(); break;
     case 'toggle-sidebar': toggleBookmarks(); break;
     default: break;
   }
 }
-
