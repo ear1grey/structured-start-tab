@@ -4,8 +4,8 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  border: var(--fg-mid) solid thin;
-  border-radius: var(--small);
+  border: var(--fg-light-alpha) solid thin;
+  border-radius: var(--medium);
 }
 
 ::-webkit-scrollbar-track {
