@@ -4,6 +4,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
+  background: var(--fg-mid);
   border: var(--fg-light-alpha) solid thin;
   border-radius: var(--medium);
 }
