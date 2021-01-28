@@ -39,8 +39,10 @@ export function loadOptionsWithPromise() :Promise<void> {
           // typecasting in order to remove warnings about "any"; this is planned to be rebuilt completely
           if (typeof OPTS[key as keyof Options] === 'number') {
             (OPTS[key as keyof Options] as number) = Number(items[key]);
+          } else if (typeof OPTS[key as keyof Options] === 'boolean') {
+            (OPTS[key as keyof Options] as boolean) = items[key] === true || items[key] === 'true';
           } else {
-            (OPTS[key as keyof Options] as string) = String(items[key]);
+            (OPTS[key as keyof Options] as unknown) = items[key];
           }
         }
         resolve();
@@ -57,6 +59,7 @@ function updatePrefsWithPage() {
   getCheckBox('hideBookmarksInPage');
   getCheckBox('showToolTips');
   getCheckBox('proportionalSections');
+  getCheckBox('useCustomScrollbar');
   getValue('showToast');
   getValue('showBookmarksLimit');
   getValue('space');
@@ -69,6 +72,7 @@ function updatePageWithPrefs(prefs:Options) {
   setCheckBox(prefs, 'hideBookmarksInPage');
   setCheckBox(prefs, 'showToolTips');
   setCheckBox(prefs, 'proportionalSections');
+  setCheckBox(prefs, 'useCustomScrollbar');
   setValue(prefs, 'showToast');
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
@@ -103,7 +107,7 @@ function create(where:Element, type:string, attrs:ElAttrs, txt:string):Element {
   const elem = cloneTemplate('#template_' + type);
   where.append(elem);
 
-  const elemInDoc = where.lastElementChild as Element;
+  const elemInDoc = where.lastElementChild!;
   if (elemInDoc) {
     if (attrs.id) {
       elemInDoc.setAttribute('for', attrs.id);
@@ -141,6 +145,7 @@ function createPageWithPrefs(prefs:Options) {
     create(layout, 'checkbox', { id: 'proportionalSections' }, 'Proportional Sections.');
     create(layout, 'range', { id: 'space', max: '200', min: '0', step: '5' }, 'Space between items.');
     create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, 'Adjust font size.');
+    create(layout, 'checkbox', { id: 'useCustomScrollbar' }, 'Use a custom scroll bar.');
   }
   updatePageWithPrefs(prefs);
 }

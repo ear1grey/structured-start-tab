@@ -15,6 +15,7 @@ export interface BooleanOpts {
   proportionalSections: boolean,
   showBookmarksSidebar: boolean,
   hideBookmarksInPage: boolean,
+  useCustomScrollbar: boolean,
 }
 
 export interface StringOpts {
@@ -36,6 +37,7 @@ export const OPTS: Options = {
   proportionalSections: true,
   showBookmarksSidebar: false,
   hideBookmarksInPage: true,
+  useCustomScrollbar: true,
   showBookmarksLimit: 20,
   space: 100,
   fontsize: 100,
