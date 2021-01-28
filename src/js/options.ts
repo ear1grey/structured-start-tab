@@ -80,7 +80,7 @@ interface NonEmptyDocumentFragment extends DocumentFragment {
 }
 
 export function cloneTemplate(selector:string):NonEmptyDocumentFragment {
-  const template = document.querySelector(selector) as HTMLTemplateElement;
+  const template = document.querySelector<HTMLTemplateElement>(selector);
   if (template && template.content.lastElementChild) {
     return document.importNode(template.content, true) as NonEmptyDocumentFragment;
   }
@@ -229,10 +229,8 @@ export function saveOptions() :void {
 }
 
 export function simulateClick(selector:string) :void {
-  const inp = document.querySelector(selector);
-  if (inp instanceof HTMLElement) {
-    inp.click();
-  }
+  const inp = document.querySelector<HTMLElement>(selector);
+  inp?.click();
 }
 
 function toggleBookmarks() {

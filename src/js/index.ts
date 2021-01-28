@@ -31,17 +31,17 @@ interface Dragging {
 let dragging: Dragging | undefined;
 
 function setValue(where:string, what:string|null, open = false) {
-  const elem:HTMLInputElement = <HTMLInputElement> document.querySelector(where);
+  const elem = document.querySelector<HTMLInputElement>(where)!;
   elem.value = what ?? '';
   if (open) elem.dataset.open = 'true';
 }
 
 function getValue(where:string) {
-  return (<HTMLInputElement> document.querySelector(where)).value;
+  return document.querySelector<HTMLInputElement>(where)!.value;
 }
 
 function setColorValue(where:string, what:string) {
-  const elem:HTMLInputElement = <HTMLInputElement> document.querySelector(where);
+  const elem = document.querySelector<HTMLInputElement>(where)!;
   if (what[0] === '!') {
     elem.value = what.slice(1);
   } else {
@@ -51,7 +51,7 @@ function setColorValue(where:string, what:string) {
 }
 
 function getColorValue(where:string) {
-  const elem:HTMLInputElement = <HTMLInputElement> document.querySelector(where);
+  const elem = document.querySelector<HTMLInputElement>(where)!;
   const color = elem.value;
   const open = elem.dataset.open ? '' : '!';
   return open + color;
@@ -112,7 +112,7 @@ function editStart(elem:HTMLElement) {
   document.querySelector('#editok')!.addEventListener('click', editOk);
   document.querySelector('#editcancel')!.addEventListener('click', editCancel);
 
-  els.editname = document.querySelector('#editname') as HTMLElement;
+  els.editname = document.querySelector<HTMLElement>('#editname')!;
 }
 
 function editCancel() {
@@ -131,7 +131,7 @@ function closeDialog() {
 }
 
 function setFavicon(elem:HTMLElement, url:string) {
-  let favicon = elem.querySelector('img.favicon') as HTMLImageElement|null;
+  let favicon = elem.querySelector<HTMLImageElement>('img.favicon');
   if (!favicon) {
     favicon = document.createElement('img');
     favicon.className = 'favicon';
@@ -643,9 +643,9 @@ function showBookmarks(visible = true) {
  */
 function prepareElements(selectors = '[id]') :Elems {
   const el:Elems = {};
-  const elems = document.querySelectorAll(selectors);
+  const elems = document.querySelectorAll<HTMLElement>(selectors);
   elems.forEach(e => {
-    el[e.id ? e.id : e.tagName.toLowerCase()] = e as HTMLElement;
+    el[e.id ? e.id : e.tagName.toLowerCase()] = e;
   });
   return el;
 }
@@ -769,7 +769,7 @@ function cloneToDialog(selector:string) {
   dialog.id = 'dialog';
   document.body.append(dialog);
 
-  const template = document.querySelector(selector) as HTMLTemplateElement;
+  const template = document.querySelector(selector);
 
   if (!(template instanceof HTMLTemplateElement)) {
     throw new Error('Failed to clone. Selector ' + selector + ' in dialog must point to a template.');
@@ -882,7 +882,7 @@ function prepareMain(OPTS:Options) {
 /** Migration **/
 function migrateLinks() {
   /* pre 1.6 used data-href */
-  for (const o of els.main.querySelectorAll('a[data-href]') as NodeListOf<HTMLAnchorElement>) {
+  for (const o of els.main.querySelectorAll<HTMLAnchorElement>('a[data-href]')) {
     o.href = o.dataset.href!;
     delete o.dataset.href;
   }

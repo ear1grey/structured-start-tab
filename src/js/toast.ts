@@ -1,7 +1,7 @@
 import { OPTS } from './defaults.js';
 
 function isDupe(msg: string) {
-  const slices = document.querySelectorAll('#toast>.toast') as NodeListOf<HTMLElement>;
+  const slices = document.querySelectorAll<HTMLElement>('#toast>.toast');
   for (const slice of slices) {
     if (slice.dataset.name === msg || slice.textContent === msg) return true;
   }

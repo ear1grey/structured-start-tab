@@ -31,7 +31,7 @@ export function hide() :void {
 
 export function prepare(O: Options, selector = '[data-info]') :void {
   OPTS = O;
-  const things = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+  const things = document.querySelectorAll<HTMLElement>(selector);
 
   for (const thing of things) {
     thing.addEventListener('mousemove', reposition);
