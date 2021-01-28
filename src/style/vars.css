@@ -21,6 +21,7 @@
   --small: calc( var(--tiny) * 2 );
   --medium: calc( var(--tiny) * 4 );
   --large: calc( var(--tiny) * 8 );
+  --vlarge: calc( var(--tiny) * 12 );
   --huge: calc( var(--tiny) * 16 );
   --massive: calc( var(--tiny) * 32 );
 
