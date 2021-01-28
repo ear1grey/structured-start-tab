@@ -55,7 +55,7 @@ main>section, #sidebar {
 #bookmarks {
   flex-grow: 1;
   overflow: hidden;
-  border-radius: var(--medium) var(--medium) var(--vlarge) var(--medium);
+  border-radius: var(--medium);
 }
 
 #bookmarksnav {
