@@ -11,7 +11,7 @@
     "esModuleInterop": true
   },
   "include": [
-    "src/js",
+    "src/js"
   ],
   "types": [
     "chrome"

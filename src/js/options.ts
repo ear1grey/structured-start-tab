@@ -40,7 +40,7 @@ export function loadOptionsWithPromise() :Promise<void> {
           if (typeof OPTS[key as keyof Options] === 'number') {
             (OPTS[key as keyof Options] as number) = Number(items[key]);
           } else {
-            (OPTS[key as keyof Options] as string) = items[key];
+            (OPTS[key as keyof Options] as string) = String(items[key]);
           }
         }
         resolve();

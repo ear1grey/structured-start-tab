@@ -283,6 +283,8 @@ export function buildBookmarks(OPTS:Options, data:chrome.bookmarks.BookmarkTreeN
   for (const x of data) {
     if (count === 0) break;
 
+    if (!x.url) continue; // skip folders
+
     const indoc = OPTS.hideBookmarksInPage && document.querySelector(`[href="${x.url}"]`);
     if (indoc || (x.dateAdded && x.dateAdded < Date.now() - twoWeeks)) {
       // bookmark is already in doc, or its older
@@ -607,6 +609,7 @@ function dragEnd() {
 export async function prepareBookmarks(OPTS:Options, target:HTMLElement) :Promise<void> {
   if (OPTS.showBookmarksSidebar) {
     const count = OPTS.showBookmarksLimit;
+
     const bp = new Promise<chrome.bookmarks.BookmarkTreeNode[]>(resolve => {
       chrome.bookmarks.getRecent(20 + count, resolve);
     });
@@ -618,7 +621,6 @@ export async function prepareBookmarks(OPTS:Options, target:HTMLElement) :Promis
 function toggleBookmarks() {
   OPTS.showBookmarksSidebar = !OPTS.showBookmarksSidebar;
   prepareBookmarks(OPTS, els.bookmarksnav);
-  showBookmarks(OPTS.showBookmarksSidebar);
   saveChanges();
 }
 

@@ -38,7 +38,7 @@ export function popup(msg: string) :void {
 }
 
 function setToastTime(num: number) {
-  document.documentElement.style.setProperty('--toast-time', num + 's');
+  document.documentElement.style.setProperty('--toast-time', `${num}s`);
 }
 
 export function prepare() :void {

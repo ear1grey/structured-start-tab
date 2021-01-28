@@ -22,9 +22,10 @@
     "@types/chrome": "^0.0.128",
     "@typescript-eslint/eslint-plugin": "^4.14.1",
     "@typescript-eslint/parser": "^4.14.1",
-    "eslint": "^6.8.0",
+    "eslint": "^7.18.0",
     "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-portsoc": "^0.6.0",
+    "eslint-config-portsoc": "^0.8.1",
+    "eslint-import-resolver-typescript": "^2.3.0",
     "eslint-plugin-import": "^2.19.1",
     "parcel": "^2.0.0-beta.1",
     "typescript": "^4.1.3"
@@ -34,13 +35,19 @@
       "browser": true,
       "es6": true
     },
-    "ignorePatterns": ["node_modules", "app"],
+    "ignorePatterns": [
+      "node_modules",
+      "app"
+    ],
     "plugins": [
       "@typescript-eslint"
     ],
     "extends": [
       "portsoc",
-      "plugin:@typescript-eslint/recommended"
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended-requiring-type-checking",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:import/typescript"
     ],
     "globals": {
       "Atomics": "readonly",
@@ -51,7 +58,15 @@
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
       "ecmaVersion": 2018,
-      "sourceType": "module"
+      "sourceType": "module",
+      "project": "./tsconfig.json"
+    },
+    "settings": {
+      "import/resolver": {
+        "typescript": {
+          "alwaysTryTypes": true
+        }
+      }
     },
     "rules": {
       "no-restricted-syntax": 0,
@@ -59,7 +74,16 @@
       "@typescript-eslint/no-non-null-assertion": 0,
       "@typescript-eslint/no-unused-expressions": [
         "error",
-        {"allowShortCircuit": true }
+        {
+          "allowShortCircuit": true
+        }
+      ],
+      "@typescript-eslint/no-floating-promises": 0,
+      "@typescript-eslint/no-misused-promises": [
+        "error",
+        {
+          "checksVoidReturn": false
+        }
       ]
     }
   }

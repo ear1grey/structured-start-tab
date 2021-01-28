@@ -22,7 +22,7 @@ const urls = [
 // * currently any of 1.
 function menuClicked(info: chrome.contextMenus.OnClickData, tab?:chrome.tabs.Tab) {
   if (tab?.id) {
-    chrome.tabs.sendMessage(tab.id, { item: info.menuItemId });
+    chrome.tabs.sendMessage(tab.id, { item: info.menuItemId as unknown });
   }
 }
 
