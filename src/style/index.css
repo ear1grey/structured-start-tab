@@ -1,6 +1,7 @@
 @import url("vars.css");
 @import url("toast.css");
 @import url("tooltip.css");
+@import url("scrollbar.css");
 
 :root {
   font-size: var(--page-font-size);
@@ -32,8 +33,9 @@ body {
 
 main {
   grid-area: main;
-  overflow: scroll;
+  overflow: auto;
 }
+
 
 #sidebar {
   grid-area: sidebar;
@@ -52,13 +54,14 @@ main>section, #sidebar {
 
 #bookmarks {
   flex-grow: 1;
-  overflow: scroll;
+  overflow: hidden;
+  border-radius: var(--medium);
 }
 
 #bookmarksnav {
   flex-direction: column;
   flex-grow: 1;
-  overflow: scroll;
+  overflow: auto;
 }
 
 #toolbar {
@@ -126,7 +129,7 @@ dialog {
 dialog>* {
   flex: 1 1 auto;
   padding: 1rem;
-} 
+}
 
 
 dialog {
@@ -213,7 +216,7 @@ section.hide nav {
 main>section>nav,
 main>section {
   flex-wrap: none;
-  margin: var(--small);
+  margin: var(--medium);
 }
 
 
@@ -265,7 +268,7 @@ h1, h2, main a {
   background: transparent;
 }
 
-a, 
+a,
 main a {
   display: flex;
   align-items: center;

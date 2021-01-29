@@ -2,3 +2,5 @@ node_modules
 .DS_Store
 .vscode
 releases
+app
+.eslintrc.reference.json

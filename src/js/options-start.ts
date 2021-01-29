@@ -1,3 +1,3 @@
-import { loadOptions } from './options.mjs';
+import { loadOptions } from './options.js';
 
 window.addEventListener('load', loadOptions);

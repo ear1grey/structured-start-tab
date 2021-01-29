@@ -1,5 +1,5 @@
-// define the menu item 
-const menuItems = [
+// define the menu item
+const menuItems:chrome.contextMenus.CreateProperties[] = [
   {
     id: 'emptytrash',
     title: 'Empty Trash',
@@ -19,9 +19,11 @@ const urls = [
 
 // message sender used whenever any of our
 // menu items* are clicked.
-// * currently any of 1. 
-function menuClicked(info, tab) {
-  chrome.tabs.sendMessage(tab.id, { item: info.menuItemId });
+// * currently any of 1.
+function menuClicked(info: chrome.contextMenus.OnClickData, tab?:chrome.tabs.Tab) {
+  if (tab?.id) {
+    chrome.tabs.sendMessage(tab.id, { item: info.menuItemId as unknown });
+  }
 }
 
 function menuInstaller() {
@@ -33,11 +35,12 @@ function menuInstaller() {
   }
 }
 
-function commandReceived(command) {
+function commandReceived(command:string) {
   chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
     if (tabs.length === 0) return;
+    if (!tabs[0].id) return;
     chrome.tabs.get(tabs[0].id, tab => {
-      if (urls.includes(tab.url)) {
+      if (tab.url && tab.id && urls.includes(tab.url)) {
         chrome.tabs.sendMessage(tab.id, { item: command });
       }
     });

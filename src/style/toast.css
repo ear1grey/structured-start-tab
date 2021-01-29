@@ -28,7 +28,8 @@
   100%   { flex: 0; opacity: 0;}
  }
 
-.toast h1, p {
+.toast h1,
+.toast p {
   margin: 0;
   padding: var(--tiny) var(--small);
 }

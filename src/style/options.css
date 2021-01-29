@@ -10,7 +10,7 @@ body {
 }
 
 h1, h2 {
-  padding: 0 var(--large); 
+  padding: 0 1rem;
 
 }
 h1 { font-size: 1.25rem;}
@@ -27,7 +27,7 @@ header {
 
 header img {
   max-height: 1em;
-  vertical-align: text-top; 
+  vertical-align: text-top;
 }
 
 header h1 {
@@ -36,7 +36,7 @@ header h1 {
 
 label {
   display: flex;
-  padding: var(--large);
+  padding: 0.5rem 1rem;
   background: var(--bg-light);
   flex-direction: row-reverse;
   border-top: solid thin var(--bg-dark);
@@ -77,9 +77,9 @@ label>p {
 button {
   flex-grow: 0;
   font-size: 125%;
-  padding: var(--large);
+  padding: 0.5rem;
   border: none;
-  border-radius: var(--small);
+  border-radius: 0.25rem;
   background: var(--key-col);
   color: var(--key-col-inv);
   min-width: 6rem;
@@ -103,8 +103,8 @@ section, footer {
   align-content: flex-start;
   background: var(--bg-mid);
   flex-direction: column;
-  margin-bottom: var(--massive);
-  border-radius: var(--medium);
+  margin-bottom: 2rem;
+  border-radius: 0.5rem;
   box-shadow: 0rem 0.125rem 0.25rem var(--fg-light-alpha);
 }
 
@@ -120,11 +120,4 @@ label, section {
   width: auto;
   flex-grow: 1;
   text-align: left;
-}
-
-#ok {
-  position: absolute;
-  top: var(--medium);
-  left: var(--medium);
-  margin: 0;
 }

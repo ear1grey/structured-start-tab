@@ -1,0 +1,21 @@
+html.use-custom-scrollbar ::-webkit-scrollbar {
+  width: calc(0.5rem + var(--small));
+  height: var(--small);
+}
+
+html.use-custom-scrollbar ::-webkit-scrollbar-thumb {
+  background: var(--fg-mid);
+  border: var(--fg-light-alpha) solid thin;
+  border-radius: var(--medium);
+}
+
+html.use-custom-scrollbar ::-webkit-scrollbar-track {
+  background-color: inherit;
+}
+
+/* Turn on single button up on top, and down on bottom */
+html.use-custom-scrollbar ::-webkit-scrollbar-button:start:decrement,
+html.use-custom-scrollbar ::-webkit-scrollbar-button:end:increment {
+  display: block;
+  height: var(--medium);
+}

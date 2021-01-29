@@ -10,39 +10,84 @@
   "license": "MPL-2.0",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint app/js/*.js",
-    "zip": "rm sst.zip;find . -name '.DS_Store' -type f -delete;zip -u -9 -v -r sst.zip app manifest.json release.md; echo 'bump versions in releases.md, manifest.json and package.json...'"
+    "lint": "npx eslint src --ext .js,.jsx,.ts,.tsx",
+    "build": "rm -rf app && mkdir app && cp -R src/* app && tsc; find app -name \\*.ts -delete",
+    "zip": "rm sst.zip;rm sst.xpi;find . -name '.DS_Store' -type f -delete;zip -u -8 -v -r sst.zip app manifest.json release.md;cp sst.zip sst.xpi;echo 'bump versions in releases.md, manifest.json and package.json...'",
+    "all": "npm run build;npm run zip;",
+    "test-moz": "web-ext --firefox=firefoxdeveloperedition run "
   },
-  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/ear1grey/structured-start-tab.git"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-portsoc": "^0.6.0",
+    "@types/chrome": "^0.0.128",
+    "@typescript-eslint/eslint-plugin": "^4.14.1",
+    "@typescript-eslint/parser": "^4.14.1",
+    "eslint": "^7.18.0",
     "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.19.1"
+    "eslint-config-portsoc": "^0.8.1",
+    "eslint-import-resolver-typescript": "^2.3.0",
+    "eslint-plugin-import": "^2.19.1",
+    "parcel": "^2.0.0-beta.1",
+    "typescript": "^4.1.3",
+    "web-ext": "^5.5.0"
   },
   "eslintConfig": {
     "env": {
       "browser": true,
       "es6": true
     },
+    "ignorePatterns": [
+      "node_modules",
+      "app"
+    ],
+    "plugins": [
+      "@typescript-eslint"
+    ],
     "extends": [
-      "portsoc"
+      "portsoc",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended-requiring-type-checking",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:import/typescript"
     ],
     "globals": {
       "Atomics": "readonly",
       "SharedArrayBuffer": "readonly",
       "chrome": "readonly"
     },
+    "root": true,
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
       "ecmaVersion": 2018,
-      "sourceType": "module"
+      "sourceType": "module",
+      "project": "./tsconfig.json"
+    },
+    "settings": {
+      "import/resolver": {
+        "typescript": {
+          "alwaysTryTypes": true
+        }
+      }
     },
     "rules": {
-      "no-restricted-syntax": 0
+      "no-restricted-syntax": 0,
+      "no-unused-expressions": 0,
+      "@typescript-eslint/no-non-null-assertion": 0,
+      "@typescript-eslint/no-unused-expressions": [
+        "error",
+        {
+          "allowShortCircuit": true
+        }
+      ],
+      "@typescript-eslint/no-floating-promises": 0,
+      "@typescript-eslint/no-misused-promises": [
+        "error",
+        {
+          "checksVoidReturn": false
+        }
+      ]
     }
   }
 }

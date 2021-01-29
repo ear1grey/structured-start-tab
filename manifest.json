@@ -26,7 +26,9 @@
     "chrome_url_overrides": {
         "newtab": "app/index.html"
     },
-    "options_page": "app/options.html",
+    "options_ui": {
+        "page" : "app/options.html"
+    },
     "web_accessible_resources": [
         "data/*",
         "chrome://settings/strings.js"
@@ -34,8 +36,8 @@
     "commands": {
         "toggle-sidebar": {
             "suggested_key": {
-                "default": "Ctrl+B",
-                "mac": "Command+B"
+                "default": "Ctrl+Shift+B",
+                "mac": "MacCtrl+Shift+B"
             },
             "description": "Toggle Sidebar"
         }
