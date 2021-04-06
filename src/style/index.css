@@ -121,7 +121,6 @@ dialog::backdrop {
 
 dialog {
   display: flex;
-  height: auto;
   overflow: visible;
   flex-direction: column;
 }
