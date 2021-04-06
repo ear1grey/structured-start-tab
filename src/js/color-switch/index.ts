@@ -63,7 +63,7 @@ export class ColorSwitch extends HTMLElement {
   }
 
   get open() :boolean {
-    return this.hasAttribute('open');
+    return !!this.dataset.open;
   }
 
   set open(val:boolean) {
@@ -106,12 +106,15 @@ export class ColorSwitch extends HTMLElement {
     const auto = create(div, 'label', { id: 'auto', for: 'auto' }, this.auto);
     const manual = create(div, 'label', { id: 'manual', for: 'manual' }, this.manual);
     auto.addEventListener('click', () => {
+      console.log('Automatic clicked');
+
       this.el.auto.setAttribute('class', 'on');
       this.el.manual.removeAttribute('class');
       this.el.main.removeAttribute('class');
       this.open = false;
     });
     manual.addEventListener('click', () => {
+      console.log('Manual clicked');
       this.el.manual.setAttribute('class', 'on');
       this.el.auto.removeAttribute('class');
       this.el.main.setAttribute('class', 'on');
