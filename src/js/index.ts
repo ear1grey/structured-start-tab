@@ -258,7 +258,7 @@ function addLink() {
   a.scrollIntoView({ behavior: 'smooth' });
   toast.html('locked', '<h1>Add link.</h1><p>You have added a link. It is at the bottom.</p>');
   a.classList.add('addLink');
-  setTimeout(() => { a.classList.remove('addLink'); }, 2000);
+  a.addEventListener('animationend', () => { a.classList.remove('addLink'); });
 }
 
 function createPanel() {
