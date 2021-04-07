@@ -414,14 +414,13 @@ footer {
 }
 
 .addLink {
-  transition: all 1s linear;
-  background: var(--bg-addLink);
-  color: var(--fg-drop);
-  border-color: var(--fg-drop);
-  border-style: solid;
+  animation: yellowFlash 3s;
 }
 
-
+@keyframes yellowFlash {
+  from {background: var(--bg-addLink);}
+  to {background: transparent;}
+}
 
 dialog {
   background: var(--bg-mid);
