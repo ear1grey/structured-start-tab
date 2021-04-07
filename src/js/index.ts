@@ -255,6 +255,10 @@ function addLink() {
   }
   const a = createExampleLink();
   els.main.append(a);
+  a.scrollIntoView({ behavior: 'smooth' });
+  toast.html('locked', '<h1>Add link.</h1><p>You have added a link. It is at the bottom.</p>');
+  a.classList.add('addLink');
+  setTimeout(() => { a.classList.remove('addLink'); }, 2000);
 }
 
 function createPanel() {

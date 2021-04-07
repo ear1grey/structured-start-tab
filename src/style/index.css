@@ -413,6 +413,14 @@ footer {
   cursor: copy;
 }
 
+.addLink {
+  transition: all 1s linear;
+  background: var(--bg-addLink);
+  color: var(--fg-drop);
+  border-color: var(--fg-drop);
+  border-style: solid;
+}
+
 
 
 dialog {
