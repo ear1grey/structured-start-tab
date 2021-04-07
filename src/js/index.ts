@@ -257,8 +257,8 @@ function addLink() {
   els.main.append(a);
   a.scrollIntoView({ behavior: 'smooth' });
   toast.html('locked', '<h1>Add link.</h1><p>You have added a link. It is at the bottom.</p>');
-  a.classList.add('addLink');
-  a.addEventListener('animationend', () => { a.classList.remove('addLink'); });
+  a.classList.add('flash');
+  a.addEventListener('animationend', () => { a.classList.remove('flash'); });
 }
 
 function createPanel() {

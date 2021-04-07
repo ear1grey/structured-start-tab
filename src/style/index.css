@@ -413,13 +413,20 @@ footer {
   cursor: copy;
 }
 
-.addLink {
-  animation: yellowFlash 3s;
+.flash {
+  animation: flash 3s;
 }
 
-@keyframes yellowFlash {
-  from {background: var(--bg-addLink);}
-  to {background: transparent;}
+@keyframes flash {
+  0% { background: var(--overlay-mid); }
+  10% { background: var(--bg-highlight); }
+  20% { background: var(--overlay-mid); }
+  30% { background: var(--bg-highlight); }
+  40% { background: var(--overlay-mid); }
+  50% { background: var(--bg-highlight); }
+  60% { background: var(--overlay-mid); }
+  70% { background: var(--bg-highlight); }
+  100% { background: var(--overlay-mid); }
 }
 
 dialog {

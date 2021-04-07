@@ -41,7 +41,7 @@
   --bg-drop: #C00;
   --fg-drop: #FFF;
 
-  --bg-addLink: #ffff00;
+  --bg-highlight: #ffff00;
 
   --key-col:  #06C;
   --key-col-inv:  #FFF;
@@ -74,5 +74,7 @@
 
     --bg-drop: #A00;
     --fg-drop: #CCC;
+
+    --bg-highlight: #CC9900;
   }
 }
