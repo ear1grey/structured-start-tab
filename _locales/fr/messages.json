@@ -13,5 +13,8 @@
   },
   "Bookmarks": {
     "message": "Marque-pages"
+  },
+  "placeholder_item_name": {
+    "message": "Nom de l'item"
   }
 }

@@ -13,5 +13,8 @@
   },
   "Bookmarks": {
     "message": "Bookmarks"
+  },
+  "placeholder_item_name": {
+    "message": "Item Name"
   }
 }

@@ -901,7 +901,14 @@ function localizeHtmlPage() {
   document.querySelectorAll('[data-locale]').forEach(elem => {
     const messageKey = elem.getAttribute('data-locale');
     if (messageKey !== null) {
-      elem.innerHTML = chrome.i18n.getMessage(messageKey);
+      console.log(messageKey);
+      if (messageKey.includes('placeholder')) {
+        console.log('In if');
+        elem.setAttribute('placeholder', chrome.i18n.getMessage(messageKey));
+      } else {
+        console.log('in Else');
+        elem.innerHTML = chrome.i18n.getMessage(messageKey);
+      }
     }
   });
 }
