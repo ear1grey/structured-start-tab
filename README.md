@@ -16,3 +16,5 @@ A browser extension that replaces the default tab content with a page of organis
 
 [Mozilla Public License v2](https://www.mozilla.org/en-US/MPL/2.0/)
 
+# ignore this
+
