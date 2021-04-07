@@ -3,7 +3,7 @@
 Every release for the foreseeable future will be an alpha level release.  This means you can expect an evolving and improving feature set, and also bugs.  Please report bugs and request features via the Suggestions button on the toolbar.
 
 ## Alpha Releases
-
+* 1.6.0 [Review & Cleanup](https://github.com/ear1grey/structured-start-tab/milestone/15?closed=1)
 * 1.5.0 [Style Controls](https://github.com/ear1grey/structured-start-tab/milestone/8?closed=1)
 * 1.4.3 Tweak facebook link.
 * 1.4.2 Improved toast formatting (a precursor to i18n).
