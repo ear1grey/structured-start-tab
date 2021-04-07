@@ -1,0 +1,17 @@
+{
+  "add_link": {
+    "message": "Ajouter un lien"
+  },
+  "add_panel": {
+    "message": "Ajouter un panneau"
+  },
+  "options": {
+    "message": "Options"
+  },
+  "trash": {
+    "message": "Corbeille"
+  },
+  "Bookmarks": {
+    "message": "Marque-pages"
+  }
+}

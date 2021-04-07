@@ -897,6 +897,15 @@ function migrateLinks() {
   }
 }
 
+function localizeHtmlPage() {
+  document.querySelectorAll('[data-locale]').forEach(elem => {
+    const messageKey = elem.getAttribute('data-locale');
+    if (messageKey !== null) {
+      elem.innerHTML = chrome.i18n.getMessage(messageKey);
+    }
+  });
+}
+
 async function prepareAll() {
   await loadOptionsWithPromise();
   els = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
@@ -910,6 +919,7 @@ async function prepareAll() {
   toast.popup('Ctrl+Shift+B: Toggle Sidebar');
   tooltip.prepare(OPTS);
   migrateLinks();
+  localizeHtmlPage();
 }
 
 window.addEventListener('DOMContentLoaded', prepareAll);
