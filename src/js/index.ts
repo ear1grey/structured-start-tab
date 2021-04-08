@@ -202,6 +202,7 @@ function saveChanges(makeBackup = true) {
 function cleanTree(tree:Document) {
   const all = tree.querySelectorAll('section, a');
   for (const e of all) {
+    if (e.classList.contains('flash')) e.classList.remove('flash');
     if (e.classList.length === 0) {
       e.removeAttribute('class');
     }
