@@ -231,7 +231,7 @@ export async function loadOptions() :Promise<void> {
 export function saveOptions() :void {
   console.log('saving');
   updatePrefsWithPage();
-  STORE.set(OPTS, () => toast.popup(chrome.i18n.getMessage("option_change")));
+  STORE.set(OPTS, () => toast.popup(chrome.i18n.getMessage('option_change')));
 }
 
 export function simulateClick(selector:string) :void {

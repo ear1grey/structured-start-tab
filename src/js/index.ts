@@ -663,7 +663,7 @@ function toggleFold(e:Event) {
   if (els.body.classList.contains('editing')) return;
   const foldMe = findParentSection(e.target);
   if (foldMe === els.trash) {
-    toast.html('locked',  chrome.i18n.getMessage('locked_trash_hidden'));
+    toast.html('locked', chrome.i18n.getMessage('locked_trash_hidden'));
     toggleTrash();
     saveChanges();
     return;
