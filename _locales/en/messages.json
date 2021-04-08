@@ -11,7 +11,7 @@
   "data_info_trash": {
     "message": "Trash|Click to toggle the trash section open or closed.  Drag links or panels here to move them to the trash."
   },
-  "Bookmarks": {
+  "bookmarks": {
     "message": "Bookmarks"
   },
   "edit_link": {
@@ -43,5 +43,78 @@
   },
   "style": {
     "message": "Style"
+  },
+  "edit_cancelled": {
+    "message": "<h1>Edit cancelled.</h1>"
+  },
+  "undo": {
+    "message": "<h1>Undo.</h1><p>The previous layout has been reinstated.</p>"
+  },
+  "locked": {
+    "message": "<h1>Page locked.</h1><p>Unlock it in the options page.</p>"
+  },
+  "add_link": {
+    "message": "<h1>Adding a link&hellip;.</h1><p>Drop anywhere in the page to add it, or press Escape to cancel.</p>"
+  },
+  "add_panel": {
+    "message": "<h1>Adding a panel&hellip;.</h1><p>Drop anywhere in the page to add it, or press Escape to cancel.</p>"
+  },
+  "moving": {
+    "message": "<h1>Moving&hellip;</h1><p>Drop anywhere in the page or cancel with the Escape key.</p>"
+  },
+  "not_link": {
+    "message": "<h1>Not a link or URL.</h1><p>Only links can be imported from other pages.</p>"
+  },
+  "locked_moved_to_trash": {
+    "message": "<h1>Moved.</h1><p>Your item is now in the trash.</p>"
+  },
+  "drag_cancel": {
+    "message": "<h1>Drag cancelled.</h1>"
+  },
+  "locked_trash_hidden": {
+    "message": "<h1>Trash panel hidden.</h1>"
+  },
+  "popup_toggle_sidebar": {
+    "message": "Ctrl+Shift+B: Toggle Sidebar"
+  },
+  "layout": {
+    "message": "Layout"
+  },
+  "messages": {
+    "message": "Messages & Feedback"
+  },
+  "showBookmarksSidebar": {
+    "message": "Include a sidebar of most recent bookmarks."
+  },
+  "hideBookmarksInPage": {
+    "message": "Omit bookmarks that are already in the page."
+  },
+  "showBookmarksLimit": {
+    "message": "Number of recent bookmarks to show."
+  },
+  "showToolTips": {
+    "message": "Show helpful tooltips when hovering over things."
+  },
+  "showToast": {
+    "message": "Time (in seconds) each feedback message is shown. Setting this to zero will disable messages."
+  },
+  "lock": {
+    "message": "Lock page.  When locked, no drags can occur and no new links can be added."
+  },
+  "proportionalSections": {
+    "message": "Proportional Sections."
+  },
+  "space": {
+    "message": "Space between items."
+  },
+  "fontsize": {
+    "message": "Adjust font size."
+  },
+  "useCustomScrollbar": {
+    "message": "Use a custom scroll bar."
+  }
+  ,
+  "option_change": {
+    "message": "Option change stored."
   }
 }
