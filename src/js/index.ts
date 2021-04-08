@@ -777,7 +777,7 @@ function cloneToDialog(selector:string) {
     throw new Error('Failed to clone. Selector ' + selector + ' in dialog must point to a template.');
   }
 
-  localizeHtml(template.content);
+  util.localizeHtml(template.content);
   const clone = document.importNode(template.content, true);
 
   if (!clone) {
@@ -898,24 +898,6 @@ function migrateLinks() {
   }
 }
 
-function localizeHtml(doc:DocumentFragment |Document) {
-  doc.querySelectorAll('[data-locale]').forEach(elem => {
-    const messageKey = elem.getAttribute('data-locale');
-    if (messageKey !== null) {
-      const text = chrome.i18n.getMessage(messageKey);
-      if (messageKey.includes('placeholder')) {
-        elem.setAttribute('placeholder', text);
-      } else if (messageKey.includes('data_info')) {
-        const messages = text.split('|');
-        elem.setAttribute('data-info', messages[1]);
-        elem.innerHTML = messages[0];
-      } else {
-        elem.innerHTML = text;
-      }
-    }
-  });
-}
-
 async function prepareAll() {
   await loadOptionsWithPromise();
   els = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
@@ -929,7 +911,7 @@ async function prepareAll() {
   toast.popup(chrome.i18n.getMessage('popup_toggle_sidebar'));
   tooltip.prepare(OPTS);
   migrateLinks();
-  localizeHtml(document);
+  util.localizeHtml(document);
 }
 
 window.addEventListener('DOMContentLoaded', prepareAll);
