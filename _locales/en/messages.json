@@ -43,5 +43,20 @@
   },
   "style": {
     "message": "Style"
+  },
+  "backup": {
+    "message": "Backup &amp; Restore"
+  },
+  "text_export": {
+    "message": "Export a backup file of your current start tabs."
+  },
+  "export": {
+    "message": "Export"
+  },
+  "text_import": {
+    "message": "<p>Import a previously backed-up file to restore it.</p><p>You can also drop an exported file here.</p><p>Caution: Importing will replace all existing tabs.</p>"
+  },
+  "import": {
+    "message": "Import"
   }
 }

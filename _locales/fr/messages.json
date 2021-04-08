@@ -46,5 +46,20 @@
   },
   "style": {
     "message": "Style"
+  },
+  "backup": {
+    "message": "Sauvegarde &amp; restauration"
+  },
+  "text_export": {
+    "message": "Exportez un fichier de sauvegarde de vos onglets de démarrage actuels."
+  },
+  "export": {
+    "message": "Exportation"
+  },
+  "text_import": {
+    "message": "<p>Importez un fichier précédemment sauvegardé pour le restaurer.</p><p>Vous pouvez également déposer un fichier exporté ici.</p><p>Attention : L'importation remplacera tous les onglets existants.</p>"
+  },
+  "import": {
+    "message": "Importation"
   }
 }

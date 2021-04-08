@@ -224,6 +224,7 @@ export async function loadOptions() :Promise<void> {
   createPageWithPrefs(OPTS);
   prepareListeners();
   util.prepareCSSVariables(OPTS);
+  util.localizeHtml(document);
   toast.prepare();
 }
 
