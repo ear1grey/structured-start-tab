@@ -777,6 +777,7 @@ function cloneToDialog(selector:string) {
     throw new Error('Failed to clone. Selector ' + selector + ' in dialog must point to a template.');
   }
 
+  localizeHtml(template.content);
   const clone = document.importNode(template.content, true);
 
   if (!clone) {
@@ -785,7 +786,6 @@ function cloneToDialog(selector:string) {
 
   clearDialog();
   dialog.append(clone);
-  localizeHtmlPage();
 }
 
 function cloneTemplateToTarget(selector:string, where:HTMLElement) {
@@ -898,8 +898,8 @@ function migrateLinks() {
   }
 }
 
-function localizeHtmlPage() {
-  document.querySelectorAll('[data-locale]').forEach(elem => {
+function localizeHtml(doc:DocumentFragment |Document) {
+  doc.querySelectorAll('[data-locale]').forEach(elem => {
     const messageKey = elem.getAttribute('data-locale');
     if (messageKey !== null) {
       if (messageKey.includes('placeholder')) {
@@ -924,7 +924,7 @@ async function prepareAll() {
   toast.popup('Ctrl+Shift+B: Toggle Sidebar');
   tooltip.prepare(OPTS);
   migrateLinks();
-  localizeHtmlPage();
+  localizeHtml(document);
 }
 
 window.addEventListener('DOMContentLoaded', prepareAll);
