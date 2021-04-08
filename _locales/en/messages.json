@@ -1,19 +1,15 @@
 {
-  "add_link": {
-    "message": "Add link",
-    "data-info": "New link: click or drag."
+  "data_info_add_link": {
+    "message": "Add link|New link: click or drag."
   },
-  "add_panel": {
-    "message": "Add panel",
-    "data-info": "New panel: click or drag."
+  "data_info_add_panel": {
+    "message": "Add panel|New panel: click or drag."
   },
-  "options": {
-    "message": "Options",
-    "data-info":"Open the options page."
+  "data_info_options": {
+    "message": "Options|Open the options page."
   },
-  "trash": {
-    "message": "Trash",
-    "data-info": "Click to toggle the trash section open or closed.  Drag links or panels here to move them to the trash."
+  "data_info_trash": {
+    "message": "Trash|Click to toggle the trash section open or closed.  Drag links or panels here to move them to the trash."
   },
   "Bookmarks": {
     "message": "Bookmarks"

@@ -902,10 +902,15 @@ function localizeHtml(doc:DocumentFragment |Document) {
   doc.querySelectorAll('[data-locale]').forEach(elem => {
     const messageKey = elem.getAttribute('data-locale');
     if (messageKey !== null) {
+      const text = chrome.i18n.getMessage(messageKey);
       if (messageKey.includes('placeholder')) {
-        elem.setAttribute('placeholder', chrome.i18n.getMessage(messageKey));
+        elem.setAttribute('placeholder', text);
+      } else if (messageKey.includes('data_info')) {
+        const messages = text.split('|');
+        elem.setAttribute('data-info', messages[1]);
+        elem.innerHTML = messages[0];
       } else {
-        elem.innerHTML = chrome.i18n.getMessage(messageKey);
+        elem.innerHTML = text;
       }
     }
   });

@@ -1,15 +1,15 @@
 {
-  "add_link": {
-    "message": "Ajouter un lien"
+  "data_info_add_link": {
+    "message": "Ajouter un lien|Nouveau lien : cliquez ou faites glisser."
   },
-  "add_panel": {
-    "message": "Ajouter un panneau"
+  "data_info_add_panel": {
+    "message": "Ajouter un panneau|Nouveau panneau : cliquez ou faites glisser."
   },
-  "options": {
-    "message": "Options"
+  "data_info_options": {
+    "message": "Options|Ouvrez la page des options."
   },
-  "trash": {
-    "message": "Corbeille"
+  "data_info_trash": {
+    "message": "Corbeille|Cliquez pour ouvrir ou fermer la section de la corbeille.  Faites glisser les liens ou les panneaux ici pour les déplacer vers la corbeille."
   },
   "Bookmarks": {
     "message": "Marque-pages"
