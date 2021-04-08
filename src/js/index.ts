@@ -4,12 +4,11 @@ import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
 
-
 export interface Elems {
   [index:string]: HTMLElement,
 }
 
-const version = '1.6.0';
+const version = '1.6.3';
 
 const storage = OPTS.storage;
 const store = chrome.storage[storage];
