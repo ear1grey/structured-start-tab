@@ -1,20 +1,51 @@
 {
   "add_link": {
-    "message": "Add link"
+    "message": "Add link",
+    "data-info": "New link: click or drag."
   },
   "add_panel": {
-    "message": "Add panel"
+    "message": "Add panel",
+    "data-info": "New panel: click or drag."
   },
   "options": {
-    "message": "Options"
+    "message": "Options",
+    "data-info":"Open the options page."
   },
   "trash": {
-    "message": "Trash"
+    "message": "Trash",
+    "data-info": "Click to toggle the trash section open or closed.  Drag links or panels here to move them to the trash."
   },
   "Bookmarks": {
     "message": "Bookmarks"
   },
+  "edit_link": {
+    "message": "Editing link"
+  },
+  "name": {
+    "message": "Name"
+  },  
   "placeholder_item_name": {
     "message": "Item Name"
+  },
+  "link": {
+    "message": "Link"
+  },
+  "placeholder_url": {
+    "message": "URL"
+  },
+  "background": {
+    "message": "Background"
+  },
+  "text": {
+    "message": "Text"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "edit_panel": {
+    "message": "Editing Panel"
+  },
+  "style": {
+    "message": "Style"
   }
 }

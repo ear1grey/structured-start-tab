@@ -14,7 +14,37 @@
   "Bookmarks": {
     "message": "Marque-pages"
   },
+  "edit_link": {
+    "message": "Editer le lien"
+  },
+  "name": {
+    "message": "Nom"
+  },  
   "placeholder_item_name": {
     "message": "Nom de l'item"
+  },
+  "link": {
+    "message": "Lien"
+  },
+  "placeholder_url": {
+    "message": "URL"
+  },
+  "background": {
+    "message": "Arrière-plan"
+  },
+  "text": {
+    "message": "Texte"
+  },
+  "cancel": {
+    "message": "Annuler"
+  },
+  "edit_panel": {
+    "message": "Editer le panneau"
+  },
+  "placeholder_panel_name": {
+    "message": "Nom du panneau"
+  },
+  "style": {
+    "message": "Style"
   }
 }
