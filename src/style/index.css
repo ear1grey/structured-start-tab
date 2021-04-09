@@ -413,11 +413,11 @@ footer {
   cursor: copy;
 }
 
-.flash {
-  animation: flash 3s;
+.highlight {
+  animation: highlight 3s;
 }
 
-@keyframes flash {
+@keyframes highlight {
   0% { background: var(--overlay-mid); }
   10% { background: var(--bg-highlight); }
   20% { background: var(--overlay-mid); }
