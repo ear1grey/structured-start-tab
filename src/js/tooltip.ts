@@ -20,6 +20,7 @@ export function reposition(e: MouseEvent, messageOverride?: string) :void {
     x = x + gap;
   }
   y = y - tip.clientHeight - gap;
+  if (y < 0) y = 0;
 
   document.documentElement.style.setProperty('--tool-tip-left', `${x}px`);
   document.documentElement.style.setProperty('--tool-tip-top', `${y}px`);
