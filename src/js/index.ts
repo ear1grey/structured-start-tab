@@ -115,7 +115,7 @@ function editStart(elem:HTMLElement) {
 }
 
 function editCancel() {
-  toast.html('editcancelled', '<h1>Edit cancelled.</h1>');
+  toast.html('editcancelled', chrome.i18n.getMessage('edit_cancelled'));
   closeDialog();
 }
 
@@ -228,7 +228,7 @@ function detectKeydown(e:KeyboardEvent) {
     }
     store.set(OPTS, () => {
       prepareContent(OPTS.html);
-      toast.html('undo', '<h1>Undo.</h1><p>The previous layout has been reinstated.</p>');
+      toast.html('undo', chrome.i18n.getMessage('undo'));
     });
   }
 
@@ -250,7 +250,7 @@ function createExampleLink(text = 'Example', href = 'http://example.org') {
 
 function addLink() {
   if (OPTS.lock) {
-    toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
+    toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
   const a = createExampleLink();
@@ -271,7 +271,7 @@ function createPanel() {
 
 function addPanel() {
   if (OPTS.lock) {
-    toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
+    toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
   return createPanel();
@@ -437,7 +437,7 @@ function dragEnter() {
 /* respond when a drag begins */
 function dragStart(e:DragEvent) {
   if (OPTS.lock) {
-    toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
+    toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
   els.body.classList.add('dragOngoing');
@@ -451,20 +451,20 @@ function dragStart(e:DragEvent) {
       dummy = createExampleLink();
       dummy.classList.add('dragging');
       el = dummy;
-      toast.html('addlink', '<h1>Adding a link&hellip;.</h1><p>Drop anywhere in the page to add it, or press Escape to cancel.</p>');
+      toast.html('addlink', chrome.i18n.getMessage('add_link'));
     } else {
       // addpanel
       dummy = createPanel();
       dummy.classList.add('dragging');
       el = dummy;
-      toast.html('addpanel', '<h1>Adding a panel&hellip;.</h1><p>Drop anywhere in the page to add it, or press Escape to cancel.</p>');
+      toast.html('addpanel', chrome.i18n.getMessage('add_panel'));
     }
   } else {
     el = target;
     el.classList.add('dragging');
     e.dataTransfer!.effectAllowed = 'move';
     e.dataTransfer!.dropEffect = 'move';
-    toast.html('moving', '<h1>Moving&hellip;</h1><p>Drop anywhere in the page or cancel with the Escape key.</p>');
+    toast.html('moving', chrome.i18n.getMessage('moving'));
   }
 
   dragging = {
@@ -494,7 +494,7 @@ function dragOver(e:DragEvent) {
   if (!dragging) return;
 
   if (OPTS.lock) {
-    toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
+    toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
 
@@ -549,7 +549,7 @@ function extractDataFromDrop(e:DragEvent) {
       url = u.toString();
       text = url;
     } catch (e) {
-      toast.html('notlink', '<h1>Not a link or URL.</h1><p>Only links can be imported from other pages.</p>');
+      toast.html('notlink', chrome.i18n.getMessage('not_link'));
     }
   }
 
@@ -566,7 +566,7 @@ function dragDrop(e: DragEvent) {
   if (!dragging) return;
 
   if (OPTS.lock) {
-    toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
+    toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
   e.preventDefault();
@@ -575,7 +575,7 @@ function dragDrop(e: DragEvent) {
   if (e.target === els.bin && !dragging.dummy) {
     els.trash.lastElementChild?.append(dragging.el);
     saveChanges();
-    toast.html('locked', '<h1>Moved.</h1><p>Your item is now in the trash.</p>');
+    toast.html('locked', chrome.i18n.getMessage('locked_moved_to_trash'));
   } else {
     if (!dragging.startedOnThisPage) {
       extractDataFromDrop(e);
@@ -590,7 +590,7 @@ function dragEnd() {
   if (!dragging) return;
 
   if (OPTS.lock) {
-    toast.html('locked', '<h1>Page locked.</h1><p>Unlock it in the options page.</p>');
+    toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
 
@@ -610,7 +610,7 @@ function dragEnd() {
   dragging = undefined;
 
   tooltip.hide();
-  toast.html('cancel', '<h1>Drag cancelled.</h1>');
+  toast.html('cancel', chrome.i18n.getMessage('drag_cancel'));
 }
 
 export async function prepareBookmarks(OPTS:Options, target:HTMLElement) :Promise<void> {
@@ -670,7 +670,7 @@ function toggleFold(e:Event) {
   if (els.body.classList.contains('editing')) return;
   const foldMe = findParentSection(e.target);
   if (foldMe === els.trash) {
-    toast.html('locked', '<h1>Trash panel hidden.</h1>');
+    toast.html('locked', chrome.i18n.getMessage('locked_trash_hidden'));
     toggleTrash();
     saveChanges();
     return;
@@ -784,6 +784,7 @@ function cloneToDialog(selector:string) {
     throw new Error('Failed to clone. Selector ' + selector + ' in dialog must point to a template.');
   }
 
+  util.localizeHtml(template.content);
   const clone = document.importNode(template.content, true);
 
   if (!clone) {
@@ -919,9 +920,10 @@ async function prepareAll() {
   prepareBackgroundListener();
   toast.prepare();
   toast.popup(`Structured Start Tab v${version}`);
-  toast.popup('Ctrl+Shift+B: Toggle Sidebar');
+  toast.popup(chrome.i18n.getMessage('popup_toggle_sidebar'));
   tooltip.prepare(OPTS);
   migrateLinks();
+  util.localizeHtml(document);
 }
 
 window.addEventListener('DOMContentLoaded', prepareAll);

@@ -133,19 +133,19 @@ function create(where:Element, type:string, attrs:ElAttrs, txt:string):Element {
 function createPageWithPrefs(prefs:Options) {
   const settings = document.querySelector('#settings');
   if (settings) {
-    const layout = create(settings, 'section', {}, 'Layout');
-    const book = create(settings, 'section', {}, 'Bookmarks');
-    const feed = create(settings, 'section', {}, 'Messages & Feedback');
-    create(book, 'checkbox', { id: 'showBookmarksSidebar' }, 'Include a sidebar of most recent bookmarks.');
-    create(book, 'checkbox', { id: 'hideBookmarksInPage' }, 'Omit bookmarks that are already in the page.');
-    create(book, 'number', { id: 'showBookmarksLimit' }, 'Number of recent bookmarks to show.');
-    create(feed, 'checkbox', { id: 'showToolTips' }, 'Show helpful tooltips when hovering over things.');
-    create(feed, 'number', { id: 'showToast' }, 'Time (in seconds) each feedback message is shown.   Setting this to zero will disable messages.');
-    create(layout, 'checkbox', { id: 'lock' }, 'Lock page.  When locked, no drags can occur and no new links can be added.');
-    create(layout, 'checkbox', { id: 'proportionalSections' }, 'Proportional Sections.');
-    create(layout, 'range', { id: 'space', max: '200', min: '0', step: '5' }, 'Space between items.');
-    create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, 'Adjust font size.');
-    create(layout, 'checkbox', { id: 'useCustomScrollbar' }, 'Use a custom scroll bar.');
+    const layout = create(settings, 'section', {}, chrome.i18n.getMessage('layout'));
+    const book = create(settings, 'section', {}, chrome.i18n.getMessage('bookmarks'));
+    const feed = create(settings, 'section', {}, chrome.i18n.getMessage('messages'));
+    create(book, 'checkbox', { id: 'showBookmarksSidebar' }, chrome.i18n.getMessage('showBookmarksSidebar'));
+    create(book, 'checkbox', { id: 'hideBookmarksInPage' }, chrome.i18n.getMessage('hideBookmarksInPage'));
+    create(book, 'number', { id: 'showBookmarksLimit' }, chrome.i18n.getMessage('showBookmarksLimit'));
+    create(feed, 'checkbox', { id: 'showToolTips' }, chrome.i18n.getMessage('showToolTips'));
+    create(feed, 'number', { id: 'showToast' }, chrome.i18n.getMessage('showToast'));
+    create(layout, 'checkbox', { id: 'lock' }, chrome.i18n.getMessage('lock'));
+    create(layout, 'checkbox', { id: 'proportionalSections' }, chrome.i18n.getMessage('proportionalSections'));
+    create(layout, 'range', { id: 'space', max: '200', min: '0', step: '5' }, chrome.i18n.getMessage('space'));
+    create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, chrome.i18n.getMessage('fontsize'));
+    create(layout, 'checkbox', { id: 'useCustomScrollbar' }, chrome.i18n.getMessage('useCustomScrollbar'));
   }
   updatePageWithPrefs(prefs);
 }
@@ -224,13 +224,14 @@ export async function loadOptions() :Promise<void> {
   createPageWithPrefs(OPTS);
   prepareListeners();
   util.prepareCSSVariables(OPTS);
+  util.localizeHtml(document);
   toast.prepare();
 }
 
 export function saveOptions() :void {
   console.log('saving');
   updatePrefsWithPage();
-  STORE.set(OPTS, () => toast.popup('Option change stored.'));
+  STORE.set(OPTS, () => toast.popup(chrome.i18n.getMessage('option_change')));
 }
 
 export function simulateClick(selector:string) :void {

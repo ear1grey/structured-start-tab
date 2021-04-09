@@ -1,0 +1,147 @@
+{
+  "data_info_add_link": {
+    "message": "Ajouter un lien|Nouveau lien : cliquez ou faites glisser."
+  },
+  "data_info_add_panel": {
+    "message": "Ajouter un panneau|Nouveau panneau : cliquez ou faites glisser."
+  },
+  "data_info_options": {
+    "message": "Options|Ouvrez la page des options."
+  },
+  "data_info_trash": {
+    "message": "Corbeille|Cliquez pour ouvrir ou fermer la section de la corbeille.  Faites glisser les liens ou les panneaux ici pour les déplacer vers la corbeille."
+  },
+  "bookmarks": {
+    "message": "Marque-pages"
+  },
+  "edit_link": {
+    "message": "Editer le lien"
+  },
+  "name": {
+    "message": "Nom"
+  },  
+  "placeholder_item_name": {
+    "message": "Nom de l'item"
+  },
+  "link": {
+    "message": "Lien"
+  },
+  "placeholder_url": {
+    "message": "URL"
+  },
+  "background": {
+    "message": "Arrière-plan"
+  },
+  "text": {
+    "message": "Texte"
+  },
+  "cancel": {
+    "message": "Annuler"
+  },
+  "edit_panel": {
+    "message": "Editer le panneau"
+  },
+  "placeholder_panel_name": {
+    "message": "Nom du panneau"
+  },
+  "style": {
+    "message": "Style"
+  },
+  "edit_cancelled": {
+    "message": "<h1>Modification annulée.</h1>"
+  },
+  "undo": {
+    "message": "<h1>Annulation.</h1><p>La disposition précédente a été rétablie.</p>"
+  },
+  "locked": {
+    "message": "<h1>Page verrouillée.</h1><p>Déverrouillez-la dans la page des options.</p>"
+  },
+  "add_link": {
+    "message": "<h1>Ajout d'un lien&hellip;.</h1><p>Déposez n'importe où dans la page pour l'ajouter, ou appuyez sur Echap pour annuler.</p>"
+  },
+  "add_panel": {
+    "message": "<h1>Ajout d'un panneau&hellip;.</h1><p>Déposez n'importe où dans la page pour l'ajouter, ou appuyez sur Echap pour annuler.</p>"
+  },
+  "moving": {
+    "message": "<h1>Déplacement&hellip;</h1><p>Déposez n'importe où dans la page ou annulez avec la touche Echap.</p>"
+  },
+  "not_link": {
+    "message": "<h1>Pas de lien ou d'URL.</h1><p>Seuls les liens peuvent être importés d'autres pages.</p>"
+  },
+  "locked_moved_to_trash": {
+    "message": "<h1>Deplacé.</h1><p>Votre item est maintenant dans la poubelle.</p>"
+  },
+  "drag_cancel": {
+    "message": "<h1>Drag'n drop annulé.</h1>"
+  },
+  "locked_trash_hidden": {
+    "message": "<h1>Panneau de la corbeille caché.</h1>"
+  },
+  "popup_toggle_sidebar": {
+    "message": "Ctrl+Shift+B : Afficher/Masquer la barre latérale"
+  },
+  "layout": {
+    "message": "Mise en page"
+  },
+  "messages": {
+    "message": "Messages & Commentaires"
+  },
+  "showBookmarksSidebar": {
+    "message": "Inclure une barre latérale des marque-pages les plus récents."
+  },
+  "hideBookmarksInPage": {
+    "message": "Omettre les marque-pages qui sont déjà dans la page"
+  },
+  "showBookmarksLimit": {
+    "message": "Nombre de marque-pages récents à afficher."
+  },
+  "showToolTips": {
+    "message": "Affichez des infobulles utiles lorsque vous survolez des éléments."
+  },
+  "showToast": {
+    "message": "Durée (en secondes) d'affichage de chaque commentaire. Si vous mettez cette valeur à zéro, les messages seront désactivés."
+  },
+  "lock": {
+    "message": "Verrouiller la page.  Lorsqu'elle est verrouillée, aucun glisser-déposer ne peut avoir lieu et aucun nouveau lien ne peut être ajouté."
+  },
+  "proportionalSections": {
+    "message": "Sections proportionnelles."
+  },
+  "space": {
+    "message": "L'espace entre les articles."
+  },
+  "fontsize": {
+    "message": "Ajustez la taille de la police."
+  },
+  "useCustomScrollbar": {
+    "message": "Utilisez une barre de défilement personnalisée."
+  }
+  ,
+  "option_change": {
+    "message": "Changement d'option enregistré."
+  },
+  "backup": {
+    "message": "Sauvegarde &amp; restauration"
+  },
+  "text_export": {
+    "message": "Exportez un fichier de sauvegarde de vos onglets de démarrage actuels."
+  },
+  "export": {
+    "message": "Exportation"
+  },
+  "text_import": {
+    "message": "<p>Importez un fichier précédemment sauvegardé pour le restaurer.</p><p>Vous pouvez également déposer un fichier exporté ici.</p><p>Attention : L'importation remplacera tous les onglets existants.</p>"
+  },
+  "import": {
+    "message": "Importation"
+  },
+  "colour": {
+    "message": "Couleur"
+  },
+  "tranparency": {
+    "message": "Tranparence"
+  },
+  "toast_link_add": {
+    "message": "<h1>Ajout d'un lien.</h1><p>Vous avez ajouté un lien. Il se trouve en bas de la page.</p>"
+  }
+}

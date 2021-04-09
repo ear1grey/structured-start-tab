@@ -125,12 +125,12 @@ export class ColorSwitch extends HTMLElement {
 
     // color input
     const value = this.value.slice(0, 7);
-    const col = create(main, 'label', { id: 'col', for: 'pik' }, 'Colour');
+    const col = create(main, 'label', { id: 'col', for: 'pik' }, chrome.i18n.getMessage('colour'));
     const incol = create(main, 'input', { id: 'pik', type: 'color', value });
 
     // tranparency input
     const transValue = String(parseInt(this.value.slice(7, 9), 16));
-    const trans = create(main, 'label', { id: 'col', for: 'trs' }, 'Tranparency');
+    const trans = create(main, 'label', { id: 'col', for: 'trs' }, chrome.i18n.getMessage('tranparency'));
     const intrans = create(main, 'input', { id: 'trs', type: 'range', min: '0', max: '255', value: transValue });
 
     incol.addEventListener('input', this.updateValue.bind(this));
