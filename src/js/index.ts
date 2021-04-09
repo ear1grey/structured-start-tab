@@ -8,7 +8,7 @@ export interface Elems {
   [index:string]: HTMLElement,
 }
 
-const version = '1.6.3';
+const version = '1.6.4';
 
 const storage = OPTS.storage;
 const store = chrome.storage[storage];
@@ -256,8 +256,7 @@ function addLink() {
   els.main.append(a);
   a.scrollIntoView({ behavior: 'smooth' });
   toast.html('locked', '<h1>Add link.</h1><p>You have added a link. It is at the bottom.</p>');
-  a.classList.add('flash');
-  a.addEventListener('animationend', () => { a.classList.remove('flash'); });
+  flash(a, 'highlight');
 }
 
 function createPanel() {
@@ -474,9 +473,9 @@ function dragStart(e:DragEvent) {
   // setDragImage(e);  // <-- not sure I like disabling this or if I want it as an option
 }
 
-function flash(elem:HTMLElement) {
-  elem.classList.add('flash');
-  window.setTimeout(() => { elem.classList.remove('flash'); }, 1000);
+function flash(elem:HTMLElement, cls = 'flash') {
+  elem.classList.add(cls);
+  elem.addEventListener('animationend', () => { elem.classList.remove(cls); });
 }
 
 // function setDragImage(e) {
@@ -892,11 +891,16 @@ function migrateLinks() {
     delete o.dataset.href;
   }
 
-  /* anchors are draggable anyway and shoudl not have the attr set
+  /* anchors are draggable anyway and should not have the attr set
    * this was erroneously done before 1.6 */
   for (const o of els.main.querySelectorAll('a[draggable]')) {
-    console.log(o);
     o.removeAttribute('draggable');
+  }
+
+  /* Ensure no highlights are hanging around there's a small
+   * chance they can be saved before they timeout */
+  for (const o of els.main.querySelectorAll('.highlight')) {
+    o.classList.remove('highlight');
   }
 }
 
