@@ -41,6 +41,8 @@
   --bg-drop: #C00;
   --fg-drop: #FFF;
 
+  --bg-highlight: #ffff00;
+
   --key-col:  #06C;
   --key-col-inv:  #FFF;
 
@@ -53,7 +55,7 @@
 
   --fresh: #befb8da8;
   --bookmark: var(--bg-dark);
-  --bookmark-width: 15em;
+  --bookmark-width: 16em;
   --bookmark-margin: var(--tiny);
   --bookmark-padding: var(--medium);
   --bookmark-border: thin;
@@ -72,5 +74,7 @@
 
     --bg-drop: #A00;
     --fg-drop: #CCC;
+
+    --bg-highlight: #CC9900;
   }
 }

@@ -4,12 +4,11 @@ import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
 
-
 export interface Elems {
   [index:string]: HTMLElement,
 }
 
-const version = '1.6.0';
+const version = '1.6.4';
 
 const storage = OPTS.storage;
 const store = chrome.storage[storage];
@@ -203,6 +202,7 @@ function saveChanges(makeBackup = true) {
 function cleanTree(tree:Document) {
   const all = tree.querySelectorAll('section, a');
   for (const e of all) {
+    if (e.classList.contains('flash')) e.classList.remove('flash');
     if (e.classList.length === 0) {
       e.removeAttribute('class');
     }
@@ -255,10 +255,17 @@ function addLink() {
   }
   const a = createExampleLink();
   els.main.append(a);
+  a.scrollIntoView({ behavior: 'smooth' });
+  toast.html('locked', '<h1>Add link.</h1><p>You have added a link. It is at the bottom.</p>');
+  flash(a, 'highlight');
 }
 
 function createPanel() {
   const div = cloneTemplateToTarget('#template_panel', els.main);
+  div.scrollIntoView({ behavior: 'smooth' });
+  toast.html('locked', '<h1>Add panel.</h1><p>You have added a panel. It is at the bottom.</p>');
+  div.classList.add('flash');
+  div.addEventListener('animationend', () => { div.classList.remove('flash'); });
   return div;
 }
 
@@ -471,9 +478,9 @@ function dragStart(e:DragEvent) {
   // setDragImage(e);  // <-- not sure I like disabling this or if I want it as an option
 }
 
-function flash(elem:HTMLElement) {
-  elem.classList.add('flash');
-  window.setTimeout(() => { elem.classList.remove('flash'); }, 1000);
+function flash(elem:HTMLElement, cls = 'flash') {
+  elem.classList.add(cls);
+  elem.addEventListener('animationend', () => { elem.classList.remove(cls); });
 }
 
 // function setDragImage(e) {
@@ -890,11 +897,16 @@ function migrateLinks() {
     delete o.dataset.href;
   }
 
-  /* anchors are draggable anyway and shoudl not have the attr set
+  /* anchors are draggable anyway and should not have the attr set
    * this was erroneously done before 1.6 */
   for (const o of els.main.querySelectorAll('a[draggable]')) {
-    console.log(o);
     o.removeAttribute('draggable');
+  }
+
+  /* Ensure no highlights are hanging around there's a small
+   * chance they can be saved before they timeout */
+  for (const o of els.main.querySelectorAll('.highlight')) {
+    o.classList.remove('highlight');
   }
 }
 

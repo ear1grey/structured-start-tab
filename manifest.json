@@ -1,6 +1,6 @@
 {
     "manifest_version": 2,
-    "version": "1.5.0",
+    "version": "1.6.3",
     "name": "Structured Start Tab",
     "description": "Show a structured page when a new tab is opened.",
     "author": "Rich Boakes",
@@ -19,7 +19,9 @@
     "icons": {
         "16": "app/style/i/16.png",
         "48": "app/style/i/48.png",
-       "128": "app/style/i/128.png"
+        "96": "app/style/i/96.png",
+       "128": "app/style/i/128.png",
+       "580": "app/style/i/580.png"
     },
     "browser_action": {
         "default_icon": "app/style/i/48.png"
