@@ -261,6 +261,10 @@ function addLink() {
 
 function createPanel() {
   const div = cloneTemplateToTarget('#template_panel', els.main);
+  div.scrollIntoView({ behavior: 'smooth' });
+  toast.html('locked', '<h1>Add panel.</h1><p>You have added a panel. It is at the bottom.</p>');
+  div.classList.add('flash');
+  div.addEventListener('animationend', () => { div.classList.remove('flash'); });
   return div;
 }
 
