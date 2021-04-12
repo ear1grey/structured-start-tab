@@ -290,7 +290,6 @@ function duplicatePanel() {
   flash(divBis, 'highlight');
   toast.html('locked', chrome.i18n.getMessage('duplicate_panel'));
   closeDialog();
-  return div;
 }
 
 /**
