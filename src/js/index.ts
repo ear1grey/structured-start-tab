@@ -239,7 +239,7 @@ function detectKeydown(e:KeyboardEvent) {
   }
 }
 
-function createExampleLink(text = 'Example', href = 'http://example.org') {
+function createExampleLink(text = chrome.i18n.getMessage('example'), href = 'http://example.org') {
   const a = document.createElement('a');
   a.href = href;
   a.textContent = text;
@@ -256,14 +256,14 @@ function addLink() {
   const a = createExampleLink();
   els.main.append(a);
   a.scrollIntoView({ behavior: 'smooth' });
-  toast.html('locked', '<h1>Add link.</h1><p>You have added a link. It is at the bottom.</p>');
+  toast.html('locked', chrome.i18n.getMessage('toast_link_add'));
   flash(a, 'highlight');
 }
 
 function createPanel() {
   const div = cloneTemplateToTarget('#template_panel', els.main);
   div.scrollIntoView({ behavior: 'smooth' });
-  toast.html('locked', '<h1>Add panel.</h1><p>You have added a panel. It is at the bottom.</p>');
+  toast.html('locked', chrome.i18n.getMessage('add_panel_auto'));
   div.classList.add('flash');
   div.addEventListener('animationend', () => { div.classList.remove('flash'); });
   return div;

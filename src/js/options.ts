@@ -86,6 +86,7 @@ interface NonEmptyDocumentFragment extends DocumentFragment {
 export function cloneTemplate(selector:string):NonEmptyDocumentFragment {
   const template = document.querySelector<HTMLTemplateElement>(selector);
   if (template && template.content.lastElementChild) {
+    util.localizeHtml(template.content);
     return document.importNode(template.content, true) as NonEmptyDocumentFragment;
   }
   throw new Error('Template not found!');
