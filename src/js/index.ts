@@ -111,6 +111,7 @@ function editStart(elem:HTMLElement) {
   document.querySelector('#editok')!.addEventListener('click', editOk);
   document.querySelector('#editcancel')!.addEventListener('click', editCancel);
   document.querySelector('#duplicate')!.addEventListener('click', duplicatePanel);
+  document.querySelector('#duplicate_link')!.addEventListener('click', duplicatePanel);
 
   els.editname = document.querySelector<HTMLElement>('#editname')!;
 }
@@ -278,13 +279,22 @@ function addPanel() {
   return createPanel();
 }
 
-function duplicatePanel() {
+function duplicatePanel(e : Event) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
   const div = els.editing;
   const divBis = div.cloneNode(true) as HTMLElement;
+  const target = e.target! as HTMLElement;
+  if (target.id === 'duplicate') {
+    const elements = divBis.querySelectorAll('a');
+    for (const e of elements) {
+      e.parentNode?.removeChild(e);
+    }
+    console.log(elements);
+  }
+  divBis.firstElementChild!.innerHTML = chrome.i18n.getMessage('copy') + divBis.firstElementChild!.innerHTML;
   div.parentNode!.append(divBis);
   divBis.scrollIntoView({ behavior: 'smooth' });
   flash(divBis, 'highlight');

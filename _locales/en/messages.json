@@ -146,6 +146,12 @@
   },
   "duplicate_panel": {
     "message": "<h1>Duplicated panel</h1><p>You have duplicated a panel. It is at the bottom of its parent.</p>"
+  },
+  "duplicate_link": {
+    "message": "Duplicate with links"
+  },
+  "copy": {
+    "message": "Copy of "
   }
 }
 

@@ -149,5 +149,11 @@
   },
   "duplicate_panel": {
     "message": "<h1>Panneau dupliqué</h1><p>Vous avez dupliqué un panneau. Il se trouve en bas de son parent.</p>"
+  },
+  "duplicate_link": {
+    "message": "Dupliquer avec les liens"
+  },
+  "copy": {
+    "message": "Copie de "
   }
 }
