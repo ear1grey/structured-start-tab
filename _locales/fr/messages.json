@@ -143,5 +143,11 @@
   },
   "toast_link_add": {
     "message": "<h1>Ajout d'un lien.</h1><p>Vous avez ajouté un lien. Il se trouve en bas de la page.</p>"
+  },
+  "duplicate": {
+    "message": "Dupliquer"
+  },
+  "duplicate_panel": {
+    "message": "<h1>Panneau dupliqué</h1><p>Vous avez dupliqué un panneau. Il se trouve en bas de son parent.</p>"
   }
 }

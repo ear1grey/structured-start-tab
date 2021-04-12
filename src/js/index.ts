@@ -110,6 +110,7 @@ function editStart(elem:HTMLElement) {
 
   document.querySelector('#editok')!.addEventListener('click', editOk);
   document.querySelector('#editcancel')!.addEventListener('click', editCancel);
+  document.querySelector('#duplicate')!.addEventListener('click', duplicatePanel);
 
   els.editname = document.querySelector<HTMLElement>('#editname')!;
 }
@@ -275,6 +276,21 @@ function addPanel() {
     return;
   }
   return createPanel();
+}
+
+function duplicatePanel() {
+  if (OPTS.lock) {
+    toast.html('locked', chrome.i18n.getMessage('locked'));
+    return;
+  }
+  const div = els.editing;
+  const divBis = div.cloneNode(true) as HTMLElement;
+  div.parentNode!.append(divBis);
+  divBis.scrollIntoView({ behavior: 'smooth' });
+  flash(divBis, 'highlight');
+  toast.html('locked', chrome.i18n.getMessage('duplicate_panel'));
+  closeDialog();
+  return div;
 }
 
 /**
