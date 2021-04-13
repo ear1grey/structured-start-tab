@@ -40,7 +40,6 @@ export class ColorSwitch extends HTMLElement {
   }
 
   set value(val:string) {
-    console.trace();
     if (val) {
       this.setAttribute('value', val);
       this.el.incol.value = this.value.slice(0, 7);
