@@ -3,6 +3,8 @@ import { Options, OPTS } from './defaults.js';
 import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
+import { ColorSwitch } from 'color-switch/index.js';
+
 
 export interface Elems {
   [index:string]: HTMLElement,
@@ -40,17 +42,18 @@ function getValue(where:string) {
 }
 
 function setColorValue(where:string, what:string) {
-  const elem = document.querySelector<HTMLInputElement>(where)!;
+  const elem = document.querySelector<ColorSwitch>(where)!;
   if (what[0] === '!') {
     elem.value = what.slice(1);
+    elem.open = false;
   } else {
     elem.value = what;
-    elem.dataset.open = 'true';
+    elem.open = true;
   }
 }
 
 function getColorValue(where:string) {
-  const elem = document.querySelector<HTMLInputElement>(where)!;
+  const elem = document.querySelector<ColorSwitch>(where)!;
   const color = elem.value;
   const open = elem.dataset.open ? '' : '!';
   return open + color;

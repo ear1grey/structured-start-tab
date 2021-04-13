@@ -22,7 +22,7 @@
   },
   "name": {
     "message": "Name"
-  },  
+  },
   "placeholder_item_name": {
     "message": "Item Name"
   },
@@ -140,6 +140,9 @@
   },
   "tranparency": {
     "message": "Tranparency"
+  },
+  "opacity": {
+    "message": "Opacity"
   },
   "toast_link_add": {
     "message": "<h1>Add link.</h1><p>You have added a link. It is at the bottom.</p>"

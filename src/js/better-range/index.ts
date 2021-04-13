@@ -16,6 +16,15 @@ function create(where:HTMLElement|DocumentFragment, what:string, attrs:ElAttrs =
   return x;
 }
 
+function attachStyleSheet(shadow:ShadowRoot) {
+  const e = document.createElement('link');
+  e.setAttribute('rel', 'stylesheet');
+  e.setAttribute('type', 'text/css');
+  e.setAttribute('href', 'js/better-range/index.css');
+  shadow.append(e);
+}
+
+
 interface Elements {
   intrans:HTMLInputElement,
   labelnum:HTMLElement,
@@ -49,6 +58,8 @@ export class BetterRange extends HTMLElement {
     super();
 
     const shadow = this.attachShadow({ mode: 'open' });
+    attachStyleSheet(shadow);
+
     const div = create(shadow, 'div', { id: 'better_range' });
 
     // tranparency input
