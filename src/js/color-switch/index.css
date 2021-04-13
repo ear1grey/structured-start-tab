@@ -55,3 +55,9 @@
 #main input {
   width: 100%;
 }
+
+#better_range {
+  display: grid;
+  grid-template-columns: 0.80fr 0.18fr 0.02fr;
+  gap: 10px;
+}
