@@ -3,7 +3,7 @@ import { Options } from './defaults.js';
 let tip: HTMLElement;
 let OPTS: Options;
 
-const gap = 40;
+const gap = 20;
 
 export function reposition(e: MouseEvent, messageOverride?: string) :void {
   if (!OPTS.showToolTips) return;
@@ -14,12 +14,20 @@ export function reposition(e: MouseEvent, messageOverride?: string) :void {
   let x = e.clientX;
   let y = e.clientY;
 
-  if (2 * e.clientX > document.documentElement.clientWidth) {
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+
+  if (x >= centerX) {
     x = x - tip.clientWidth - gap;
   } else {
     x = x + gap;
   }
-  y = y - tip.clientHeight - gap;
+
+  if (y >= centerY) {
+    y = y - tip.clientHeight - gap;
+  } else {
+    y = y + gap;
+  }
 
   document.documentElement.style.setProperty('--tool-tip-left', `${x}px`);
   document.documentElement.style.setProperty('--tool-tip-top', `${y}px`);
