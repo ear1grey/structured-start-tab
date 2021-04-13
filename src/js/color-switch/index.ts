@@ -107,15 +107,12 @@ export class ColorSwitch extends HTMLElement {
     const auto = create(div, 'label', { id: 'auto', for: 'auto' }, this.auto);
     const manual = create(div, 'label', { id: 'manual', for: 'manual' }, this.manual);
     auto.addEventListener('click', () => {
-      console.log('Automatic clicked');
-
       this.el.auto.setAttribute('class', 'on');
       this.el.manual.removeAttribute('class');
       this.el.main.removeAttribute('class');
       this.open = false;
     });
     manual.addEventListener('click', () => {
-      console.log('Manual clicked');
       this.el.manual.setAttribute('class', 'on');
       this.el.auto.removeAttribute('class');
       this.el.main.setAttribute('class', 'on');
@@ -130,7 +127,7 @@ export class ColorSwitch extends HTMLElement {
     const incol = create(main, 'input', { id: 'pik', type: 'color', value });
 
     // tranparency input
-    const trans = create(main, 'label', { id: 'col', for: 'trs' }, chrome.i18n.getMessage('tranparency'));
+    const trans = create(main, 'label', { id: 'col', for: 'trs' }, chrome.i18n.getMessage('opacity'));
     const betterRange = create(main, 'better-range', { value: '' }) as BetterRange;
 
     incol.addEventListener('input', this.updateValue.bind(this));

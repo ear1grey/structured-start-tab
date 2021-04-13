@@ -144,6 +144,9 @@
   "tranparency": {
     "message": "Tranparence"
   },
+  "opacity": {
+    "message": "Opacité"
+  },
   "toast_link_add": {
     "message": "<h1>Ajout d'un lien.</h1><p>Vous avez ajouté un lien.</p>"
   },
