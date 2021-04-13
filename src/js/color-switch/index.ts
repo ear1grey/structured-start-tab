@@ -28,6 +28,7 @@ function create(where:HTMLElement|DocumentFragment, what:string, attrs:ElAttrs =
 interface Elements {
   incol:HTMLInputElement,
   intrans:HTMLInputElement,
+  intransnum:HTMLInputElement,
   [key:string]:HTMLElement
 }
 
@@ -43,6 +44,7 @@ export class ColorSwitch extends HTMLElement {
       this.setAttribute('value', val);
       this.el.incol.value = this.value.slice(0, 7);
       this.el.intrans.value = String(parseInt(this.value.slice(7, 9), 16));
+      this.el.intransnum.value = String(parseInt(this.value.slice(7, 9), 16));
     }
   }
 
@@ -76,8 +78,13 @@ export class ColorSwitch extends HTMLElement {
   }
 
 
-  updateValue() :void {
-    this.value = this.el.incol.value + ('0' + Number(this.el.intrans.value).toString(16)).slice(-2);
+  updateValue(e :Event) :void {
+    const target = e.target as HTMLElement;
+    if (target.id === 'trsnum') {
+      this.value = this.el.incol.value + ('0' + Number(this.el.intransnum.value).toString(16)).slice(-2);
+    } else {
+      this.value = this.el.incol.value + ('0' + Number(this.el.intrans.value).toString(16)).slice(-2);
+    }
     this.open = this.el.manual.classList.contains('on');
   }
 
@@ -132,9 +139,11 @@ export class ColorSwitch extends HTMLElement {
     const transValue = String(parseInt(this.value.slice(7, 9), 16));
     const trans = create(main, 'label', { id: 'col', for: 'trs' }, chrome.i18n.getMessage('tranparency'));
     const intrans = create(main, 'input', { id: 'trs', type: 'range', min: '0', max: '255', value: transValue });
+    const intransnum = create(main, 'input', { id: 'trsnum', type: 'number', min: '0', max: '255', value: transValue });
 
     incol.addEventListener('input', this.updateValue.bind(this));
     intrans.addEventListener('input', this.updateValue.bind(this));
+    intransnum.addEventListener('input', this.updateValue.bind(this));
 
     this.el = {
       div,
@@ -145,6 +154,7 @@ export class ColorSwitch extends HTMLElement {
       incol,
       trans,
       intrans,
+      intransnum,
     };
 
     // decide which one of them is selected
