@@ -110,8 +110,6 @@ function editStart(elem:HTMLElement) {
 
   document.querySelector('#editok')!.addEventListener('click', editOk);
   document.querySelector('#editcancel')!.addEventListener('click', editCancel);
-  document.querySelector('#duplicate')!.addEventListener('click', duplicatePanel);
-  document.querySelector('#duplicate_link')!.addEventListener('click', duplicatePanel);
 
   els.editname = document.querySelector<HTMLElement>('#editname')!;
 }
@@ -279,27 +277,25 @@ function addPanel() {
   return createPanel();
 }
 
-function duplicatePanel(e : Event) {
+function duplicatePanel(link: boolean) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
-  const div = els.editing;
-  const divBis = div.cloneNode(true) as HTMLElement;
-  const target = e.target! as HTMLElement;
-  if (target.id === 'duplicate') {
+  const section = els.contextClicked;
+  const divBis = section.cloneNode(true) as HTMLElement;
+  if (!link) {
     const elements = divBis.querySelectorAll('a');
     for (const e of elements) {
       e.parentNode?.removeChild(e);
     }
-    console.log(elements);
   }
   divBis.firstElementChild!.innerHTML = chrome.i18n.getMessage('copy') + divBis.firstElementChild!.innerHTML;
-  div.parentNode!.append(divBis);
+  section.parentNode!.append(divBis);
   divBis.scrollIntoView({ behavior: 'smooth' });
   flash(divBis, 'highlight');
+  divBis.addEventListener('contextmenu', saveElmContextClicked);
   toast.html('locked', chrome.i18n.getMessage('duplicate_panel'));
-  closeDialog();
 }
 
 /**
@@ -899,7 +895,17 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'emptytrash': emptyTrash(); break;
     case 'togglebookmarks': toggleBookmarks(); break;
     case 'toggle-sidebar': toggleBookmarks(); break;
+    case 'withoutLink': duplicatePanel(false); break;
+    case 'withLink': duplicatePanel(true); break;
     default: break;
+  }
+}
+
+function saveElmContextClicked(e: Event) {
+  e.stopPropagation();
+  const target = findParentSection(e.target! as HTMLElement);
+  if (target !== null && target.tagName === 'SECTION') {
+    els.contextClicked = target as HTMLElement;
   }
 }
 
@@ -912,6 +918,14 @@ function prepareMain(OPTS:Options) {
   prepareDrag();
   prepareFoldables();
   prepareDynamicFlex(els.main);
+  prepareContextPanelEventListener();
+}
+
+function prepareContextPanelEventListener() {
+  const sections = els.main.querySelectorAll('section');
+  for (const s of sections) {
+    s.addEventListener('contextmenu', saveElmContextClicked);
+  }
 }
 
 /** Migration **/

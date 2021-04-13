@@ -141,17 +141,26 @@
   "toast_link_add": {
     "message": "<h1>Add link.</h1><p>You have added a link. It is at the bottom.</p>"
   },
-  "duplicate": {
-    "message": "Duplicate"
-  },
   "duplicate_panel": {
     "message": "<h1>Duplicated panel</h1><p>You have duplicated a panel. It is at the bottom of its parent.</p>"
   },
-  "duplicate_link": {
-    "message": "Duplicate with links"
-  },
   "copy": {
     "message": "Copy of "
+  },
+  "emptytrash": {
+    "message": "Empty Trash"
+  },
+  "togglebookmarks" : {
+    "message":"Toggle Bookmarks"
+  },
+  "duplicatePanel" :{
+    "message": "Duplicate Panel"
+  },
+  "withLink":{
+    "message": "With links"
+  },
+  "withoutLink": {
+    "message": "Without links"
   }
 }
 

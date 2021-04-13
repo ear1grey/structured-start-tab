@@ -144,16 +144,25 @@
   "toast_link_add": {
     "message": "<h1>Ajout d'un lien.</h1><p>Vous avez ajouté un lien. Il se trouve en bas de la page.</p>"
   },
-  "duplicate": {
-    "message": "Dupliquer"
-  },
   "duplicate_panel": {
     "message": "<h1>Panneau dupliqué</h1><p>Vous avez dupliqué un panneau. Il se trouve en bas de son parent.</p>"
   },
-  "duplicate_link": {
-    "message": "Dupliquer avec les liens"
-  },
   "copy": {
     "message": "Copie de "
+  },
+  "emptytrash": {
+    "message": "Vider la corbeille"
+  },
+  "togglebookmarks" : {
+    "message":"Afficher les marque-pages"
+  },
+  "duplicatePanel" :{
+    "message": "Dupliquer les panneaux"
+  },
+  "withLink":{
+    "message": "Avec les liens"
+  },
+  "withoutLink": {
+    "message": "Sans les liens"
   }
 }
