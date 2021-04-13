@@ -1,3 +1,4 @@
+import { BetterRange } from '../better-range/index.js';
 
 function attachStyleSheet(shadow:ShadowRoot) {
   const e = document.createElement('link');
@@ -27,9 +28,8 @@ function create(where:HTMLElement|DocumentFragment, what:string, attrs:ElAttrs =
 
 interface Elements {
   incol:HTMLInputElement,
-  intrans:HTMLInputElement,
-  intransnum:HTMLInputElement,
-  [key:string]:HTMLElement
+  [key:string]:HTMLElement,
+  betterRange:BetterRange
 }
 
 type OptionalString = string|undefined;
@@ -40,11 +40,11 @@ export class ColorSwitch extends HTMLElement {
   }
 
   set value(val:string) {
+    console.trace();
     if (val) {
       this.setAttribute('value', val);
       this.el.incol.value = this.value.slice(0, 7);
-      this.el.intrans.value = String(parseInt(this.value.slice(7, 9), 16));
-      this.el.intransnum.value = String(parseInt(this.value.slice(7, 9), 16));
+      this.el.betterRange.value = this.value.slice(7, 9);
     }
   }
 
@@ -78,13 +78,8 @@ export class ColorSwitch extends HTMLElement {
   }
 
 
-  updateValue(e :Event) :void {
-    const target = e.target as HTMLElement;
-    if (target.id === 'trsnum') {
-      this.value = this.el.incol.value + ('0' + Number(this.el.intransnum.value).toString(16)).slice(-2);
-    } else {
-      this.value = this.el.incol.value + ('0' + Number(this.el.intrans.value).toString(16)).slice(-2);
-    }
+  updateValue() :void {
+    this.value = this.el.incol.value + this.el.betterRange.value;
     this.open = this.el.manual.classList.contains('on');
   }
 
@@ -136,15 +131,11 @@ export class ColorSwitch extends HTMLElement {
     const incol = create(main, 'input', { id: 'pik', type: 'color', value });
 
     // tranparency input
-    const transValue = String(parseInt(this.value.slice(7, 9), 16));
     const trans = create(main, 'label', { id: 'col', for: 'trs' }, chrome.i18n.getMessage('tranparency'));
-    const intrans = create(main, 'input', { id: 'trs', type: 'range', min: '0', max: '255', value: transValue });
-    const labelnum = create(main, 'label', { id: 'col', for: 'trsnum' }, '%');
-    const intransnum = create(main, 'input', { id: 'trsnum', type: 'number', min: '0', max: '255', value: transValue });
+    const betterRange = create(main, 'better-range', { value: '' }) as BetterRange;
 
     incol.addEventListener('input', this.updateValue.bind(this));
-    intrans.addEventListener('input', this.updateValue.bind(this));
-    intransnum.addEventListener('input', this.updateValue.bind(this));
+    betterRange.addEventListener('input', this.updateValue.bind(this));
 
     this.el = {
       div,
@@ -154,9 +145,7 @@ export class ColorSwitch extends HTMLElement {
       col,
       incol,
       trans,
-      intrans,
-      labelnum,
-      intransnum,
+      betterRange,
     };
 
     // decide which one of them is selected
@@ -165,3 +154,4 @@ export class ColorSwitch extends HTMLElement {
 }
 
 customElements.define('color-switch', ColorSwitch);
+customElements.define('better-range', BetterRange);
