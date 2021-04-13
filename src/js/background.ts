@@ -2,11 +2,25 @@
 const menuItems:chrome.contextMenus.CreateProperties[] = [
   {
     id: 'emptytrash',
-    title: 'Empty Trash',
+    title: chrome.i18n.getMessage('emptytrash'),
   },
   {
     id: 'togglebookmarks',
-    title: 'Toggle Bookmarks',
+    title: chrome.i18n.getMessage('togglebookmarks'),
+  },
+  {
+    id: 'duplicatePanel',
+    title: chrome.i18n.getMessage('duplicatePanel'),
+  },
+  {
+    id: 'withLink',
+    parentId: 'duplicatePanel',
+    title: chrome.i18n.getMessage('withLink'),
+  },
+  {
+    id: 'withoutLink',
+    parentId: 'duplicatePanel',
+    title: chrome.i18n.getMessage('withoutLink'),
   },
 ];
 

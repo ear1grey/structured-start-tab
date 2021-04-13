@@ -277,6 +277,27 @@ function addPanel() {
   return createPanel();
 }
 
+function duplicatePanel(keepLinks: boolean) {
+  if (OPTS.lock) {
+    toast.html('locked', chrome.i18n.getMessage('locked'));
+    return;
+  }
+  const section = els.contextClicked;
+  const dupe = section.cloneNode(true) as HTMLElement;
+  if (!keepLinks) {
+    const elements = dupe.querySelectorAll('a');
+    for (const e of elements) {
+      e.parentNode?.removeChild(e);
+    }
+  }
+  dupe.firstElementChild!.innerHTML = chrome.i18n.getMessage('copy') + dupe.firstElementChild!.innerHTML;
+  section.after(dupe);
+  dupe.scrollIntoView({ behavior: 'smooth' });
+  flash(dupe, 'highlight');
+  dupe.addEventListener('contextmenu', saveElmContextClicked);
+  toast.html('locked', chrome.i18n.getMessage('duplicate_panel'));
+}
+
 /**
  * Accept an array of things that are either containers or links
  * inject in the section template
@@ -874,7 +895,17 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'emptytrash': emptyTrash(); break;
     case 'togglebookmarks': toggleBookmarks(); break;
     case 'toggle-sidebar': toggleBookmarks(); break;
+    case 'withoutLink': duplicatePanel(false); break;
+    case 'withLink': duplicatePanel(true); break;
     default: break;
+  }
+}
+
+function saveElmContextClicked(e: Event) {
+  e.stopPropagation();
+  const target = findParentSection(e.target! as HTMLElement);
+  if (target !== null && target.tagName === 'SECTION') {
+    els.contextClicked = target as HTMLElement;
   }
 }
 
@@ -887,6 +918,14 @@ function prepareMain(OPTS:Options) {
   prepareDrag();
   prepareFoldables();
   prepareDynamicFlex(els.main);
+  prepareContextPanelEventListener();
+}
+
+function prepareContextPanelEventListener() {
+  const sections = els.main.querySelectorAll('section');
+  for (const s of sections) {
+    s.addEventListener('contextmenu', saveElmContextClicked);
+  }
 }
 
 /** Migration **/

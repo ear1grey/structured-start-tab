@@ -22,7 +22,7 @@
   },
   "name": {
     "message": "Name"
-  },  
+  },
   "placeholder_item_name": {
     "message": "Item Name"
   },
@@ -142,7 +142,28 @@
     "message": "Tranparency"
   },
   "toast_link_add": {
-    "message": "<h1>Add link.</h1><p>You have added a link. It is at the bottom.</p>"
+    "message": "<h1>Add link.</h1><p>You have added a link.</p>"
+  },
+  "duplicate_panel": {
+    "message": "<h1>Duplicated panel</h1><p>You have duplicated a panel.</p>"
+  },
+  "copy": {
+    "message": "Copy of "
+  },
+  "emptytrash": {
+    "message": "Empty Trash"
+  },
+  "togglebookmarks" : {
+    "message":"Toggle Bookmarks"
+  },
+  "duplicatePanel" :{
+    "message": "Duplicate Panel"
+  },
+  "withLink":{
+    "message": "With links"
+  },
+  "withoutLink": {
+    "message": "Without links"
   },
   "example": {
     "message": "Example"
@@ -157,3 +178,5 @@
     "message": "<h1>Add panel.</h1><p>You have added a panel. It is at the bottom.</p>"
   }
 }
+
+
