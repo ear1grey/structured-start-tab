@@ -277,24 +277,24 @@ function addPanel() {
   return createPanel();
 }
 
-function duplicatePanel(link: boolean) {
+function duplicatePanel(keepLinks: boolean) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
   const section = els.contextClicked;
-  const divBis = section.cloneNode(true) as HTMLElement;
-  if (!link) {
-    const elements = divBis.querySelectorAll('a');
+  const dupe = section.cloneNode(true) as HTMLElement;
+  if (!keepLinks) {
+    const elements = dupe.querySelectorAll('a');
     for (const e of elements) {
       e.parentNode?.removeChild(e);
     }
   }
-  divBis.firstElementChild!.innerHTML = chrome.i18n.getMessage('copy') + divBis.firstElementChild!.innerHTML;
-  section.parentNode!.append(divBis);
-  divBis.scrollIntoView({ behavior: 'smooth' });
-  flash(divBis, 'highlight');
-  divBis.addEventListener('contextmenu', saveElmContextClicked);
+  dupe.firstElementChild!.innerHTML = chrome.i18n.getMessage('copy') + dupe.firstElementChild!.innerHTML;
+  section.after(dupe);
+  dupe.scrollIntoView({ behavior: 'smooth' });
+  flash(dupe, 'highlight');
+  dupe.addEventListener('contextmenu', saveElmContextClicked);
   toast.html('locked', chrome.i18n.getMessage('duplicate_panel'));
 }
 
