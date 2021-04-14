@@ -10,7 +10,7 @@ export interface Elems {
   [index:string]: HTMLElement,
 }
 
-const version = '1.6.4';
+const version = '1.7.0';
 
 const storage = OPTS.storage;
 const store = chrome.storage[storage];

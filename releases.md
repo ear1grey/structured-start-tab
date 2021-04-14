@@ -3,6 +3,7 @@
 Every release for the foreseeable future will be an alpha level release.  This means you can expect an evolving and improving feature set, and also bugs.  Please report bugs and request features via the Suggestions button on the toolbar.
 
 ## Alpha Releases
+* 1.7.0 [i18n](https://github.com/ear1grey/structured-start-tab/milestone/17)
 * 1.6.3 Sidebar on by default.
 * 1.6.2 Tweak landing page again.
 * 1.6.1 Tweak landing page.
