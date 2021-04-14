@@ -3,7 +3,7 @@ import { Options, OPTS } from './defaults.js';
 import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
-import { ColorSwitch } from 'color-switch/index.js';
+import { ColorSwitch } from './color-switch/index.js';
 
 
 export interface Elems {
@@ -206,6 +206,7 @@ function cleanTree(tree:Document) {
   const all = tree.querySelectorAll('section, a');
   for (const e of all) {
     if (e.classList.contains('flash')) e.classList.remove('flash');
+    if (e.classList.contains('highlight')) e.classList.remove('highlight');
     if (e.classList.length === 0) {
       e.removeAttribute('class');
     }
@@ -597,6 +598,7 @@ function dragDrop(e: DragEvent) {
   dragging.el.classList.remove('dragging');
   dragging.el.classList.remove('fresh');
   if (e.target === els.bin && !dragging.dummy) {
+    els.trash = els.main.querySelector('#trash') || cloneTemplateToTarget('#template_trash', els.main);
     els.trash.lastElementChild?.append(dragging.el);
     saveChanges();
     toast.html('locked', chrome.i18n.getMessage('locked_moved_to_trash'));
@@ -776,6 +778,7 @@ function prepareContent(html:string) {
 
 function toggleTrash() {
   // ensure trash is the last thing on the screen
+  els.trash = els.main.querySelector('#trash') || cloneTemplateToTarget('#template_trash', els.main);
   els.main.append(els.trash);
   els.trash.classList.toggle('open');
   if (els.trash.classList.contains('open')) {
