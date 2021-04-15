@@ -1,6 +1,5 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { loadOptionsWithPromise, simulateClick, cloneTemplate } from './options.js';
-import { linksStatsPath, Options, OPTS } from './defaults.js';
+import { Options, OPTS } from './defaults.js';
 import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
@@ -71,7 +70,6 @@ function linkClicked(e:MouseEvent) {
       e.preventDefault();
       editStart(e.target);
     } else if (!e.target.id) {
-      e.preventDefault();
       updateClickCount(e.target);
     }
   }
@@ -85,7 +83,7 @@ function updateClickCount(a :HTMLElement) {
   } else {
     linksStats[link] = 1;
   }
-  writeFileSync(linksStatsPath, JSON.stringify(linksStats));
+  localStorage.setItem('linksStats', JSON.stringify(linksStats));
 }
 
 function toHex(x:number, m = 1) {
@@ -948,8 +946,11 @@ function prepareMain(OPTS:Options) {
 }
 
 function prepareLinksStats() {
-  if (existsSync(linksStatsPath)) {
-    linksStats = JSON.parse(readFileSync(linksStatsPath, 'utf8')) as LinkStats;
+  const linksStatsAsString = localStorage.getItem('linksStats');
+  if (linksStatsAsString) {
+    linksStats = JSON.parse(linksStatsAsString) as LinkStats;
+  } else {
+    linksStats = {};
   }
 }
 
