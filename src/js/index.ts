@@ -259,6 +259,33 @@ function detectKeydown(e:KeyboardEvent) {
       editCancel();
     }
   }
+
+  if (e.code === 'KeyI' && (e.metaKey || e.ctrlKey) && !e.repeat) {
+    toggleHeatMap();
+  }
+}
+
+function toggleHeatMap() {
+  const links = els.main.querySelectorAll('a');
+  els.main.classList.toggle('heatmap');
+  if (els.main.classList.contains('heatmap')) {
+    for (const a of links) {
+      if (!a.id) {
+        a.style.filter = getColorHeatMap(linksStats[a.href]);
+        console.log(a.style.filter);
+      }
+    }
+  } else {
+    for (const a of links) {
+      if (!a.id) {
+        a.style.filter = '';
+      }
+    }
+  }
+}
+
+function getColorHeatMap(value :number): string {
+  return '20';
 }
 
 function createExampleLink(text = chrome.i18n.getMessage('example'), href = 'http://example.org') {
