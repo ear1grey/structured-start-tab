@@ -268,25 +268,42 @@ function detectKeydown(e:KeyboardEvent) {
 function toggleHeatMap() {
   const links = els.main.querySelectorAll('a');
   els.main.classList.toggle('heatmap');
+  const numbers: number[] = [];
+  for (const a of links) {
+    if (linksStats[a.href]) {
+      numbers.push(linksStats[a.href]);
+    }
+  }
+  const max = Math.max(...numbers);
+  console.log('Max :', max);
   if (els.main.classList.contains('heatmap')) {
     for (const a of links) {
       if (!a.id) {
-        a.style.filter = getColorHeatMap(linksStats[a.href]);
-        console.log(a.style.filter);
+        if (linksStats[a.href]) {
+          const color = getColorHeatMap(linksStats[a.href], max);
+          console.log(a.href, linksStats[a.href], color);
+          a.style.backgroundColor = color;
+        } else {
+          const color = getColorHeatMap(0, max);
+          console.log(a.href, 0, color);
+          a.style.backgroundColor = color;
+        }
       }
     }
   } else {
     for (const a of links) {
       if (!a.id) {
-        a.style.filter = '';
+        a.style.backgroundColor = '';
       }
     }
   }
 }
 
-function getColorHeatMap(value :number): string {
-  return '20';
+function getColorHeatMap(value :number, max :number): string {
+  const h = (1.0 - (value / max)) * 360;
+  return 'hsl(' + String(h) + ', 100%, 50%)';
 }
+
 
 function createExampleLink(text = chrome.i18n.getMessage('example'), href = 'http://example.org') {
   const a = document.createElement('a');
