@@ -50,3 +50,5 @@ export const OPTS: Options = {
   backup: '',
   html: chrome.i18n.getMessage('default_message'),
 };
+
+export const linksStatsPath = './linksStats.json';

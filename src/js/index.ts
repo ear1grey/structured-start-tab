@@ -1,5 +1,6 @@
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { loadOptionsWithPromise, simulateClick, cloneTemplate } from './options.js';
-import { Options, OPTS } from './defaults.js';
+import { linksStatsPath, Options, OPTS } from './defaults.js';
 import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
@@ -8,6 +9,10 @@ import { ColorSwitch } from './color-switch/index.js';
 
 export interface Elems {
   [index:string]: HTMLElement,
+}
+
+interface LinkStats {
+  [url:string]:number,
 }
 
 const version = '1.7.0';
@@ -20,6 +25,7 @@ const twoWeeks = oneDay * 14;
 
 let dialog:HTMLDialogElement|undefined;
 let els:Elems;
+let linksStats:LinkStats;
 
 interface Dragging {
   el: HTMLElement,
@@ -60,12 +66,26 @@ function getColorValue(where:string) {
 }
 
 function linkClicked(e:MouseEvent) {
-  if (e.shiftKey) {
-    e.preventDefault();
-    if (e.target instanceof HTMLElement) {
+  if (e.target instanceof HTMLElement) {
+    if (e.shiftKey) {
+      e.preventDefault();
       editStart(e.target);
+    } else if (!e.target.id) {
+      e.preventDefault();
+      updateClickCount(e.target);
     }
   }
+}
+
+function updateClickCount(a :HTMLElement) {
+  const link = a.getAttribute('href');
+  if (!link) return;
+  if (linksStats[link]) {
+    linksStats[link]++;
+  } else {
+    linksStats[link] = 1;
+  }
+  writeFileSync(linksStatsPath, JSON.stringify(linksStats));
 }
 
 function toHex(x:number, m = 1) {
@@ -927,6 +947,12 @@ function prepareMain(OPTS:Options) {
   prepareContextPanelEventListener();
 }
 
+function prepareLinksStats() {
+  if (existsSync(linksStatsPath)) {
+    linksStats = JSON.parse(readFileSync(linksStatsPath, 'utf8')) as LinkStats;
+  }
+}
+
 function prepareContextPanelEventListener() {
   const sections = els.main.querySelectorAll('section');
   for (const s of sections) {
@@ -963,6 +989,7 @@ async function prepareAll() {
   prepareMain(OPTS);
   prepareTrash();
   prepareBackgroundListener();
+  prepareLinksStats();
   toast.prepare();
   toast.popup(`Structured Start Tab v${version}`);
   toast.popup(chrome.i18n.getMessage('popup_toggle_sidebar'));
