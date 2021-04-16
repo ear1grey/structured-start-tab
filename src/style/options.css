@@ -121,3 +121,16 @@ label, section {
   flex-grow: 1;
   text-align: left;
 }
+
+#btnIndex {
+  background-color: var(--fg-light-alpha);
+  border: solid transparent thin;
+  border-radius: 12px;
+  color: white;
+  padding: 8px 18px;
+  margin-bottom: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
