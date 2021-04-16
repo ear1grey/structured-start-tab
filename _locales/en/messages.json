@@ -179,7 +179,8 @@
   },
   "add_panel_auto": {
     "message": "<h1>Add panel.</h1><p>You have added a panel. It is at the bottom.</p>"
+  },
+  "return_index": {
+    "message": "Return"
   }
 }
-
-
