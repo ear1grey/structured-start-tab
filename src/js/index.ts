@@ -207,6 +207,9 @@ function editOk() {
 }
 
 function saveChanges(makeBackup = true) {
+  if (els.main.classList.contains('heatmap')) {
+    toggleHeatMap();
+  }
   if (makeBackup) {
     OPTS.backup = OPTS.html;
   }
@@ -267,27 +270,26 @@ function detectKeydown(e:KeyboardEvent) {
 
 function toggleHeatMap() {
   const links = els.main.querySelectorAll('a');
-  els.main.classList.toggle('heatmap');
   const numbers: number[] = [];
+
   for (const a of links) {
-    if (linksStats[a.href]) {
-      numbers.push(linksStats[a.href]);
+    const link = a.getAttribute('href');
+    if (link && linksStats[link]) {
+      numbers.push(linksStats[link]);
     }
   }
   const max = Math.max(...numbers);
-  console.log('Max :', max);
+
+  els.main.classList.toggle('heatmap');
   if (els.main.classList.contains('heatmap')) {
     for (const a of links) {
       if (!a.id) {
-        if (linksStats[a.href]) {
-          const color = getColorHeatMap(linksStats[a.href], max);
-          console.log(a.href, linksStats[a.href], color);
-          a.style.backgroundColor = color;
-        } else {
-          const color = getColorHeatMap(0, max);
-          console.log(a.href, 0, color);
-          a.style.backgroundColor = color;
+        const link = a.getAttribute('href');
+        let color = 'hsl(240, 100%, 50%)';
+        if (link && linksStats[link]) {
+          color = getColorHeatMap(linksStats[link], max);
         }
+        a.style.backgroundColor = color;
       }
     }
   } else {
@@ -300,7 +302,7 @@ function toggleHeatMap() {
 }
 
 function getColorHeatMap(value :number, max :number): string {
-  const h = (1.0 - (value / max)) * 360;
+  const h = (1.0 - (value / max)) * 240;
   return 'hsl(' + String(h) + ', 100%, 50%)';
 }
 

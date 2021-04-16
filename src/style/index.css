@@ -36,6 +36,9 @@ main {
   overflow: auto;
 }
 
+.heatmap {
+  background-color: rgb(0,0,255);
+}
 
 #sidebar {
   grid-area: sidebar;
