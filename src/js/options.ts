@@ -2,7 +2,7 @@
 
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
-import { OPTS, Options, BooleanOpts, NumberOpts } from './defaults.js';
+import { OPTS, Options, BooleanOpts, NumberOpts, LinkStats } from './defaults.js';
 import * as toast from './toast.js';
 import * as util from './util.js';
 
@@ -133,7 +133,7 @@ function create(where:Element, type:string, attrs:ElAttrs, txt:string):Element {
 
 function createPageWithPrefs(prefs:Options) {
   const settings = document.querySelector('#settings');
-  const linksStats = localStorage.getItem('linksStats');
+  const linkStatsAsString = localStorage.getItem('linkStats');
   if (settings) {
     const layout = create(settings, 'section', {}, chrome.i18n.getMessage('layout'));
     const book = create(settings, 'section', {}, chrome.i18n.getMessage('bookmarks'));
@@ -148,16 +148,16 @@ function createPageWithPrefs(prefs:Options) {
     create(layout, 'range', { id: 'space', max: '200', min: '0', step: '5' }, chrome.i18n.getMessage('space'));
     create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, chrome.i18n.getMessage('fontsize'));
     create(layout, 'checkbox', { id: 'useCustomScrollbar' }, chrome.i18n.getMessage('useCustomScrollbar'));
-    if (linksStats) {
+    if (linkStatsAsString) {
       const stats = create(settings, 'section', {}, chrome.i18n.getMessage('clicks_analytics'));
       create(stats, 'table', {}, '');
-      populateStats(JSON.parse(linksStats));
+      populateStats(JSON.parse(linkStatsAsString) as LinkStats);
     }
   }
   updatePageWithPrefs(prefs);
 }
 
-function populateStats(linkStats: any) {
+function populateStats(linkStats: LinkStats) {
   const tbody = document.getElementsByTagName('tbody')[0];
   let html = '';
   for (const [url, number] of Object.entries(linkStats).sort(function (a, b) {
@@ -169,7 +169,6 @@ function populateStats(linkStats: any) {
   }
   tbody.innerHTML = html;
 }
-
 
 function exportHTML() {
   const now = (new Date()).toISOString().slice(0, 10).replace(/-/g, '_');

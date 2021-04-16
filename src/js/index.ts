@@ -1,5 +1,5 @@
 import { loadOptionsWithPromise, simulateClick, cloneTemplate } from './options.js';
-import { Options, OPTS } from './defaults.js';
+import { Options, OPTS, LinkStats } from './defaults.js';
 import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
@@ -8,10 +8,6 @@ import { ColorSwitch } from './color-switch/index.js';
 
 export interface Elems {
   [index:string]: HTMLElement,
-}
-
-interface LinkStats {
-  [url:string]:number,
 }
 
 const version = '1.7.0';
@@ -24,7 +20,7 @@ const twoWeeks = oneDay * 14;
 
 let dialog:HTMLDialogElement|undefined;
 let els:Elems;
-let linksStats:LinkStats;
+let linkStats:LinkStats;
 
 interface Dragging {
   el: HTMLElement,
@@ -78,12 +74,12 @@ function linkClicked(e:MouseEvent) {
 function updateClickCount(a :HTMLElement) {
   const link = a.getAttribute('href');
   if (!link) return;
-  if (linksStats[link]) {
-    linksStats[link]++;
+  if (linkStats[link]) {
+    linkStats[link]++;
   } else {
-    linksStats[link] = 1;
+    linkStats[link] = 1;
   }
-  localStorage.setItem('linksStats', JSON.stringify(linksStats));
+  localStorage.setItem('linkStats', JSON.stringify(linkStats));
 }
 
 function toHex(x:number, m = 1) {
@@ -274,8 +270,8 @@ function toggleHeatMap() {
 
   for (const a of links) {
     const link = a.getAttribute('href');
-    if (link && linksStats[link]) {
-      numbers.push(linksStats[link]);
+    if (link && linkStats[link]) {
+      numbers.push(linkStats[link]);
     }
   }
   const max = Math.max(...numbers);
@@ -286,8 +282,8 @@ function toggleHeatMap() {
       if (!a.id) {
         const link = a.getAttribute('href');
         let color = 'hsl(240, 100%, 50%)';
-        if (link && linksStats[link]) {
-          color = getColorHeatMap(linksStats[link], max);
+        if (link && linkStats[link]) {
+          color = getColorHeatMap(linkStats[link], max);
         }
         a.style.backgroundColor = color;
       }
@@ -991,12 +987,12 @@ function prepareMain(OPTS:Options) {
   prepareContextPanelEventListener();
 }
 
-function prepareLinksStats() {
-  const linksStatsAsString = localStorage.getItem('linksStats');
-  if (linksStatsAsString) {
-    linksStats = JSON.parse(linksStatsAsString) as LinkStats;
+function prepareLinkStats() {
+  const linkStatsAsString = localStorage.getItem('linkStats');
+  if (linkStatsAsString) {
+    linkStats = JSON.parse(linkStatsAsString) as LinkStats;
   } else {
-    linksStats = {};
+    linkStats = {};
   }
 }
 
@@ -1036,7 +1032,7 @@ async function prepareAll() {
   prepareMain(OPTS);
   prepareTrash();
   prepareBackgroundListener();
-  prepareLinksStats();
+  prepareLinkStats();
   toast.prepare();
   toast.popup(`Structured Start Tab v${version}`);
   toast.popup(chrome.i18n.getMessage('popup_toggle_sidebar'));
