@@ -70,6 +70,14 @@ label>p {
   width: 100%;
 }
 
+#tabStats {    
+  padding: 0.5rem 1rem;
+  background: var(--bg-light);
+  border-top: solid thin var(--bg-dark);
+  text-align: left;
+  align-items: center;
+}
+
 .wideopt {
   flex-direction: column;
 }

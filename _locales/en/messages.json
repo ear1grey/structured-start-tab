@@ -179,6 +179,12 @@
   },
   "add_panel_auto": {
     "message": "<h1>Add panel.</h1><p>You have added a panel. It is at the bottom.</p>"
+  },
+  "click_number": {
+    "message": "Number of clicks"
+  },
+  "clicks_analytics": {
+    "message": "Clicks Analytics"
   }
 }
 

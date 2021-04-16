@@ -182,5 +182,11 @@
   },
   "add_panel_auto": {
     "message": "<h1>Ajout d'un panneau.</h1><p>Vous avez ajouté un panneau. Il se trouve en bas de la page.</p>"
+  },
+  "click_number": {
+    "message": "Nombre de clics"
+  },
+  "clicks_analytics": {
+    "message": "Analyse des clics"
   }
 }
