@@ -12,8 +12,6 @@ export interface Elems {
 
 const version = '1.7.0';
 
-const storage = OPTS.storage;
-const store = chrome.storage[storage];
 const oneDay = 1000 * 60 * 60 * 24;
 const fourDays = oneDay * 4;
 const twoWeeks = oneDay * 14;
@@ -199,7 +197,12 @@ function saveChanges(makeBackup = true) {
   cleanTree(tree);
 
   OPTS.html = tree.body.innerHTML;
-  store.set(OPTS);
+  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
+
+  prepareMain(OPTS);
+  util.prepareCSSVariables(OPTS);
+  prepareDynamicFlex(els.main);
+  prepareBookmarks(OPTS, els.bookmarksnav);
 }
 
 function cleanTree(tree:Document) {
@@ -230,10 +233,9 @@ function detectKeydown(e:KeyboardEvent) {
       OPTS.html = OPTS.backup;
       OPTS.backup = prev;
     }
-    store.set(OPTS, () => {
-      prepareContent(OPTS.html);
-      toast.html('undo', chrome.i18n.getMessage('undo'));
-    });
+    localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
+    prepareContent(OPTS.html);
+    toast.html('undo', chrome.i18n.getMessage('undo'));
   }
 
   if (e.code === 'Escape') {
@@ -738,27 +740,6 @@ function prepareFoldables(selectors = 'main') {
   elems.forEach(e => e.addEventListener('click', editSection));
 }
 
-interface Changes {
-  [key: string]: chrome.storage.StorageChange;
-}
-
-function storageChanged(changes:Changes) {
-  for (const key in changes) {
-    // typecasting to avoid linter problems, this is expected to be rewritten
-    // as part of https://github.com/ear1grey/structured-start-tab/issues/83
-    (OPTS[key as keyof Options] as unknown) = changes[key].newValue;
-    if (key === 'html') {
-      prepareMain(OPTS);
-      // TODO have a tick to show if changes are saved
-    } else {
-      util.prepareCSSVariables(OPTS);
-      prepareDynamicFlex(els.main);
-      prepareBookmarks(OPTS, els.bookmarksnav);
-    }
-  }
-}
-
-
 function prepareListeners() {
   const anchors = document.querySelectorAll('a');
   for (const a of anchors) {
@@ -768,8 +749,6 @@ function prepareListeners() {
 
   els.addlink.addEventListener('click', addLink);
   els.addpanel.addEventListener('click', addPanel);
-
-  chrome.storage.onChanged.addListener(storageChanged);
 }
 
 function prepareContent(html:string) {

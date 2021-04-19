@@ -6,7 +6,6 @@ import { OPTS, Options, BooleanOpts, NumberOpts } from './defaults.js';
 import * as toast from './toast.js';
 import * as util from './util.js';
 
-const STORE = chrome.storage.local;
 
 function setCheckBox(prefs:Options, what: keyof BooleanOpts) {
   const elem = <HTMLInputElement> document.getElementById(what);
@@ -30,24 +29,14 @@ function getValue(what: keyof NumberOpts) {
 
 export function loadOptionsWithPromise() :Promise<void> {
   return new Promise((resolve, reject) => {
-    STORE.get(OPTS, items => {
-      if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError.message);
-        reject(chrome.runtime.lastError.message);
-      } else {
-        for (const key in items) {
-          // typecasting in order to remove warnings about "any"; this is planned to be rebuilt completely
-          if (typeof OPTS[key as keyof Options] === 'number') {
-            (OPTS[key as keyof Options] as number) = Number(items[key]);
-          } else if (typeof OPTS[key as keyof Options] === 'boolean') {
-            (OPTS[key as keyof Options] as boolean) = items[key] === true || items[key] === 'true';
-          } else {
-            (OPTS[key as keyof Options] as unknown) = items[key];
-          }
-        }
-        resolve();
-      }
-    });
+    const dataAsString = localStorage.getItem('structured-start-tab');
+    if (dataAsString) {
+      const data = JSON.parse(dataAsString) as Options;
+      Object.assign(OPTS, data);
+      resolve();
+    } else {
+      reject(new Error('No Data in localStorage'));
+    }
   });
 }
 
@@ -210,13 +199,6 @@ function prepareListeners() {
   fileupload!.addEventListener('change', uploadFiles, false);
 
   chrome.runtime.onMessage.addListener(receiveBackgroundMessages);
-  chrome.storage.onChanged.addListener(updateOptions);
-}
-
-export async function updateOptions() :Promise<void> {
-  await loadOptionsWithPromise();
-  updatePageWithPrefs(OPTS);
-  util.prepareCSSVariables(OPTS);
 }
 
 
@@ -232,7 +214,9 @@ export async function loadOptions() :Promise<void> {
 export function saveOptions() :void {
   console.log('saving');
   updatePrefsWithPage();
-  STORE.set(OPTS, () => toast.popup(chrome.i18n.getMessage('option_change')));
+  updatePageWithPrefs(OPTS);
+  util.prepareCSSVariables(OPTS);
+  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
 }
 
 export function simulateClick(selector:string) :void {
