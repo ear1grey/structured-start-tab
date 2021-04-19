@@ -60,6 +60,7 @@ function updatePrefsWithPage() {
   getCheckBox('showToolTips');
   getCheckBox('proportionalSections');
   getCheckBox('useCustomScrollbar');
+  getCheckBox('editOnNewDrop');
   getValue('showToast');
   getValue('showBookmarksLimit');
   getValue('space');
@@ -73,6 +74,7 @@ function updatePageWithPrefs(prefs:Options) {
   setCheckBox(prefs, 'showToolTips');
   setCheckBox(prefs, 'proportionalSections');
   setCheckBox(prefs, 'useCustomScrollbar');
+  setCheckBox(prefs, 'editOnNewDrop');
   setValue(prefs, 'showToast');
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
@@ -147,6 +149,7 @@ function createPageWithPrefs(prefs:Options) {
     create(layout, 'range', { id: 'space', max: '200', min: '0', step: '5' }, chrome.i18n.getMessage('space'));
     create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, chrome.i18n.getMessage('fontsize'));
     create(layout, 'checkbox', { id: 'useCustomScrollbar' }, chrome.i18n.getMessage('useCustomScrollbar'));
+    create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
   }
   updatePageWithPrefs(prefs);
 }

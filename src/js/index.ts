@@ -475,12 +475,14 @@ function dragStart(e:DragEvent) {
     if (target.id === 'addlink') {
       dummy = createExampleLink();
       dummy.classList.add('dragging');
+      dummy.classList.add('new');
       el = dummy;
       toast.html('addlink', chrome.i18n.getMessage('add_link'));
     } else {
       // addpanel
       dummy = createPanel();
       dummy.classList.add('dragging');
+      dummy.classList.add('new');
       el = dummy;
       toast.html('addpanel', chrome.i18n.getMessage('add_panel'));
     }
@@ -607,6 +609,10 @@ function dragDrop(e: DragEvent) {
       extractDataFromDrop(e);
     }
     // handle all cases
+    if (dragging.el.classList.contains('new')) {
+      dragging.el.classList.remove('new');
+      if (OPTS.editOnNewDrop) editStart(dragging.el);
+    }
     saveChanges();
   }
 }

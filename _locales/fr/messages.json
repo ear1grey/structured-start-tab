@@ -185,5 +185,8 @@
   },
   "return_index": {
     "message": "Retour"
+  },
+  "editOnNewDrop": {
+    "message": "Ouvrez le dialogue d'édition après avoir créé et déposé un nouveau panneau/lien."
   }
 }

@@ -16,6 +16,7 @@ export interface BooleanOpts {
   showBookmarksSidebar: boolean,
   hideBookmarksInPage: boolean,
   useCustomScrollbar: boolean,
+  editOnNewDrop: boolean,
 }
 
 export interface StringOpts {
@@ -44,6 +45,7 @@ export const OPTS: Options = {
   showBookmarksSidebar: true,
   showToolTips: true,
   useCustomScrollbar: true,
+  editOnNewDrop: true,
 
   // StringOpts
   storage: 'local',

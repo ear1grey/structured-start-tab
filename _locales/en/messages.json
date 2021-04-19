@@ -182,5 +182,8 @@
   },
   "return_index": {
     "message": "Return"
+  },
+  "editOnNewDrop": {
+    "message": "Open edit dialogue after create and drop new panel/link"
   }
 }
