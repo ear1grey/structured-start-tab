@@ -23,9 +23,7 @@ export interface StringOpts {
   backup: string,
 }
 
-export interface Options extends NumberOpts, BooleanOpts, StringOpts {
-  storage: 'local'|'sync',
-}
+export interface Options extends NumberOpts, BooleanOpts, StringOpts {}
 
 
 // eslint-disable-next-line import/prefer-default-export
@@ -46,7 +44,6 @@ export const OPTS: Options = {
   useCustomScrollbar: true,
 
   // StringOpts
-  storage: 'local',
   backup: '',
   html: chrome.i18n.getMessage('default_message'),
 };
