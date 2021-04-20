@@ -268,6 +268,7 @@ function addLink() {
 
 function createPanel() {
   const div = cloneTemplateToTarget('#template_panel', els.main);
+  div.firstElementChild!.textContent = chrome.i18n.getMessage('panel');
   div.scrollIntoView({ behavior: 'smooth' });
   toast.html('locked', chrome.i18n.getMessage('add_panel_auto'));
   div.classList.add('flash');
@@ -284,8 +285,29 @@ function addPanel() {
 }
 
 function addTopSitesPanel() {
-  const panel = createPanel();
-  panel.firstElementChild!.innerHTML = chrome.i18n.getMessage('top_sites_panel');
+  let panel = els.main.querySelector('#topsites');
+  if (!panel) {
+    panel = createPanel();
+    panel.id = 'topsites';
+    panel.firstElementChild!.textContent = chrome.i18n.getMessage('top_sites_panel');
+  }
+  updateTopSites();
+  let e = panel.parentElement;
+  while (e && e !== els.main) {
+    if (e.classList.contains('folded')) e.classList.toggle('folded');
+    e = e.parentElement;
+  }
+  panel.scrollIntoView({ behavior: 'smooth' });
+  flash(panel as HTMLElement, 'highlight');
+}
+
+function updateTopSites() {
+  const panel = els.main.querySelector('#topsites');
+  if (!panel) return;
+  const sites = panel.querySelectorAll('a');
+  for (const link of sites) {
+    panel.lastElementChild?.removeChild(link);
+  }
   chrome.topSites.get((data) => {
     for (const link of data) {
       const a = createExampleLink(link.title, link.url);
@@ -960,6 +982,7 @@ async function prepareAll() {
   toast.popup(chrome.i18n.getMessage('popup_toggle_sidebar'));
   tooltip.prepare(OPTS);
   migrateLinks();
+  updateTopSites();
   util.localizeHtml(document);
 }
 
