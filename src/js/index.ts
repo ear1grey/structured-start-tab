@@ -298,6 +298,7 @@ function duplicatePanel(keepLinks: boolean) {
     return;
   }
   const section = els.contextClicked;
+  if (!section) return;
   const dupe = section.cloneNode(true) as HTMLElement;
   if (!keepLinks) {
     const elements = dupe.querySelectorAll('a');
