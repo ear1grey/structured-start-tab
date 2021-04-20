@@ -91,10 +91,12 @@ function editStart(elem:HTMLElement) {
     cloneToDialog('#template_edit_link');
     setValue('#editname', elem.textContent);
     setValue('#editurl', elem.href);
+    (document.querySelector('#editname') as HTMLInputElement).select();
   } else {
     if (elem.tagName === 'SECTION') {
       cloneToDialog('#template_edit_panel');
       setValue('#editname', elem.firstElementChild!.textContent);
+      (document.querySelector('#editname') as HTMLInputElement).select();
     } else {
       return;
     }
