@@ -185,5 +185,11 @@
   },
   "editOnNewDrop": {
     "message": "Open edit dialogue after create and drop new panel/link"
+  },
+  "top_sites_panel": {
+    "message": "Top sites"
+  },
+  "topsitespanel": {
+    "message": "Show top sites"
   }
 }

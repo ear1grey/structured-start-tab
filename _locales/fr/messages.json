@@ -188,5 +188,11 @@
   },
   "editOnNewDrop": {
     "message": "Ouvrez le dialogue d'édition après avoir créé et déposé un nouveau panneau/lien."
+  },
+  "top_sites_panel": {
+    "message": "Top sites"
+  },
+  "topsitespanel": {
+    "message": "Afficher les sites les plus visités"
   }
 }
