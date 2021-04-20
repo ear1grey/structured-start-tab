@@ -185,5 +185,11 @@
   },
   "return_index": {
     "message": "Retour"
+  },
+  "top_sites_panel": {
+    "message": "Top sites"
+  },
+  "topsitespanel": {
+    "message": "Afficher les sites les plus visités"
   }
 }

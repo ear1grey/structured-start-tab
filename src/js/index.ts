@@ -281,6 +281,17 @@ function addPanel() {
   return createPanel();
 }
 
+function addTopSitesPanel() {
+  const panel = createPanel();
+  panel.firstElementChild!.innerHTML = chrome.i18n.getMessage('top_sites_panel');
+  chrome.topSites.get((data) => {
+    for (const link of data) {
+      const a = createExampleLink(link.title, link.url);
+      panel.lastElementChild?.append(a);
+    }
+  });
+}
+
 function duplicatePanel(keepLinks: boolean) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
@@ -903,6 +914,7 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'toggle-sidebar': toggleBookmarks(); break;
     case 'withoutLink': duplicatePanel(false); break;
     case 'withLink': duplicatePanel(true); break;
+    case 'topsitespanel': addTopSitesPanel(); break;
     default: break;
   }
 }
