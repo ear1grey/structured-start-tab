@@ -28,15 +28,13 @@ function getValue(what: keyof NumberOpts) {
 }
 
 export function loadOptionsWithPromise() :Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const dataAsString = localStorage.getItem('structured-start-tab');
     if (dataAsString) {
       const data = JSON.parse(dataAsString) as Options;
       Object.assign(OPTS, data);
-      resolve();
-    } else {
-      reject(new Error('No Data in localStorage'));
     }
+    resolve();
   });
 }
 
