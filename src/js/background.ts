@@ -9,6 +9,10 @@ const menuItems:chrome.contextMenus.CreateProperties[] = [
     title: chrome.i18n.getMessage('togglebookmarks'),
   },
   {
+    id: 'topsitespanel',
+    title: chrome.i18n.getMessage('topsitespanel'),
+  },
+  {
     id: 'duplicatePanel',
     title: chrome.i18n.getMessage('duplicatePanel'),
   },

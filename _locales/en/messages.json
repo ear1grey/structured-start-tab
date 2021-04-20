@@ -182,5 +182,11 @@
   },
   "return_index": {
     "message": "Return"
+  },
+  "top_sites_panel": {
+    "message": "Top sites"
+  },
+  "topsitespanel": {
+    "message": "Show top sites"
   }
 }
