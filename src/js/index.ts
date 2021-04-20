@@ -292,6 +292,7 @@ function addTopSitesPanel() {
     panel.firstElementChild!.textContent = chrome.i18n.getMessage('top_sites_panel');
   }
   updateTopSites();
+  if (panel.classList.contains('folded')) panel.classList.toggle('folded');
   let e = panel.parentElement;
   while (e && e !== els.main) {
     if (e.classList.contains('folded')) e.classList.toggle('folded');
