@@ -191,5 +191,14 @@
   },
   "topsitespanel": {
     "message": "Show top sites"
+  },
+  "reset_page": {
+    "message": "Reset the page to the default value"
+  },
+  "reset": {
+    "message": "Reset"
+  },
+  "suggest_backup": {
+    "message": "Do u want to make a backup ?"
   }
 }
