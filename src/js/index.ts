@@ -258,10 +258,6 @@ function detectKeydown(e:KeyboardEvent) {
       editCancel();
     }
   }
-
-  if (e.code === 'KeyI' && (e.metaKey || e.ctrlKey) && !e.repeat) {
-    toggleHeatMap();
-  }
 }
 
 function toggleHeatMap() {
@@ -288,12 +284,29 @@ function toggleHeatMap() {
         a.style.backgroundColor = color;
       }
     }
+    changeBookmarksToHeatmap();
   } else {
     for (const a of links) {
       if (!a.id) {
         a.style.backgroundColor = '';
       }
     }
+    changeBookmarksToHeatmap();
+  }
+}
+
+function changeBookmarksToHeatmap() {
+  els.bookmarksnav.classList.toggle('heatmapLegend');
+  if (els.bookmarksnav.classList.contains('heatmapLegend')) {
+    const links = els.bookmarksnav.querySelectorAll('a');
+    for (const a of links) {
+      els.bookmarksnav.removeChild(a);
+    }
+    els.bookmarks.querySelector('h1')!.textContent = chrome.i18n.getMessage('heatmap_legend');
+    cloneTemplateToTarget('#heatmap_legend', els.bookmarksnav);
+  } else {
+    els.bookmarks.querySelector('h1')!.textContent = chrome.i18n.getMessage('bookmarks');
+    prepareBookmarks(OPTS, els.bookmarksnav);
   }
 }
 
@@ -961,6 +974,7 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'emptytrash': emptyTrash(); break;
     case 'togglebookmarks': toggleBookmarks(); break;
     case 'toggle-sidebar': toggleBookmarks(); break;
+    case 'toggle-heatmap': toggleHeatMap(); break;
     case 'withoutLink': duplicatePanel(false); break;
     case 'withLink': duplicatePanel(true); break;
     default: break;
