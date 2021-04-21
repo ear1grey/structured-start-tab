@@ -194,5 +194,14 @@
   },
   "topsitespanel": {
     "message": "Afficher les sites les plus visités"
+  },
+  "reset_page": {
+    "message": "Réinitialiser la page pour revenir au valeur par défaut"
+  },
+  "reset": {
+    "message": "Réinitialiser"
+  },
+  "suggest_backup": {
+    "message": "Voulez-vous faire une sauvegarde ?"
   }
 }

@@ -186,11 +186,21 @@ function uploadFiles(e:Event) {
   upload(file);
 }
 
+function resetHTML() {
+  const backup = confirm(chrome.i18n.getMessage('suggest_backup'));
+  if (backup) {
+    exportHTML();
+  }
+  OPTS.html = chrome.i18n.getMessage('default_message');
+  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
+}
+
 
 function prepareListeners() {
   // ! ensures that if any of these elems don't exist a NPE is thrown.
   document.getElementById('export')!.addEventListener('click', exportHTML);
   document.getElementById('import')!.addEventListener('click', importHTML);
+  document.getElementById('reset')!.addEventListener('click', resetHTML);
 
   const importDropZone = document.getElementById('importdropzone');
   importDropZone!.addEventListener('dragover', e => e.preventDefault());
