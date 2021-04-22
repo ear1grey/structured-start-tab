@@ -36,6 +36,42 @@ main {
   overflow: auto;
 }
 
+.heatmap {
+  background-color: rgb(0,0,255);
+}
+
+.heatmapLegend > p {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.heatmapLegend {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  column-gap: 5px;
+}
+
+#redHsl {
+  background-color: hsl(0,100%,50%);
+}
+
+#yellowHsl {
+  background-color: hsl(60,100%,50%);
+}
+
+#greenHsl {
+  background-color: hsl(120,100%,50%);
+}
+
+#cyanHsl {
+  background-color: hsl(180,100%,50%);
+}
+
+#blueHsl {
+  background-color: hsl(240,100%,50%);
+}
 
 #sidebar {
   grid-area: sidebar;

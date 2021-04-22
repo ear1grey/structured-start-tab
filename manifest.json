@@ -44,6 +44,13 @@
                 "mac": "MacCtrl+Shift+B"
             },
             "description": "Toggle Sidebar"
+        },
+        "toggle-heatmap":  {
+            "suggested_key": {
+                "default": "Ctrl+Shift+I",
+                "mac": "MacCtrl+Shift+I"
+            },
+            "description": "Toggle HeatMap"
         }
     }
 }

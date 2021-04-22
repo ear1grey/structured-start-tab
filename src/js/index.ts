@@ -1,5 +1,5 @@
 import { loadOptionsWithPromise, simulateClick, cloneTemplate } from './options.js';
-import { Options, OPTS } from './defaults.js';
+import { Options, OPTS, LinkStats } from './defaults.js';
 import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
@@ -18,6 +18,7 @@ const twoWeeks = oneDay * 14;
 
 let dialog:HTMLDialogElement|undefined;
 let els:Elems;
+let linkStats:LinkStats;
 
 interface Dragging {
   el: HTMLElement,
@@ -58,12 +59,25 @@ function getColorValue(where:string) {
 }
 
 function linkClicked(e:MouseEvent) {
-  if (e.shiftKey) {
-    e.preventDefault();
-    if (e.target instanceof HTMLElement) {
+  if (e.target instanceof HTMLElement) {
+    if (e.shiftKey) {
+      e.preventDefault();
       editStart(e.target);
+    } else if (!e.target.id) {
+      updateClickCount(e.target);
     }
   }
+}
+
+function updateClickCount(a :HTMLElement) {
+  const link = a.getAttribute('href');
+  if (!link) return;
+  if (linkStats[link]) {
+    linkStats[link]++;
+  } else {
+    linkStats[link] = 1;
+  }
+  localStorage.setItem('linkStats', JSON.stringify(linkStats));
 }
 
 function toHex(x:number, m = 1) {
@@ -189,6 +203,9 @@ function editOk() {
 }
 
 function saveChanges(makeBackup = true) {
+  if (els.main.classList.contains('heatmap')) {
+    toggleHeatMap();
+  }
   if (makeBackup) {
     OPTS.backup = OPTS.html;
   }
@@ -246,6 +263,62 @@ function detectKeydown(e:KeyboardEvent) {
     }
   }
 }
+
+function toggleHeatMap() {
+  const links = els.main.querySelectorAll('a');
+  const numbers: number[] = [];
+
+  for (const a of links) {
+    const link = a.getAttribute('href');
+    if (link && linkStats[link]) {
+      numbers.push(linkStats[link]);
+    }
+  }
+  const max = Math.max(...numbers);
+
+  els.main.classList.toggle('heatmap');
+  if (els.main.classList.contains('heatmap')) {
+    for (const a of links) {
+      if (!a.id) {
+        const link = a.getAttribute('href');
+        let color = 'hsl(240, 100%, 50%)';
+        if (link && linkStats[link]) {
+          color = getColorHeatMap(linkStats[link], max);
+        }
+        a.style.backgroundColor = color;
+      }
+    }
+    changeBookmarksToHeatmap();
+  } else {
+    for (const a of links) {
+      if (!a.id) {
+        a.style.backgroundColor = '';
+      }
+    }
+    changeBookmarksToHeatmap();
+  }
+}
+
+function changeBookmarksToHeatmap() {
+  els.bookmarksnav.classList.toggle('heatmapLegend');
+  if (els.bookmarksnav.classList.contains('heatmapLegend')) {
+    const links = els.bookmarksnav.querySelectorAll('a');
+    for (const a of links) {
+      els.bookmarksnav.removeChild(a);
+    }
+    els.bookmarks.querySelector('h1')!.textContent = chrome.i18n.getMessage('heatmap_legend');
+    cloneTemplateToTarget('#heatmap_legend', els.bookmarksnav);
+  } else {
+    els.bookmarks.querySelector('h1')!.textContent = chrome.i18n.getMessage('bookmarks');
+    prepareBookmarks(OPTS, els.bookmarksnav);
+  }
+}
+
+function getColorHeatMap(value :number, max :number): string {
+  const h = (1.0 - (value / max)) * 240;
+  return 'hsl(' + String(h) + ', 100%, 50%)';
+}
+
 
 function createExampleLink(text = chrome.i18n.getMessage('example'), href = 'http://example.org') {
   const a = document.createElement('a');
@@ -927,6 +1000,7 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'emptytrash': emptyTrash(); break;
     case 'togglebookmarks': toggleBookmarks(); break;
     case 'toggle-sidebar': toggleBookmarks(); break;
+    case 'toggle-heatmap': toggleHeatMap(); break;
     case 'withoutLink': duplicatePanel(false); break;
     case 'withLink': duplicatePanel(true); break;
     case 'topsitespanel': addTopSitesPanel(); break;
@@ -952,6 +1026,15 @@ function prepareMain(OPTS:Options) {
   prepareFoldables();
   prepareDynamicFlex(els.main);
   prepareContextPanelEventListener();
+}
+
+function prepareLinkStats() {
+  const linkStatsAsString = localStorage.getItem('linkStats');
+  if (linkStatsAsString) {
+    linkStats = JSON.parse(linkStatsAsString) as LinkStats;
+  } else {
+    linkStats = {};
+  }
 }
 
 function prepareContextPanelEventListener() {
@@ -990,6 +1073,7 @@ async function prepareAll() {
   prepareMain(OPTS);
   prepareTrash();
   prepareBackgroundListener();
+  prepareLinkStats();
   toast.prepare();
   toast.popup(`Structured Start Tab v${version}`);
   toast.popup(chrome.i18n.getMessage('popup_toggle_sidebar'));
