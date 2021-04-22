@@ -13,6 +13,10 @@ const menuItems:chrome.contextMenus.CreateProperties[] = [
     title: chrome.i18n.getMessage('topsitespanel'),
   },
   {
+    id: 'bookmarkspanel',
+    title: chrome.i18n.getMessage('bookmarkspanel'),
+  },
+  {
     id: 'duplicatePanel',
     title: chrome.i18n.getMessage('duplicatePanel'),
   },
