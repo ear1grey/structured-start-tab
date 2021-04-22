@@ -17,6 +17,8 @@ export interface BooleanOpts {
   hideBookmarksInPage: boolean,
   useCustomScrollbar: boolean,
   editOnNewDrop: boolean,
+  allowCollapsingLocked: boolean,
+  savePanelStatusLocked: boolean,
 }
 
 export interface StringOpts {
@@ -44,6 +46,8 @@ export const OPTS: Options = {
   showToolTips: true,
   useCustomScrollbar: true,
   editOnNewDrop: true,
+  allowCollapsingLocked: true,
+  savePanelStatusLocked: false,
 
   // StringOpts
   backup: '',

@@ -199,6 +199,12 @@
     "message": "Reset"
   },
   "suggest_backup": {
-    "message": "Do u want to make a backup ?"
+    "message": "Do you want to make a backup ?"
+  },
+  "allow_collapsing_locked": {
+    "message": "Allow collapsing and opening of panels when page is locked"
+  },
+  "save_panel_status_locked": {
+    "message": "Remember status of panel (open/collapsed) when the page is locked"
   }
 }

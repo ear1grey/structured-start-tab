@@ -42,6 +42,8 @@ export function loadOptionsWithPromise() :Promise<void> {
 // the OPTS object that gets stored.
 function updatePrefsWithPage() {
   getCheckBox('lock');
+  getCheckBox('allowCollapsingLocked');
+  getCheckBox('savePanelStatusLocked');
   getCheckBox('showBookmarksSidebar');
   getCheckBox('hideBookmarksInPage');
   getCheckBox('showToolTips');
@@ -56,6 +58,8 @@ function updatePrefsWithPage() {
 
 function updatePageWithPrefs(prefs:Options) {
   setCheckBox(prefs, 'lock');
+  setCheckBox(prefs, 'allowCollapsingLocked');
+  setCheckBox(prefs, 'savePanelStatusLocked');
   setCheckBox(prefs, 'showBookmarksSidebar');
   setCheckBox(prefs, 'hideBookmarksInPage');
   setCheckBox(prefs, 'showToolTips');
@@ -132,6 +136,8 @@ function createPageWithPrefs(prefs:Options) {
     create(feed, 'checkbox', { id: 'showToolTips' }, chrome.i18n.getMessage('showToolTips'));
     create(feed, 'number', { id: 'showToast' }, chrome.i18n.getMessage('showToast'));
     create(layout, 'checkbox', { id: 'lock' }, chrome.i18n.getMessage('lock'));
+    create(layout, 'checkbox', { id: 'allowCollapsingLocked' }, chrome.i18n.getMessage('allow_collapsing_locked'));
+    create(layout, 'checkbox', { id: 'savePanelStatusLocked' }, chrome.i18n.getMessage('save_panel_status_locked'));
     create(layout, 'checkbox', { id: 'proportionalSections' }, chrome.i18n.getMessage('proportionalSections'));
     create(layout, 'range', { id: 'space', max: '200', min: '0', step: '5' }, chrome.i18n.getMessage('space'));
     create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, chrome.i18n.getMessage('fontsize'));
