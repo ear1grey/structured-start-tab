@@ -737,6 +737,10 @@ function findParentSection(elem?:Element) {
 }
 
 function toggleFold(e:Event) {
+  if (!OPTS.allowCollapsingLocked) {
+    toast.html('locked', chrome.i18n.getMessage('locked'));
+    return;
+  }
   if (!(e.target instanceof HTMLElement)) return;
   if (els.body.classList.contains('editing')) return;
   const foldMe = findParentSection(e.target);
@@ -748,7 +752,7 @@ function toggleFold(e:Event) {
   }
   if (foldMe?.tagName === 'SECTION') {
     foldMe.classList.toggle('folded');
-    saveChanges();
+    if (OPTS.savePanelStatusLocked) saveChanges();
   }
   prepareDynamicFlex(els.main);
 }

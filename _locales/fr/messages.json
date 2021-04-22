@@ -203,5 +203,11 @@
   },
   "suggest_backup": {
     "message": "Voulez-vous faire une sauvegarde ?"
+  },
+  "allow_collapsing_locked": {
+    "message": "Autoriser la fermeture et l'ouverture de panneaux quand la page est verrouiller"
+  },
+  "save_panel_status_locked": {
+    "message": "Se souvenir du statut du panneau (ouvert/fermer) quand la page est verrouiller"
   }
 }
