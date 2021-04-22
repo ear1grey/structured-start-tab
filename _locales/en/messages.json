@@ -226,6 +226,6 @@
     "message": "Remember status of panel (open/collapsed) when the page is locked"
   },
   "bookmarkspanel": {
-    "message": "Show bookmarks panel"
+    "message": "Import all bookmarks"
   }
 }
