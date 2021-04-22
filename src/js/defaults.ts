@@ -19,6 +19,9 @@ export interface BooleanOpts {
   showBookmarksSidebar: boolean,
   hideBookmarksInPage: boolean,
   useCustomScrollbar: boolean,
+  editOnNewDrop: boolean,
+  allowCollapsingLocked: boolean,
+  savePanelStatusLocked: boolean,
 }
 
 export interface StringOpts {
@@ -26,9 +29,7 @@ export interface StringOpts {
   backup: string,
 }
 
-export interface Options extends NumberOpts, BooleanOpts, StringOpts {
-  storage: 'local'|'sync',
-}
+export interface Options extends NumberOpts, BooleanOpts, StringOpts {}
 
 
 // eslint-disable-next-line import/prefer-default-export
@@ -47,9 +48,11 @@ export const OPTS: Options = {
   showBookmarksSidebar: true,
   showToolTips: true,
   useCustomScrollbar: true,
+  editOnNewDrop: true,
+  allowCollapsingLocked: true,
+  savePanelStatusLocked: false,
 
   // StringOpts
-  storage: 'local',
   backup: '',
   html: chrome.i18n.getMessage('default_message'),
 };

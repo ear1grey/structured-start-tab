@@ -10,7 +10,8 @@
         "storage",
         "bookmarks",
         "chrome://favicon/",
-        "contextMenus"
+        "contextMenus",
+        "topSites"
         ],
     "background": {
         "persistent": false,

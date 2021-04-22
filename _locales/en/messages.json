@@ -197,7 +197,32 @@
   },
   "not_visited": {
     "message": "Not visited"
+  },
+  "return_index": {
+    "message": "Return"
+  },
+  "editOnNewDrop": {
+    "message": "Open edit dialogue after create and drop new panel/link"
+  },
+  "top_sites_panel": {
+    "message": "Top sites"
+  },
+  "topsitespanel": {
+    "message": "Show top sites"
+  },
+  "reset_page": {
+    "message": "Reset the page to the default value"
+  },
+  "reset": {
+    "message": "Reset"
+  },
+  "suggest_backup": {
+    "message": "Do you want to make a backup ?"
+  },
+  "allow_collapsing_locked": {
+    "message": "Allow collapsing and opening of panels when page is locked"
+  },
+  "save_panel_status_locked": {
+    "message": "Remember status of panel (open/collapsed) when the page is locked"
   }
 }
-
-

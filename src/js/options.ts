@@ -6,7 +6,6 @@ import { OPTS, Options, BooleanOpts, NumberOpts } from './defaults.js';
 import * as toast from './toast.js';
 import * as util from './util.js';
 
-const STORE = chrome.storage.local;
 
 function setCheckBox(prefs:Options, what: keyof BooleanOpts) {
   const elem = <HTMLInputElement> document.getElementById(what);
@@ -29,25 +28,13 @@ function getValue(what: keyof NumberOpts) {
 }
 
 export function loadOptionsWithPromise() :Promise<void> {
-  return new Promise((resolve, reject) => {
-    STORE.get(OPTS, items => {
-      if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError.message);
-        reject(chrome.runtime.lastError.message);
-      } else {
-        for (const key in items) {
-          // typecasting in order to remove warnings about "any"; this is planned to be rebuilt completely
-          if (typeof OPTS[key as keyof Options] === 'number') {
-            (OPTS[key as keyof Options] as number) = Number(items[key]);
-          } else if (typeof OPTS[key as keyof Options] === 'boolean') {
-            (OPTS[key as keyof Options] as boolean) = items[key] === true || items[key] === 'true';
-          } else {
-            (OPTS[key as keyof Options] as unknown) = items[key];
-          }
-        }
-        resolve();
-      }
-    });
+  return new Promise((resolve) => {
+    const dataAsString = localStorage.getItem('structured-start-tab');
+    if (dataAsString) {
+      const data = JSON.parse(dataAsString) as Options;
+      Object.assign(OPTS, data);
+    }
+    resolve();
   });
 }
 
@@ -55,11 +42,14 @@ export function loadOptionsWithPromise() :Promise<void> {
 // the OPTS object that gets stored.
 function updatePrefsWithPage() {
   getCheckBox('lock');
+  getCheckBox('allowCollapsingLocked');
+  getCheckBox('savePanelStatusLocked');
   getCheckBox('showBookmarksSidebar');
   getCheckBox('hideBookmarksInPage');
   getCheckBox('showToolTips');
   getCheckBox('proportionalSections');
   getCheckBox('useCustomScrollbar');
+  getCheckBox('editOnNewDrop');
   getValue('showToast');
   getValue('showBookmarksLimit');
   getValue('space');
@@ -68,11 +58,14 @@ function updatePrefsWithPage() {
 
 function updatePageWithPrefs(prefs:Options) {
   setCheckBox(prefs, 'lock');
+  setCheckBox(prefs, 'allowCollapsingLocked');
+  setCheckBox(prefs, 'savePanelStatusLocked');
   setCheckBox(prefs, 'showBookmarksSidebar');
   setCheckBox(prefs, 'hideBookmarksInPage');
   setCheckBox(prefs, 'showToolTips');
   setCheckBox(prefs, 'proportionalSections');
   setCheckBox(prefs, 'useCustomScrollbar');
+  setCheckBox(prefs, 'editOnNewDrop');
   setValue(prefs, 'showToast');
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
@@ -143,10 +136,13 @@ function createPageWithPrefs(prefs:Options) {
     create(feed, 'checkbox', { id: 'showToolTips' }, chrome.i18n.getMessage('showToolTips'));
     create(feed, 'number', { id: 'showToast' }, chrome.i18n.getMessage('showToast'));
     create(layout, 'checkbox', { id: 'lock' }, chrome.i18n.getMessage('lock'));
+    create(layout, 'checkbox', { id: 'allowCollapsingLocked' }, chrome.i18n.getMessage('allow_collapsing_locked'));
+    create(layout, 'checkbox', { id: 'savePanelStatusLocked' }, chrome.i18n.getMessage('save_panel_status_locked'));
     create(layout, 'checkbox', { id: 'proportionalSections' }, chrome.i18n.getMessage('proportionalSections'));
     create(layout, 'range', { id: 'space', max: '200', min: '0', step: '5' }, chrome.i18n.getMessage('space'));
     create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, chrome.i18n.getMessage('fontsize'));
     create(layout, 'checkbox', { id: 'useCustomScrollbar' }, chrome.i18n.getMessage('useCustomScrollbar'));
+    create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
   }
   updatePageWithPrefs(prefs);
 }
@@ -196,11 +192,21 @@ function uploadFiles(e:Event) {
   upload(file);
 }
 
+function resetHTML() {
+  const backup = confirm(chrome.i18n.getMessage('suggest_backup'));
+  if (backup) {
+    exportHTML();
+  }
+  OPTS.html = chrome.i18n.getMessage('default_message');
+  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
+}
+
 
 function prepareListeners() {
   // ! ensures that if any of these elems don't exist a NPE is thrown.
   document.getElementById('export')!.addEventListener('click', exportHTML);
   document.getElementById('import')!.addEventListener('click', importHTML);
+  document.getElementById('reset')!.addEventListener('click', resetHTML);
 
   const importDropZone = document.getElementById('importdropzone');
   importDropZone!.addEventListener('dragover', e => e.preventDefault());
@@ -210,13 +216,6 @@ function prepareListeners() {
   fileupload!.addEventListener('change', uploadFiles, false);
 
   chrome.runtime.onMessage.addListener(receiveBackgroundMessages);
-  chrome.storage.onChanged.addListener(updateOptions);
-}
-
-export async function updateOptions() :Promise<void> {
-  await loadOptionsWithPromise();
-  updatePageWithPrefs(OPTS);
-  util.prepareCSSVariables(OPTS);
 }
 
 
@@ -232,7 +231,9 @@ export async function loadOptions() :Promise<void> {
 export function saveOptions() :void {
   console.log('saving');
   updatePrefsWithPage();
-  STORE.set(OPTS, () => toast.popup(chrome.i18n.getMessage('option_change')));
+  updatePageWithPrefs(OPTS);
+  util.prepareCSSVariables(OPTS);
+  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
 }
 
 export function simulateClick(selector:string) :void {

@@ -200,5 +200,32 @@
   },
   "not_visited": {
     "message": "Pas visité"
+  },
+  "return_index": {
+    "message": "Retour"
+  },
+  "editOnNewDrop": {
+    "message": "Ouvrez le dialogue d'édition après avoir créé et déposé un nouveau panneau/lien."
+  },
+  "top_sites_panel": {
+    "message": "Top sites"
+  },
+  "topsitespanel": {
+    "message": "Afficher les sites les plus visités"
+  },
+  "reset_page": {
+    "message": "Réinitialiser la page pour revenir au valeur par défaut"
+  },
+  "reset": {
+    "message": "Réinitialiser"
+  },
+  "suggest_backup": {
+    "message": "Voulez-vous faire une sauvegarde ?"
+  },
+  "allow_collapsing_locked": {
+    "message": "Autoriser la fermeture et l'ouverture de panneaux quand la page est verrouiller"
+  },
+  "save_panel_status_locked": {
+    "message": "Se souvenir du statut du panneau (ouvert/fermer) quand la page est verrouiller"
   }
 }
