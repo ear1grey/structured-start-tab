@@ -224,5 +224,8 @@
   },
   "save_panel_status_locked": {
     "message": "Remember status of panel (open/collapsed) when the page is locked"
+  },
+  "bookmarkspanel": {
+    "message": "Show bookmarks panel"
   }
 }

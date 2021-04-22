@@ -227,5 +227,8 @@
   },
   "save_panel_status_locked": {
     "message": "Se souvenir du statut du panneau (ouvert/fermer) quand la page est verrouiller"
+  },
+  "bookmarkspanel": {
+    "message": "Afficher le panneau des marques-pages"
   }
 }
