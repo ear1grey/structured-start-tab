@@ -227,5 +227,8 @@
   },
   "save_panel_status_locked": {
     "message": "Se souvenir du statut du panneau (ouvert/fermer) quand la page est verrouiller"
+  },
+  "import_config": {
+    "message": "Nouvelle version: Voulez-vous importer votre ancienne configuration ? (if you refuse your old data will be deleted)"
   }
 }
