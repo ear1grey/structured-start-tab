@@ -230,5 +230,8 @@
   },
   "import_config": {
     "message": "Nouvelle version: Voulez-vous importer votre ancienne configuration ? (if you refuse your old data will be deleted)"
+  },
+  "bookmarkspanel": {
+    "message": "Afficher le panneau des marques-pages"
   }
 }

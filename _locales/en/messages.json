@@ -227,5 +227,8 @@
   },
   "import_config": {
     "message": "New version: Do you want to import your old configuration ? (if you refuse your old data will be deleted)"
+  },
+  "bookmarkspanel": {
+    "message": "Import all bookmarks"
   }
 }

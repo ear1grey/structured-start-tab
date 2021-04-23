@@ -392,6 +392,49 @@ function updateTopSites() {
   });
 }
 
+function toogleBookmarksPanel() {
+  let panel = els.main.querySelector('#bookmarksPanel');
+  if (!panel) {
+    panel = createPanel();
+    panel.id = 'bookmarksPanel';
+    panel.firstElementChild!.textContent = chrome.i18n.getMessage('bookmarks');
+  }
+  for (const children of panel.lastElementChild!.children) {
+    panel.lastElementChild!.removeChild(children);
+  }
+  updateBookmarksPanel();
+  if (panel.classList.contains('folded')) panel.classList.toggle('folded');
+  let e = panel.parentElement;
+  while (e && e !== els.main) {
+    if (e.classList.contains('folded')) e.classList.toggle('folded');
+    e = e.parentElement;
+  }
+  panel.scrollIntoView({ behavior: 'smooth' });
+  flash(panel as HTMLElement, 'highlight');
+}
+
+async function updateBookmarksPanel() {
+  const rootPanel = els.main.querySelector('#bookmarksPanel') as HTMLElement;
+  if (!rootPanel) return;
+  const tree = await new Promise<chrome.bookmarks.BookmarkTreeNode[]>(resolve => {
+    chrome.bookmarks.getTree(resolve);
+  });
+  inDepthBookmarkTree(tree[0], rootPanel);
+}
+
+function inDepthBookmarkTree(toTreat: chrome.bookmarks.BookmarkTreeNode, parentPanel: HTMLElement) {
+  if (toTreat.children) {
+    const panel = createPanel();
+    parentPanel.lastElementChild!.append(panel);
+    panel.firstElementChild!.textContent = toTreat.title;
+    for (const a of toTreat.children) {
+      inDepthBookmarkTree(a, panel);
+    }
+  } else {
+    parentPanel.lastElementChild!.append(createExampleLink(toTreat.title, toTreat.url));
+  }
+}
+
 function duplicatePanel(keepLinks: boolean) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
@@ -1004,6 +1047,7 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'withoutLink': duplicatePanel(false); break;
     case 'withLink': duplicatePanel(true); break;
     case 'topsitespanel': addTopSitesPanel(); break;
+    case 'bookmarkspanel': toogleBookmarksPanel(); break;
     default: break;
   }
 }
@@ -1080,6 +1124,7 @@ async function prepareAll() {
   tooltip.prepare(OPTS);
   migrateLinks();
   updateTopSites();
+  updateBookmarksPanel();
   util.localizeHtml(document);
 }
 
