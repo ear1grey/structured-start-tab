@@ -52,7 +52,7 @@ function menuInstaller(details: chrome.runtime.InstalledDetails) {
   const indexURL = chrome.runtime.getURL('app/index.html');
   for (const menuItem of menuItems) {
     menuItem.documentUrlPatterns = [indexURL];
-    menuItem.contexts = ['page'];
+    menuItem.contexts = ['page', 'link'];
     chrome.contextMenus.create(menuItem);
   }
 
