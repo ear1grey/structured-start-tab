@@ -1,5 +1,5 @@
-const fs = require('fs');
-const readline = require('readline');
+import { readFileSync, writeFileSync, createReadStream } from 'fs'
+import { createInterface } from 'readline'
 
 const fromPath = './src/js/index.ts';
 const toChangePath = [
@@ -17,11 +17,10 @@ const toChangePath = [
   }
 ]
 
-const readInterface = readline.createInterface({
-  input: fs.createReadStream(fromPath),
+const readInterface = createInterface({
+  input: createReadStream(fromPath),
   console: false
 });
-
 
 readInterface.on('line', function(line) {
   if (line.includes('const version')) {
@@ -32,8 +31,8 @@ readInterface.on('line', function(line) {
 
 function change(version) {
   for (const file of toChangePath) {
-    let data = JSON.parse(fs.readFileSync(file.path, "utf8"));
+    const data = JSON.parse(readFileSync(file.path, 'utf8'));
     data['version'] = version;
-    fs.writeFileSync(file.path, JSON.stringify(data, null, file.spaces));
+    writeFileSync(file.path, JSON.stringify(data, null, file.spaces));
   }
 }
