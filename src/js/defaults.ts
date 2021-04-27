@@ -29,7 +29,11 @@ export interface StringOpts {
   backup: string,
 }
 
-export interface Options extends NumberOpts, BooleanOpts, StringOpts {}
+export interface StatsOpts {
+  linkStats: LinkStats
+}
+
+export interface Options extends NumberOpts, BooleanOpts, StringOpts, StatsOpts {}
 
 
 // eslint-disable-next-line import/prefer-default-export
@@ -55,4 +59,5 @@ export const OPTS: Options = {
   // StringOpts
   backup: '',
   html: chrome.i18n.getMessage('default_message'),
+  linkStats: {},
 };

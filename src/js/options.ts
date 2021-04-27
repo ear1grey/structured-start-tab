@@ -3,6 +3,7 @@
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
 import { OPTS, Options, BooleanOpts, NumberOpts } from './defaults.js';
+import { ExtensionStorage } from './extension-storage.js';
 import * as toast from './toast.js';
 import * as util from './util.js';
 
@@ -27,16 +28,6 @@ function getValue(what: keyof NumberOpts) {
   OPTS[what] = elem.valueAsNumber;
 }
 
-export function loadOptionsWithPromise() :Promise<void> {
-  return new Promise((resolve) => {
-    const dataAsString = localStorage.getItem('structured-start-tab');
-    if (dataAsString) {
-      const data = JSON.parse(dataAsString) as Options;
-      Object.assign(OPTS, data);
-    }
-    resolve();
-  });
-}
 
 // incorporate the latest values of the page into
 // the OPTS object that gets stored.
@@ -198,7 +189,7 @@ function resetHTML() {
     exportHTML();
   }
   OPTS.html = chrome.i18n.getMessage('default_message');
-  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
+  ExtensionStorage.accessor.write();
 }
 
 
@@ -220,7 +211,7 @@ function prepareListeners() {
 
 
 export async function loadOptions() :Promise<void> {
-  await loadOptionsWithPromise();
+  await ExtensionStorage.accessor.load();
   createPageWithPrefs(OPTS);
   prepareListeners();
   util.prepareCSSVariables(OPTS);
@@ -233,7 +224,7 @@ export function saveOptions() :void {
   updatePrefsWithPage();
   updatePageWithPrefs(OPTS);
   util.prepareCSSVariables(OPTS);
-  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
+  ExtensionStorage.accessor.write();
 }
 
 export function simulateClick(selector:string) :void {

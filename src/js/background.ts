@@ -1,3 +1,5 @@
+import { ExtensionStorage } from './extension-storage';
+
 // define the menu item
 const menuItems:chrome.contextMenus.CreateProperties[] = [
   {
@@ -64,7 +66,7 @@ function menuInstaller(details: chrome.runtime.InstalledDetails) {
         if (Object.keys(items).length !== 0) {
           const importLastConfig = confirm(chrome.i18n.getMessage('import_config'));
           if (importLastConfig) {
-            localStorage.setItem('structured-start-tab', JSON.stringify(items));
+            ExtensionStorage.accessor.write();
           }
         }
       }

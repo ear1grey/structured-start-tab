@@ -1,9 +1,10 @@
-import { loadOptionsWithPromise, simulateClick, cloneTemplate } from './options.js';
-import { Options, OPTS, LinkStats } from './defaults.js';
+import { simulateClick, cloneTemplate } from './options.js';
+import { Options, OPTS } from './defaults.js';
 import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
 import { ColorSwitch } from './color-switch/index.js';
+import { ExtensionStorage } from './extension-storage.js';
 
 
 export interface Elems {
@@ -18,7 +19,6 @@ const twoWeeks = oneDay * 14;
 
 let dialog:HTMLDialogElement|undefined;
 let els:Elems;
-let linkStats:LinkStats;
 
 interface Dragging {
   el: HTMLElement,
@@ -72,12 +72,12 @@ function linkClicked(e:MouseEvent) {
 function updateClickCount(a :HTMLElement) {
   const link = a.getAttribute('href');
   if (!link) return;
-  if (linkStats[link]) {
-    linkStats[link]++;
+  if (OPTS.linkStats[link]) {
+    OPTS.linkStats[link]++;
   } else {
-    linkStats[link] = 1;
+    OPTS.linkStats[link] = 1;
   }
-  localStorage.setItem('linkStats', JSON.stringify(linkStats));
+  ExtensionStorage.accessor.write();
 }
 
 function toHex(x:number, m = 1) {
@@ -216,7 +216,7 @@ function saveChanges(makeBackup = true) {
   cleanTree(tree);
 
   OPTS.html = tree.body.innerHTML;
-  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
+  ExtensionStorage.accessor.write();
 
   prepareMain(OPTS);
   util.prepareCSSVariables(OPTS);
@@ -252,7 +252,7 @@ function detectKeydown(e:KeyboardEvent) {
       OPTS.html = OPTS.backup;
       OPTS.backup = prev;
     }
-    localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
+    ExtensionStorage.accessor.write();
     prepareContent(OPTS.html);
     toast.html('undo', chrome.i18n.getMessage('undo'));
   }
@@ -270,8 +270,8 @@ function toggleHeatMap() {
 
   for (const a of links) {
     const link = a.getAttribute('href');
-    if (link && linkStats[link]) {
-      numbers.push(linkStats[link]);
+    if (link && OPTS.linkStats[link]) {
+      numbers.push(OPTS.linkStats[link]);
     }
   }
   const max = Math.max(...numbers);
@@ -282,8 +282,8 @@ function toggleHeatMap() {
       if (!a.id) {
         const link = a.getAttribute('href');
         let color = 'hsl(240, 100%, 50%)';
-        if (link && linkStats[link]) {
-          color = getColorHeatMap(linkStats[link], max);
+        if (link && OPTS.linkStats[link]) {
+          color = getColorHeatMap(OPTS.linkStats[link], max);
         }
         a.style.backgroundColor = color;
       }
@@ -1072,15 +1072,6 @@ function prepareMain(OPTS:Options) {
   prepareContextPanelEventListener();
 }
 
-function prepareLinkStats() {
-  const linkStatsAsString = localStorage.getItem('linkStats');
-  if (linkStatsAsString) {
-    linkStats = JSON.parse(linkStatsAsString) as LinkStats;
-  } else {
-    linkStats = {};
-  }
-}
-
 function prepareContextPanelEventListener() {
   const sections = els.main.querySelectorAll('section');
   for (const s of sections) {
@@ -1110,14 +1101,13 @@ function migrateLinks() {
 }
 
 async function prepareAll() {
-  await loadOptionsWithPromise();
+  await ExtensionStorage.accessor.load();
   els = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
   prepareBookmarks(OPTS, els.bookmarksnav);
   util.prepareCSSVariables(OPTS);
   prepareMain(OPTS);
   prepareTrash();
   prepareBackgroundListener();
-  prepareLinkStats();
   toast.prepare();
   toast.popup(`Structured Start Tab v${version}`);
   toast.popup(chrome.i18n.getMessage('popup_toggle_sidebar'));
