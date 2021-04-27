@@ -6,7 +6,7 @@ export interface ApiStorage {
 }
 
 export class ExtensionStorage {
-  static accessor: LocalStorage = new LocalStorage();
+  static accessor: ApiStorage = new LocalStorage();
   static setAccesor(name: string): void {
     switch (name) {
       // The different type of storage

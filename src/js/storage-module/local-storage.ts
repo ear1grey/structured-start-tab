@@ -1,7 +1,7 @@
 import { Options, OPTS } from '../defaults.js';
-import { ExtensionStorage } from '../extension-storage.js';
+import { ApiStorage } from '../extension-storage.js';
 
-export class LocalStorage implements ExtensionStorage {
+export class LocalStorage implements ApiStorage {
   load(): Promise<void> {
     const dataAsString = localStorage.getItem('structured-start-tab');
     if (dataAsString) {
