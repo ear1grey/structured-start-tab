@@ -4,13 +4,11 @@ import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
 import { ColorSwitch } from './color-switch/index.js';
-
+import { version } from './version.js';
 
 export interface Elems {
   [index:string]: HTMLElement,
 }
-
-const version = '1.7.0';
 
 const oneDay = 1000 * 60 * 60 * 24;
 const fourDays = oneDay * 4;
