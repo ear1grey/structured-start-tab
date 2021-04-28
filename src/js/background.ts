@@ -30,6 +30,20 @@ const menuItems:chrome.contextMenus.CreateProperties[] = [
     parentId: 'duplicatePanel',
     title: chrome.i18n.getMessage('withoutLink'),
   },
+  {
+    id: 'add',
+    title: chrome.i18n.getMessage('emptytrash'),
+  },
+  {
+    id: 'addLink',
+    parentId: 'add',
+    title: chrome.i18n.getMessage('emptytrash'),
+  },
+  {
+    id: 'addPanel',
+    parentId: 'add',
+    title: chrome.i18n.getMessage('emptytrash'),
+  },
 ];
 
 const urls = [
