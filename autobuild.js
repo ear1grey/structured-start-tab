@@ -1,7 +1,6 @@
-import { readFileSync, writeFileSync, createReadStream } from 'fs'
-import { createInterface } from 'readline'
+import { readFileSync, writeFileSync } from 'fs';
+import { version } from './src/js/version.js';
 
-const fromPath = './src/js/index.ts';
 const toChangePath = [
   {
     path: './package.json',
@@ -17,18 +16,6 @@ const toChangePath = [
   }
 ]
 
-const readInterface = createInterface({
-  input: createReadStream(fromPath),
-  console: false
-});
-
-readInterface.on('line', function(line) {
-  if (line.includes('const version')) {
-    const version = line.split('\'')[1];
-    change(version);
-  }
-});
-
 function change(version) {
   for (const file of toChangePath) {
     const data = JSON.parse(readFileSync(file.path, 'utf8'));
@@ -36,3 +23,5 @@ function change(version) {
     writeFileSync(file.path, JSON.stringify(data, null, file.spaces));
   }
 }
+
+change( version );
