@@ -327,20 +327,28 @@ function createExampleLink(text = chrome.i18n.getMessage('example'), href = 'htt
   return a;
 }
 
-function addLink() {
+function addLinkListener() {
+  addLink();
+}
+
+function addLink(target? : HTMLElement) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
   const a = createExampleLink();
-  els.main.append(a);
+  if (target) {
+    target.append(a);
+  } else {
+    els.main.append(a);
+  }
   a.scrollIntoView({ behavior: 'smooth' });
   toast.html('locked', chrome.i18n.getMessage('toast_link_add'));
   flash(a, 'highlight');
 }
 
-function createPanel() {
-  const div = cloneTemplateToTarget('#template_panel', els.main);
+function createPanel(target : HTMLElement) {
+  const div = cloneTemplateToTarget('#template_panel', target);
   div.firstElementChild!.textContent = chrome.i18n.getMessage('panel');
   div.scrollIntoView({ behavior: 'smooth' });
   toast.html('locked', chrome.i18n.getMessage('add_panel_auto'));
@@ -354,13 +362,13 @@ function addPanel() {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
-  return createPanel();
+  return createPanel(els.main);
 }
 
 function addTopSitesPanel() {
   let panel = els.main.querySelector('#topsites');
   if (!panel) {
-    panel = createPanel();
+    panel = createPanel(els.main);
     panel.id = 'topsites';
     panel.firstElementChild!.textContent = chrome.i18n.getMessage('top_sites_panel');
   }
@@ -393,7 +401,7 @@ function updateTopSites() {
 function toogleBookmarksPanel() {
   let panel = els.main.querySelector('#bookmarksPanel');
   if (!panel) {
-    panel = createPanel();
+    panel = createPanel(els.main);
     panel.id = 'bookmarksPanel';
     panel.firstElementChild!.textContent = chrome.i18n.getMessage('bookmarks');
   }
@@ -422,7 +430,7 @@ async function updateBookmarksPanel() {
 
 function inDepthBookmarkTree(toTreat: chrome.bookmarks.BookmarkTreeNode, parentPanel: HTMLElement) {
   if (toTreat.children) {
-    const panel = createPanel();
+    const panel = createPanel(els.main);
     parentPanel.lastElementChild!.append(panel);
     panel.firstElementChild!.textContent = toTreat.title;
     for (const a of toTreat.children) {
@@ -633,7 +641,7 @@ function dragStart(e:DragEvent) {
       toast.html('addlink', chrome.i18n.getMessage('add_link'));
     } else {
       // addpanel
-      dummy = createPanel();
+      dummy = createPanel(els.main);
       dummy.classList.add('dragging');
       dummy.classList.add('new');
       el = dummy;
@@ -896,7 +904,7 @@ function prepareListeners() {
   }
   document.addEventListener('keydown', detectKeydown);
 
-  els.addlink.addEventListener('click', addLink);
+  els.addlink.addEventListener('click', addLinkListener);
   els.addpanel.addEventListener('click', addPanel);
 }
 
@@ -1046,6 +1054,8 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'withLink': duplicatePanel(true); break;
     case 'topsitespanel': addTopSitesPanel(); break;
     case 'bookmarkspanel': toogleBookmarksPanel(); break;
+    case 'addLink' : addLink(els.contextClicked); break;
+    case 'addPanel' : createPanel(els.contextClicked); break;
     default: break;
   }
 }
