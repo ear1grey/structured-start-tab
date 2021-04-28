@@ -230,5 +230,26 @@
   },
   "bookmarkspanel": {
     "message": "Import all bookmarks"
+  },
+  "add_link_target": {
+    "message": "Add a link"
+  },
+  "add_panel_target": {
+    "message": "Add a panel"
+  },
+  "add": {
+    "message": "Add a link/panel"
+  },
+  "lock_context": {
+    "message": "Lock page"
+  },
+  "lock_on": {
+    "message": "<h1>Lock</h1><p>The page is now locked</p>"
+  },
+  "lock_off": {
+    "message": "<h1>Unlock</h1><p>The page is now unlocked</p>"
+  },
+  "option_context": {
+    "message": "Options"
   }
 }

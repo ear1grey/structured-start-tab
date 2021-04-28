@@ -1046,6 +1046,15 @@ function emptyTrash() {
   saveChanges(false);
 }
 
+function lock() {
+  OPTS.lock = !OPTS.lock;
+  if (OPTS.lock) {
+    toast.html('locked', chrome.i18n.getMessage('lock_on'));
+  } else {
+    toast.html('locked', chrome.i18n.getMessage('lock_off'));
+  }
+}
+
 function receiveBackgroundMessages(m:{item:string}) {
   switch (m.item) {
     case 'emptytrash': emptyTrash(); break;
@@ -1058,6 +1067,8 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'bookmarkspanel': toogleBookmarksPanel(); break;
     case 'addLink' : addLink(els.contextClicked); break;
     case 'addPanel' : createPanel(els.contextClicked); break;
+    case 'lock' : lock(); break;
+    case 'option' : simulateClick('#options'); break;
     default: break;
   }
 }

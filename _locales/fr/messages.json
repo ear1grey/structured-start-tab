@@ -233,5 +233,26 @@
   },
   "bookmarkspanel": {
     "message": "Afficher le panneau des marques-pages"
+  },
+  "add_link_target": {
+    "message": "Ajouter un lien"
+  },
+  "add_panel_target": {
+    "message": "Ajouter un panel"
+  },
+  "add": {
+    "message": "Ajouter un lien/panel"
+  },
+  "lock_context": {
+    "message": "Verrouiller la page"
+  },
+  "lock_on": {
+    "message": "<h1>Verrouillage</h1><p>La page est maintenant verrouillée</p>"
+  },
+  "lock_off": {
+    "message": "<h1>Déverrouillage</h1><p>La page est maintenant déverrouillée</p>"
+  },
+  "option_context": {
+    "message": "Options"
   }
 }
