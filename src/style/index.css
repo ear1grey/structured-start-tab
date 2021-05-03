@@ -278,6 +278,14 @@ section.vertical nav {
   flex-direction: column;
 }
 
+section.vertical section {
+  width:auto;
+}
+
+#btnDirection {
+  margin: inherit;
+}
+
 section section nav {
   flex-wrap: wrap;
 }

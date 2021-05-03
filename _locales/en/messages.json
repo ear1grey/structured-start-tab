@@ -251,5 +251,14 @@
   },
   "option_context": {
     "message": "Options"
+  },
+  "direction": {
+    "message": "Direction"
+  },
+  "horizontal": {
+    "message": "Horizontal"
+  },
+  "vertical": {
+    "message": "Vertical"
   }
 }
