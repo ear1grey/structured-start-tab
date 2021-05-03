@@ -274,6 +274,10 @@ section section {
   width: min-content;
 }
 
+section.vertical nav {
+  flex-direction: column;
+}
+
 section section nav {
   flex-wrap: wrap;
 }
