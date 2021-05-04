@@ -343,7 +343,7 @@ function addLink(target? : HTMLElement) {
     els.main.append(a);
   }
   a.scrollIntoView({ behavior: 'smooth' });
-  toast.html('locked', chrome.i18n.getMessage('toast_link_add'));
+  toast.html('addlink', chrome.i18n.getMessage('toast_link_add'));
   flash(a, 'highlight');
 }
 
@@ -351,7 +351,7 @@ function createPanel(target : HTMLElement) {
   const div = cloneTemplateToTarget('#template_panel', target);
   div.firstElementChild!.textContent = chrome.i18n.getMessage('panel');
   div.scrollIntoView({ behavior: 'smooth' });
-  toast.html('locked', chrome.i18n.getMessage('add_panel_auto'));
+  toast.html('addpanel', chrome.i18n.getMessage('add_panel_auto'));
   div.classList.add('flash');
   div.addEventListener('animationend', () => { div.classList.remove('flash'); });
   return div;
