@@ -106,12 +106,9 @@ function editStart(elem:HTMLElement) {
     if (elem.tagName === 'SECTION') {
       cloneToDialog('#template_edit_panel');
       setValue('#editname', elem.firstElementChild!.textContent);
-      const btnDir = document.querySelector('#btnDirection');
       if (elem.classList.contains('vertical')) {
-        btnDir!.textContent = chrome.i18n.getMessage('vertical');
+        (document.querySelector('#radioVertical') as HTMLInputElement).checked = true;
       }
-      btnDir!.addEventListener('click', switchDirection);
-      (document.querySelector('#editname') as HTMLInputElement).select();
     } else {
       return;
     }
@@ -147,15 +144,6 @@ function closeDialog() {
     flash(els.editing);
   }
   delete els.editing;
-}
-
-function switchDirection() {
-  const btn = document.querySelector('#btnDirection') as HTMLButtonElement;
-  if (btn.textContent === chrome.i18n.getMessage('vertical')) {
-    btn.textContent = chrome.i18n.getMessage('horizontal');
-  } else {
-    btn.textContent = chrome.i18n.getMessage('vertical');
-  }
 }
 
 function setFavicon(elem:HTMLElement, url:string) {
@@ -195,7 +183,7 @@ function editOk() {
   } else {
     if (els.editing.tagName === 'SECTION') {
       els.editing.firstElementChild!.textContent = getValue('#editname');
-      if (document.querySelector('#btnDirection')!.textContent === chrome.i18n.getMessage('vertical')) {
+      if ((document.querySelector('#radioVertical') as HTMLInputElement).checked) {
         els.editing.classList.add('vertical');
       } else {
         els.editing.classList.remove('vertical');

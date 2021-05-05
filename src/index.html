@@ -89,7 +89,12 @@
   </label>
   <label>
     <h2 data-locale="direction">Direction</h2>
-    <button id=btnDirection data-locale="horizontal">Horizontal</button>
+    <div class="switch">
+      <input type="radio" id="radioHorizontal" name="direction" checked/>
+      <label for="radioHorizontal" data-locale="horizontal">Horizontal</label>
+      <input type="radio" id="radioVertical" name="direction"/>
+      <label for="radioVertical" data-locale="vertical">Vertical</label>
+    </div>
   </label>
   <div id=okcancel>
     <button id=editok value="ok">OK</button>
