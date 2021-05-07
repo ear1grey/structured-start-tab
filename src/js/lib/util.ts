@@ -1,4 +1,4 @@
-import * as types from './types';
+import * as types from './types.js';
 
 export function prepareCSSVariables(OPTS: types.Options) :void {
   document.documentElement.style.setProperty('--tiny', `${OPTS.space / 1000}em`);

@@ -1,10 +1,10 @@
-import * as util from './lib/util';
-import * as types from './lib/types';
-import { OPTS } from './lib/options';
-import * as options from './lib/options';
-import * as toast from './lib/toast';
-import * as tooltip from './lib/tooltip';
-import { ColorSwitch } from './components/color-switch/index';
+import * as util from './lib/util.js';
+import * as types from './lib/types.js';
+import { OPTS } from './lib/options.js';
+import * as options from './lib/options.js';
+import * as toast from './lib/toast.js';
+import * as tooltip from './lib/tooltip.js';
+import { ColorSwitch } from './components/color-switch/index.js';
 
 
 export interface Elems {

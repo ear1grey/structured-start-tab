@@ -1,4 +1,4 @@
-import * as types from './types';
+import * as types from './types.js';
 
 let tip: HTMLElement;
 let OPTS: types.Options;

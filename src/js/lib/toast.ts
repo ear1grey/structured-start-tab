@@ -1,4 +1,4 @@
-import { OPTS } from './options';
+import { OPTS } from './options.js';
 
 function isDupe(msg: string) {
   const slices = document.querySelectorAll<HTMLElement>('#toast>.toast');

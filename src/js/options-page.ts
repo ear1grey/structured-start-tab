@@ -2,11 +2,11 @@
 
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
-import * as toast from './lib/toast';
-import * as util from './lib/util';
-import * as types from './lib/types';
-import { OPTS } from './lib/options';
-import * as options from './lib/options';
+import * as toast from './lib/toast.js';
+import * as util from './lib/util.js';
+import * as types from './lib/types.js';
+import { OPTS } from './lib/options.js';
+import * as options from './lib/options.js';
 
 
 function setCheckBox(prefs:types.Options, what: keyof types.BooleanOpts) {

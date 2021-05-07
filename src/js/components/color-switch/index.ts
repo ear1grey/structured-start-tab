@@ -1,4 +1,4 @@
-import { BetterRange } from '../better-range/index';
+import { BetterRange } from '../better-range/index.js';
 
 function attachStyleSheet(shadow:ShadowRoot) {
   const e = document.createElement('link');
