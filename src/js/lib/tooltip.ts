@@ -1,7 +1,7 @@
-import { Options } from './defaults.js';
+import * as types from './types.js';
 
 let tip: HTMLElement;
-let OPTS: Options;
+let OPTS: types.Options;
 
 const gap = 20;
 
@@ -37,7 +37,7 @@ export function hide() :void {
   tip.style.setProperty('visibility', 'hidden');
 }
 
-export function prepare(O: Options, selector = '[data-info]') :void {
+export function prepare(O: types.Options, selector = '[data-info]') :void {
   OPTS = O;
   const things = document.querySelectorAll<HTMLElement>(selector);
 

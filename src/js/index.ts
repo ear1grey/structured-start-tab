@@ -1,10 +1,12 @@
-import { loadOptionsWithPromise, simulateClick, cloneTemplate } from './options.js';
-import { Options, OPTS, LinkStats } from './defaults.js';
-import * as toast from './toast.js';
-import * as tooltip from './tooltip.js';
-import * as util from './util.js';
-import { ColorSwitch } from './color-switch/index.js';
+import * as util from './lib/util.js';
+import * as types from './lib/types.js';
+import { OPTS } from './lib/options.js';
+import * as options from './lib/options.js';
+import * as toast from './lib/toast.js';
+import * as tooltip from './lib/tooltip.js';
+import { ColorSwitch } from './components/color-switch/index.js';
 import { version } from './version.js';
+
 
 export interface Elems {
   [index:string]: HTMLElement,
@@ -16,7 +18,6 @@ const twoWeeks = oneDay * 14;
 
 let dialog:HTMLDialogElement|undefined;
 let els:Elems;
-let linkStats:LinkStats;
 
 interface Dragging {
   el: HTMLElement,
@@ -70,12 +71,12 @@ function linkClicked(e:MouseEvent) {
 function updateClickCount(a :HTMLElement) {
   const link = a.getAttribute('href');
   if (!link) return;
-  if (linkStats[link]) {
-    linkStats[link]++;
+  if (OPTS.linkStats[link]) {
+    OPTS.linkStats[link]++;
   } else {
-    linkStats[link] = 1;
+    OPTS.linkStats[link] = 1;
   }
-  localStorage.setItem('linkStats', JSON.stringify(linkStats));
+  options.write();
 }
 
 function toHex(x:number, m = 1) {
@@ -214,7 +215,7 @@ function saveChanges(makeBackup = true) {
   cleanTree(tree);
 
   OPTS.html = tree.body.innerHTML;
-  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
+  options.write();
 
   prepareMain(OPTS);
   util.prepareCSSVariables(OPTS);
@@ -241,7 +242,7 @@ function treeFromHTML(html:string) {
 
 function detectKeydown(e:KeyboardEvent) {
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-    simulateClick('#editok');
+    util.simulateClick('#editok');
   }
 
   if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey)) {
@@ -250,7 +251,7 @@ function detectKeydown(e:KeyboardEvent) {
       OPTS.html = OPTS.backup;
       OPTS.backup = prev;
     }
-    localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
+    options.write();
     prepareContent(OPTS.html);
     toast.html('undo', chrome.i18n.getMessage('undo'));
   }
@@ -268,8 +269,8 @@ function toggleHeatMap() {
 
   for (const a of links) {
     const link = a.getAttribute('href');
-    if (link && linkStats[link]) {
-      numbers.push(linkStats[link]);
+    if (link && OPTS.linkStats[link]) {
+      numbers.push(OPTS.linkStats[link]);
     }
   }
   const max = Math.max(...numbers);
@@ -280,8 +281,8 @@ function toggleHeatMap() {
       if (!a.id) {
         const link = a.getAttribute('href');
         let color = 'hsl(240, 100%, 50%)';
-        if (link && linkStats[link]) {
-          color = getColorHeatMap(linkStats[link], max);
+        if (link && OPTS.linkStats[link]) {
+          color = getColorHeatMap(OPTS.linkStats[link], max);
         }
         a.style.backgroundColor = color;
       }
@@ -305,7 +306,7 @@ function changeBookmarksToHeatmap() {
       els.bookmarksnav.removeChild(a);
     }
     els.bookmarks.querySelector('h1')!.textContent = chrome.i18n.getMessage('heatmap_legend');
-    cloneTemplateToTarget('#heatmap_legend', els.bookmarksnav);
+    util.cloneTemplateToTarget('#heatmap_legend', els.bookmarksnav);
   } else {
     els.bookmarks.querySelector('h1')!.textContent = chrome.i18n.getMessage('bookmarks');
     prepareBookmarks(OPTS, els.bookmarksnav);
@@ -348,7 +349,7 @@ function addLink(target? : HTMLElement) {
 }
 
 function createPanel(target : HTMLElement) {
-  const div = cloneTemplateToTarget('#template_panel', target);
+  const div = util.cloneTemplateToTarget('#template_panel', target);
   div.firstElementChild!.textContent = chrome.i18n.getMessage('panel');
   div.scrollIntoView({ behavior: 'smooth' });
   toast.html('addpanel', chrome.i18n.getMessage('add_panel_auto'));
@@ -471,7 +472,7 @@ function duplicatePanel(keepLinks: boolean) {
  * iff link has links - recurse
  * iff link has no links - inject
  */
-export function buildBookmarks(OPTS:Options, data:chrome.bookmarks.BookmarkTreeNode[], target:HTMLElement, count:number) :void {
+export function buildBookmarks(OPTS:types.Options, data:chrome.bookmarks.BookmarkTreeNode[], target:HTMLElement, count:number) :void {
   target.textContent = '';
   for (const x of data) {
     if (count === 0) break;
@@ -761,7 +762,7 @@ function dragDrop(e: DragEvent) {
   dragging.el.classList.remove('dragging');
   dragging.el.classList.remove('fresh');
   if (e.target === els.bin && !dragging.dummy) {
-    els.trash = els.main.querySelector('#trash') || cloneTemplateToTarget('#template_trash', els.main);
+    els.trash = els.main.querySelector('#trash') || util.cloneTemplateToTarget('#template_trash', els.main);
     els.trash.lastElementChild?.append(dragging.el);
     saveChanges();
     toast.html('locked', chrome.i18n.getMessage('locked_moved_to_trash'));
@@ -806,7 +807,7 @@ function dragEnd() {
   toast.html('cancel', chrome.i18n.getMessage('drag_cancel'));
 }
 
-export async function prepareBookmarks(OPTS:Options, target:HTMLElement) :Promise<void> {
+export async function prepareBookmarks(OPTS:types.Options, target:HTMLElement) :Promise<void> {
   if (OPTS.showBookmarksSidebar) {
     const count = OPTS.showBookmarksLimit;
 
@@ -926,7 +927,7 @@ function prepareContent(html:string) {
 
 function toggleTrash() {
   // ensure trash is the last thing on the screen
-  els.trash = els.main.querySelector('#trash') || cloneTemplateToTarget('#template_trash', els.main);
+  els.trash = els.main.querySelector('#trash') || util.cloneTemplateToTarget('#template_trash', els.main);
   els.main.append(els.trash);
   els.trash.classList.toggle('open');
   if (els.trash.classList.contains('open')) {
@@ -970,16 +971,10 @@ function cloneToDialog(selector:string) {
   dialog.append(clone);
 }
 
-function cloneTemplateToTarget(selector:string, where:HTMLElement) {
-  const clone = cloneTemplate(selector);
-  where.append(clone);
-  return where.lastElementChild! as HTMLElement;
-}
-
 function prepareTrash() {
   els.trash = els.trash || document.querySelector('#trash');
   if (!els.trash) {
-    els.trash = cloneTemplateToTarget('#template_trash', els.main);
+    els.trash = util.cloneTemplateToTarget('#template_trash', els.main);
     els.trash.id = 'trash';
   }
   els.trash.classList.add('invisible');
@@ -1066,7 +1061,7 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'addLink' : addLink(els.contextClicked); break;
     case 'addPanel' : createPanel(els.contextClicked); break;
     case 'lock' : lock(); break;
-    case 'option' : simulateClick('#options'); break;
+    case 'option' : util.simulateClick('#options'); break;
     default: break;
   }
 }
@@ -1083,21 +1078,12 @@ function prepareBackgroundListener() {
   chrome.runtime.onMessage.addListener(receiveBackgroundMessages);
 }
 
-function prepareMain(OPTS:Options) {
+function prepareMain(OPTS:types.Options) {
   prepareContent(OPTS.html);
   prepareDrag();
   prepareFoldables();
   prepareDynamicFlex(els.main);
   prepareContextPanelEventListener();
-}
-
-function prepareLinkStats() {
-  const linkStatsAsString = localStorage.getItem('linkStats');
-  if (linkStatsAsString) {
-    linkStats = JSON.parse(linkStatsAsString) as LinkStats;
-  } else {
-    linkStats = {};
-  }
 }
 
 function prepareContextPanelEventListener() {
@@ -1129,14 +1115,13 @@ function migrateLinks() {
 }
 
 async function prepareAll() {
-  await loadOptionsWithPromise();
+  await options.load();
   els = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
   prepareBookmarks(OPTS, els.bookmarksnav);
   util.prepareCSSVariables(OPTS);
   prepareMain(OPTS);
   prepareTrash();
   prepareBackgroundListener();
-  prepareLinkStats();
   toast.prepare();
   toast.popup(`Structured Start Tab v${version}`);
   toast.popup(chrome.i18n.getMessage('popup_toggle_sidebar'));

@@ -33,7 +33,7 @@
         "newtab": "app/index.html"
     },
     "options_ui": {
-        "page": "app/options.html"
+        "page": "app/options-page.html"
     },
     "web_accessible_resources": [
         "data/*",
