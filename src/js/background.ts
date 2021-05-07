@@ -1,8 +1,16 @@
 // define the menu item
 const menuItems:chrome.contextMenus.CreateProperties[] = [
   {
+    id: 'option',
+    title: chrome.i18n.getMessage('option_context'),
+  },
+  {
     id: 'emptytrash',
     title: chrome.i18n.getMessage('emptytrash'),
+  },
+  {
+    id: 'lock',
+    title: chrome.i18n.getMessage('lock_context'),
   },
   {
     id: 'togglebookmarks',
@@ -29,6 +37,20 @@ const menuItems:chrome.contextMenus.CreateProperties[] = [
     id: 'withoutLink',
     parentId: 'duplicatePanel',
     title: chrome.i18n.getMessage('withoutLink'),
+  },
+  {
+    id: 'add',
+    title: chrome.i18n.getMessage('add'),
+  },
+  {
+    id: 'addLink',
+    parentId: 'add',
+    title: chrome.i18n.getMessage('add_link_target'),
+  },
+  {
+    id: 'addPanel',
+    parentId: 'add',
+    title: chrome.i18n.getMessage('add_panel_target'),
   },
 ];
 

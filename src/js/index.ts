@@ -5,13 +5,12 @@ import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import { ColorSwitch } from './components/color-switch/index.js';
+import { version } from './version.js';
 
 
 export interface Elems {
   [index:string]: HTMLElement,
 }
-
-const version = '1.7.0';
 
 const oneDay = 1000 * 60 * 60 * 24;
 const fourDays = oneDay * 4;
@@ -329,23 +328,31 @@ function createExampleLink(text = chrome.i18n.getMessage('example'), href = 'htt
   return a;
 }
 
-function addLink() {
+function addLinkListener() {
+  addLink();
+}
+
+function addLink(target? : HTMLElement) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
   const a = createExampleLink();
-  els.main.append(a);
+  if (target) {
+    target.append(a);
+  } else {
+    els.main.append(a);
+  }
   a.scrollIntoView({ behavior: 'smooth' });
-  toast.html('locked', chrome.i18n.getMessage('toast_link_add'));
+  toast.html('addlink', chrome.i18n.getMessage('toast_link_add'));
   flash(a, 'highlight');
 }
 
-function createPanel() {
-  const div = util.cloneTemplateToTarget('#template_panel', els.main);
+function createPanel(target : HTMLElement) {
+  const div = util.cloneTemplateToTarget('#template_panel', target);
   div.firstElementChild!.textContent = chrome.i18n.getMessage('panel');
   div.scrollIntoView({ behavior: 'smooth' });
-  toast.html('locked', chrome.i18n.getMessage('add_panel_auto'));
+  toast.html('addpanel', chrome.i18n.getMessage('add_panel_auto'));
   div.classList.add('flash');
   div.addEventListener('animationend', () => { div.classList.remove('flash'); });
   return div;
@@ -356,13 +363,13 @@ function addPanel() {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
-  return createPanel();
+  return createPanel(els.main);
 }
 
 function addTopSitesPanel() {
   let panel = els.main.querySelector('#topsites');
   if (!panel) {
-    panel = createPanel();
+    panel = createPanel(els.main);
     panel.id = 'topsites';
     panel.firstElementChild!.textContent = chrome.i18n.getMessage('top_sites_panel');
   }
@@ -395,7 +402,7 @@ function updateTopSites() {
 function toogleBookmarksPanel() {
   let panel = els.main.querySelector('#bookmarksPanel');
   if (!panel) {
-    panel = createPanel();
+    panel = createPanel(els.main);
     panel.id = 'bookmarksPanel';
     panel.firstElementChild!.textContent = chrome.i18n.getMessage('bookmarks');
   }
@@ -424,7 +431,7 @@ async function updateBookmarksPanel() {
 
 function inDepthBookmarkTree(toTreat: chrome.bookmarks.BookmarkTreeNode, parentPanel: HTMLElement) {
   if (toTreat.children) {
-    const panel = createPanel();
+    const panel = createPanel(els.main);
     parentPanel.lastElementChild!.append(panel);
     panel.firstElementChild!.textContent = toTreat.title;
     for (const a of toTreat.children) {
@@ -635,7 +642,7 @@ function dragStart(e:DragEvent) {
       toast.html('addlink', chrome.i18n.getMessage('add_link'));
     } else {
       // addpanel
-      dummy = createPanel();
+      dummy = createPanel(els.main);
       dummy.classList.add('dragging');
       dummy.classList.add('new');
       el = dummy;
@@ -898,7 +905,7 @@ function prepareListeners() {
   }
   document.addEventListener('keydown', detectKeydown);
 
-  els.addlink.addEventListener('click', addLink);
+  els.addlink.addEventListener('click', addLinkListener);
   els.addpanel.addEventListener('click', addPanel);
 }
 
@@ -1032,6 +1039,15 @@ function emptyTrash() {
   saveChanges(false);
 }
 
+function lock() {
+  OPTS.lock = !OPTS.lock;
+  if (OPTS.lock) {
+    toast.html('locked', chrome.i18n.getMessage('lock_on'));
+  } else {
+    toast.html('locked', chrome.i18n.getMessage('lock_off'));
+  }
+}
+
 function receiveBackgroundMessages(m:{item:string}) {
   switch (m.item) {
     case 'emptytrash': emptyTrash(); break;
@@ -1042,6 +1058,10 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'withLink': duplicatePanel(true); break;
     case 'topsitespanel': addTopSitesPanel(); break;
     case 'bookmarkspanel': toogleBookmarksPanel(); break;
+    case 'addLink' : addLink(els.contextClicked); break;
+    case 'addPanel' : createPanel(els.contextClicked); break;
+    case 'lock' : lock(); break;
+    case 'option' : util.simulateClick('#options'); break;
     default: break;
   }
 }

@@ -1,10 +1,10 @@
 {
     "manifest_version": 2,
-    "version": "1.7.0",
+    "version": "1.8.0",
     "name": "Structured Start Tab",
     "description": "Show a structured page when a new tab is opened.",
     "author": "Rich Boakes",
-    "default_locale" : "en",
+    "default_locale": "en",
     "permissions": [
         "tabs",
         "storage",
@@ -12,17 +12,19 @@
         "chrome://favicon/",
         "contextMenus",
         "topSites"
-        ],
+    ],
     "background": {
         "persistent": false,
-        "scripts": ["app/js/background.js"]
-        },
+        "scripts": [
+            "app/js/background.js"
+        ]
+    },
     "icons": {
         "16": "app/style/i/16.png",
         "48": "app/style/i/48.png",
         "96": "app/style/i/96.png",
-       "128": "app/style/i/128.png",
-       "580": "app/style/i/580.png"
+        "128": "app/style/i/128.png",
+        "580": "app/style/i/580.png"
     },
     "browser_action": {
         "default_icon": "app/style/i/48.png"
@@ -31,7 +33,7 @@
         "newtab": "app/index.html"
     },
     "options_ui": {
-        "page" : "app/options-page.html"
+        "page": "app/options-page.html"
     },
     "web_accessible_resources": [
         "data/*",
@@ -45,7 +47,7 @@
             },
             "description": "Toggle Sidebar"
         },
-        "toggle-heatmap":  {
+        "toggle-heatmap": {
             "suggested_key": {
                 "default": "Ctrl+Shift+I",
                 "mac": "MacCtrl+Shift+I"
