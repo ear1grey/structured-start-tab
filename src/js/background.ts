@@ -34,7 +34,7 @@ const menuItems:chrome.contextMenus.CreateProperties[] = [
 
 const urls = [
   chrome.runtime.getURL('app/index.html'),
-  chrome.runtime.getURL('app/options.html'),
+  chrome.runtime.getURL('app/options-page.html'),
   'chrome://newtab/',
 ];
 

@@ -1,5 +1,7 @@
 import * as util from './lib/util';
-import { Options, OPTS, load, write } from './lib/options';
+import * as types from './lib/types';
+import { OPTS } from './lib/options';
+import * as options from './lib/options';
 import * as toast from './lib/toast';
 import * as tooltip from './lib/tooltip';
 import { ColorSwitch } from './components/color-switch/index';
@@ -75,7 +77,7 @@ function updateClickCount(a :HTMLElement) {
   } else {
     OPTS.linkStats[link] = 1;
   }
-  write();
+  options.write();
 }
 
 function toHex(x:number, m = 1) {
@@ -214,7 +216,7 @@ function saveChanges(makeBackup = true) {
   cleanTree(tree);
 
   OPTS.html = tree.body.innerHTML;
-  write();
+  options.write();
 
   prepareMain(OPTS);
   util.prepareCSSVariables(OPTS);
@@ -250,7 +252,7 @@ function detectKeydown(e:KeyboardEvent) {
       OPTS.html = OPTS.backup;
       OPTS.backup = prev;
     }
-    write();
+    options.write();
     prepareContent(OPTS.html);
     toast.html('undo', chrome.i18n.getMessage('undo'));
   }
@@ -463,7 +465,7 @@ function duplicatePanel(keepLinks: boolean) {
  * iff link has links - recurse
  * iff link has no links - inject
  */
-export function buildBookmarks(OPTS:Options, data:chrome.bookmarks.BookmarkTreeNode[], target:HTMLElement, count:number) :void {
+export function buildBookmarks(OPTS:types.Options, data:chrome.bookmarks.BookmarkTreeNode[], target:HTMLElement, count:number) :void {
   target.textContent = '';
   for (const x of data) {
     if (count === 0) break;
@@ -798,7 +800,7 @@ function dragEnd() {
   toast.html('cancel', chrome.i18n.getMessage('drag_cancel'));
 }
 
-export async function prepareBookmarks(OPTS:Options, target:HTMLElement) :Promise<void> {
+export async function prepareBookmarks(OPTS:types.Options, target:HTMLElement) :Promise<void> {
   if (OPTS.showBookmarksSidebar) {
     const count = OPTS.showBookmarksLimit;
 
@@ -1056,7 +1058,7 @@ function prepareBackgroundListener() {
   chrome.runtime.onMessage.addListener(receiveBackgroundMessages);
 }
 
-function prepareMain(OPTS:Options) {
+function prepareMain(OPTS:types.Options) {
   prepareContent(OPTS.html);
   prepareDrag();
   prepareFoldables();
@@ -1093,7 +1095,7 @@ function migrateLinks() {
 }
 
 async function prepareAll() {
-  await load();
+  await options.load();
   els = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
   prepareBookmarks(OPTS, els.bookmarksnav);
   util.prepareCSSVariables(OPTS);

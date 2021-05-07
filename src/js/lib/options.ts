@@ -1,43 +1,10 @@
 // default options - these are reverted to
 // if there are no options in the browser's sync store.
 
-export interface LinkStats {
-  [url:string]:number,
-}
-
-export interface NumberOpts {
-  showToast: number,
-  showBookmarksLimit: number,
-  space: number,
-  fontsize: number,
-}
-
-export interface BooleanOpts {
-  showToolTips: boolean,
-  lock: boolean,
-  proportionalSections: boolean,
-  showBookmarksSidebar: boolean,
-  hideBookmarksInPage: boolean,
-  useCustomScrollbar: boolean,
-  editOnNewDrop: boolean,
-  allowCollapsingLocked: boolean,
-  savePanelStatusLocked: boolean,
-}
-
-export interface StringOpts {
-  html: string,
-  backup: string,
-}
-
-export interface StatsOpts {
-  linkStats: LinkStats
-}
-
-export interface Options extends NumberOpts, BooleanOpts, StringOpts, StatsOpts {}
-
+import * as types from './types';
 
 // eslint-disable-next-line import/prefer-default-export
-export const OPTS: Options = {
+export const OPTS: types.Options = {
 
   // NumberOpts
   fontsize: 100,
@@ -66,7 +33,7 @@ export const OPTS: Options = {
 export function load(): Promise<void> {
   const dataAsString = localStorage.getItem('structured-start-tab');
   if (dataAsString) {
-    const data = JSON.parse(dataAsString) as Options;
+    const data = JSON.parse(dataAsString) as types.Options;
     Object.assign(OPTS, data);
   }
   return Promise.resolve();

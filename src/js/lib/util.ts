@@ -1,6 +1,6 @@
-import { Options } from './options';
+import * as types from './types';
 
-export function prepareCSSVariables(OPTS: Options) :void {
+export function prepareCSSVariables(OPTS: types.Options) :void {
   document.documentElement.style.setProperty('--tiny', `${OPTS.space / 1000}em`);
   document.documentElement.style.setProperty('--page-font-size', `${OPTS.fontsize}%`);
   document.documentElement.classList.toggle('use-custom-scrollbar', OPTS.useCustomScrollbar);

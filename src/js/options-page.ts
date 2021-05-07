@@ -2,26 +2,29 @@
 
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
-import { OPTS, Options, BooleanOpts, NumberOpts, load, write } from './lib/options';
 import * as toast from './lib/toast';
 import * as util from './lib/util';
+import * as types from './lib/types';
+import { OPTS } from './lib/options';
+import * as options from './lib/options';
 
-function setCheckBox(prefs:Options, what: keyof BooleanOpts) {
+
+function setCheckBox(prefs:types.Options, what: keyof types.BooleanOpts) {
   const elem = <HTMLInputElement> document.getElementById(what);
   elem.checked = prefs[what];
 }
 
-function getCheckBox(what: keyof BooleanOpts) {
+function getCheckBox(what: keyof types.BooleanOpts) {
   const elem = <HTMLInputElement> document.getElementById(what);
   OPTS[what] = elem.checked;
 }
 
-function setValue(prefs:Options, what: keyof NumberOpts, defaultValue = 0) {
+function setValue(prefs:types.Options, what: keyof types.NumberOpts, defaultValue = 0) {
   const elem = <HTMLInputElement> document.getElementById(what);
   elem.valueAsNumber = prefs[what] || defaultValue;
 }
 
-function getValue(what: keyof NumberOpts) {
+function getValue(what: keyof types.NumberOpts) {
   const elem = <HTMLInputElement> document.getElementById(what);
   OPTS[what] = elem.valueAsNumber;
 }
@@ -45,7 +48,7 @@ function updatePrefsWithPage() {
   getValue('fontsize');
 }
 
-function updatePageWithPrefs(prefs:Options) {
+function updatePageWithPrefs(prefs:types.Options) {
   setCheckBox(prefs, 'lock');
   setCheckBox(prefs, 'allowCollapsingLocked');
   setCheckBox(prefs, 'savePanelStatusLocked');
@@ -100,7 +103,7 @@ function create(where:Element, type:string, attrs:ElAttrs, txt:string):Element {
   return elemInDoc;
 }
 
-function createPageWithPrefs(prefs:Options) {
+function createPageWithPrefs(prefs:types.Options) {
   const settings = document.querySelector('#settings');
   if (settings) {
     const layout = create(settings, 'section', {}, chrome.i18n.getMessage('layout'));
@@ -174,7 +177,7 @@ function resetHTML() {
     exportHTML();
   }
   OPTS.html = chrome.i18n.getMessage('default_message');
-  write();
+  options.write();
 }
 
 
@@ -196,7 +199,7 @@ function prepareListeners() {
 
 
 export async function loadOptions() :Promise<void> {
-  await load();
+  await options.load();
   createPageWithPrefs(OPTS);
   prepareListeners();
   util.prepareCSSVariables(OPTS);
@@ -209,7 +212,7 @@ export function saveOptions() :void {
   updatePrefsWithPage();
   updatePageWithPrefs(OPTS);
   util.prepareCSSVariables(OPTS);
-  write();
+  options.write();
 }
 
 function toggleBookmarks() {
