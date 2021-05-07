@@ -1,5 +1,6 @@
 import { loadOptionsWithPromise, simulateClick, cloneTemplate } from './options.js';
 import { Options, OPTS, LinkStats } from './defaults.js';
+import { parseIcs, IcalEvent } from './icalparse.js';
 import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
@@ -438,6 +439,43 @@ function inDepthBookmarkTree(toTreat: chrome.bookmarks.BookmarkTreeNode, parentP
     }
   } else {
     parentPanel.lastElementChild!.append(createExampleLink(toTreat.title, toTreat.url));
+  }
+}
+
+function toggleCalendarPanel() {
+  let panel = els.main.querySelector('#agendaPanel');
+  if (!panel) {
+    panel = createPanel(els.main);
+    panel.id = 'agendaPanel';
+    panel.firstElementChild!.textContent = 'Agenda';
+  }
+  for (const children of panel.lastElementChild!.children) {
+    panel.lastElementChild!.removeChild(children);
+  }
+  updateCalendar();
+  if (panel.classList.contains('folded')) panel.classList.toggle('folded');
+  let e = panel.parentElement;
+  while (e && e !== els.main) {
+    if (e.classList.contains('folded')) e.classList.toggle('folded');
+    e = e.parentElement;
+  }
+  panel.scrollIntoView({ behavior: 'smooth' });
+  flash(panel as HTMLElement, 'highlight');
+}
+
+function updateCalendar() {
+  const rootPanel = els.main.querySelector('#agendaPanel') as HTMLElement;
+  if (!rootPanel) return;
+  const xmlHttp = new XMLHttpRequest();
+  xmlHttp.open('GET', OPTS.calendarUrl, false);
+  xmlHttp.send();
+  const events = parseIcs(xmlHttp.responseText);
+  for (const event of events) {
+    const panel = createPanel(rootPanel.lastElementChild as HTMLElement);
+    panel.firstElementChild!.textContent = event.title + ' - ' + event.location;
+    const p = document.createElement('p');
+    p.textContent = 'Start : ' + event.startDate + '\n' + 'End : ' + event.endDate + '\n';
+    panel.lastElementChild?.append(p);
   }
 }
 
@@ -1144,6 +1182,7 @@ async function prepareAll() {
   migrateLinks();
   updateTopSites();
   updateBookmarksPanel();
+  toggleCalendarPanel();
   util.localizeHtml(document);
 }
 
