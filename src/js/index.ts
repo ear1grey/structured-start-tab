@@ -1,10 +1,8 @@
-import { simulateClick, cloneTemplate } from './options.js';
-import { Options, OPTS } from './defaults.js';
-import * as toast from './toast.js';
-import * as tooltip from './tooltip.js';
-import * as util from './util.js';
-import { ColorSwitch } from './color-switch/index.js';
-import { ExtensionStorage } from './extension-storage.js';
+import * as util from './lib/util';
+import { Options, OPTS, load, write } from './lib/options';
+import * as toast from './lib/toast';
+import * as tooltip from './lib/tooltip';
+import { ColorSwitch } from './components/color-switch/index';
 
 
 export interface Elems {
@@ -77,7 +75,7 @@ function updateClickCount(a :HTMLElement) {
   } else {
     OPTS.linkStats[link] = 1;
   }
-  ExtensionStorage.accessor.write();
+  write();
 }
 
 function toHex(x:number, m = 1) {
@@ -216,7 +214,7 @@ function saveChanges(makeBackup = true) {
   cleanTree(tree);
 
   OPTS.html = tree.body.innerHTML;
-  ExtensionStorage.accessor.write();
+  write();
 
   prepareMain(OPTS);
   util.prepareCSSVariables(OPTS);
@@ -243,7 +241,7 @@ function treeFromHTML(html:string) {
 
 function detectKeydown(e:KeyboardEvent) {
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-    simulateClick('#editok');
+    util.simulateClick('#editok');
   }
 
   if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey)) {
@@ -252,7 +250,7 @@ function detectKeydown(e:KeyboardEvent) {
       OPTS.html = OPTS.backup;
       OPTS.backup = prev;
     }
-    ExtensionStorage.accessor.write();
+    write();
     prepareContent(OPTS.html);
     toast.html('undo', chrome.i18n.getMessage('undo'));
   }
@@ -307,7 +305,7 @@ function changeBookmarksToHeatmap() {
       els.bookmarksnav.removeChild(a);
     }
     els.bookmarks.querySelector('h1')!.textContent = chrome.i18n.getMessage('heatmap_legend');
-    cloneTemplateToTarget('#heatmap_legend', els.bookmarksnav);
+    util.cloneTemplateToTarget('#heatmap_legend', els.bookmarksnav);
   } else {
     els.bookmarks.querySelector('h1')!.textContent = chrome.i18n.getMessage('bookmarks');
     prepareBookmarks(OPTS, els.bookmarksnav);
@@ -342,7 +340,7 @@ function addLink() {
 }
 
 function createPanel() {
-  const div = cloneTemplateToTarget('#template_panel', els.main);
+  const div = util.cloneTemplateToTarget('#template_panel', els.main);
   div.firstElementChild!.textContent = chrome.i18n.getMessage('panel');
   div.scrollIntoView({ behavior: 'smooth' });
   toast.html('locked', chrome.i18n.getMessage('add_panel_auto'));
@@ -755,7 +753,7 @@ function dragDrop(e: DragEvent) {
   dragging.el.classList.remove('dragging');
   dragging.el.classList.remove('fresh');
   if (e.target === els.bin && !dragging.dummy) {
-    els.trash = els.main.querySelector('#trash') || cloneTemplateToTarget('#template_trash', els.main);
+    els.trash = els.main.querySelector('#trash') || util.cloneTemplateToTarget('#template_trash', els.main);
     els.trash.lastElementChild?.append(dragging.el);
     saveChanges();
     toast.html('locked', chrome.i18n.getMessage('locked_moved_to_trash'));
@@ -920,7 +918,7 @@ function prepareContent(html:string) {
 
 function toggleTrash() {
   // ensure trash is the last thing on the screen
-  els.trash = els.main.querySelector('#trash') || cloneTemplateToTarget('#template_trash', els.main);
+  els.trash = els.main.querySelector('#trash') || util.cloneTemplateToTarget('#template_trash', els.main);
   els.main.append(els.trash);
   els.trash.classList.toggle('open');
   if (els.trash.classList.contains('open')) {
@@ -964,16 +962,10 @@ function cloneToDialog(selector:string) {
   dialog.append(clone);
 }
 
-function cloneTemplateToTarget(selector:string, where:HTMLElement) {
-  const clone = cloneTemplate(selector);
-  where.append(clone);
-  return where.lastElementChild! as HTMLElement;
-}
-
 function prepareTrash() {
   els.trash = els.trash || document.querySelector('#trash');
   if (!els.trash) {
-    els.trash = cloneTemplateToTarget('#template_trash', els.main);
+    els.trash = util.cloneTemplateToTarget('#template_trash', els.main);
     els.trash.id = 'trash';
   }
   els.trash.classList.add('invisible');
@@ -1101,7 +1093,7 @@ function migrateLinks() {
 }
 
 async function prepareAll() {
-  await ExtensionStorage.accessor.load();
+  await load();
   els = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
   prepareBookmarks(OPTS, els.bookmarksnav);
   util.prepareCSSVariables(OPTS);

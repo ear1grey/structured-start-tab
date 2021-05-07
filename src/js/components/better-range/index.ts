@@ -20,7 +20,7 @@ function attachStyleSheet(shadow:ShadowRoot) {
   const e = document.createElement('link');
   e.setAttribute('rel', 'stylesheet');
   e.setAttribute('type', 'text/css');
-  e.setAttribute('href', 'js/better-range/index.css');
+  e.setAttribute('href', 'js/components/better-range/index.css');
   shadow.append(e);
 }
 

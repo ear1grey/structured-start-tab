@@ -2,11 +2,9 @@
 
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
-import { OPTS, Options, BooleanOpts, NumberOpts } from './defaults.js';
-import { ExtensionStorage } from './extension-storage.js';
-import * as toast from './toast.js';
-import * as util from './util.js';
-
+import { OPTS, Options, BooleanOpts, NumberOpts, load, write } from './lib/options';
+import * as toast from './lib/toast';
+import * as util from './lib/util';
 
 function setCheckBox(prefs:Options, what: keyof BooleanOpts) {
   const elem = <HTMLInputElement> document.getElementById(what);
@@ -63,19 +61,6 @@ function updatePageWithPrefs(prefs:Options) {
   setValue(prefs, 'fontsize');
 }
 
-interface NonEmptyDocumentFragment extends DocumentFragment {
-  lastElementChild:HTMLElement
-}
-
-export function cloneTemplate(selector:string):NonEmptyDocumentFragment {
-  const template = document.querySelector<HTMLTemplateElement>(selector);
-  if (template && template.content.lastElementChild) {
-    util.localizeHtml(template.content);
-    return document.importNode(template.content, true) as NonEmptyDocumentFragment;
-  }
-  throw new Error('Template not found!');
-}
-
 interface ElAttrs {
   // id:string,
   [key:string]:string
@@ -89,7 +74,7 @@ interface ElAttrs {
   * @param txt - text for the label
   */
 function create(where:Element, type:string, attrs:ElAttrs, txt:string):Element {
-  const elem = cloneTemplate('#template_' + type);
+  const elem = util.cloneTemplate('#template_' + type);
   where.append(elem);
 
   const elemInDoc = where.lastElementChild!;
@@ -148,7 +133,7 @@ function exportHTML() {
 }
 
 function importHTML() {
-  simulateClick('#fileupload');
+  util.simulateClick('#fileupload');
 }
 
 function importLoadedFile(file:ProgressEvent<FileReader>) {
@@ -189,7 +174,7 @@ function resetHTML() {
     exportHTML();
   }
   OPTS.html = chrome.i18n.getMessage('default_message');
-  ExtensionStorage.accessor.write();
+  write();
 }
 
 
@@ -211,7 +196,7 @@ function prepareListeners() {
 
 
 export async function loadOptions() :Promise<void> {
-  await ExtensionStorage.accessor.load();
+  await load();
   createPageWithPrefs(OPTS);
   prepareListeners();
   util.prepareCSSVariables(OPTS);
@@ -224,16 +209,11 @@ export function saveOptions() :void {
   updatePrefsWithPage();
   updatePageWithPrefs(OPTS);
   util.prepareCSSVariables(OPTS);
-  ExtensionStorage.accessor.write();
-}
-
-export function simulateClick(selector:string) :void {
-  const inp = document.querySelector<HTMLElement>(selector);
-  inp?.click();
+  write();
 }
 
 function toggleBookmarks() {
-  simulateClick('#showBookmarksSidebar');
+  util.simulateClick('#showBookmarksSidebar');
 }
 
 function receiveBackgroundMessages(m:{item:string}) {
@@ -243,3 +223,5 @@ function receiveBackgroundMessages(m:{item:string}) {
     default: break;
   }
 }
+
+window.addEventListener('load', loadOptions);

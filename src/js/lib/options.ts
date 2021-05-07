@@ -61,3 +61,18 @@ export const OPTS: Options = {
   html: chrome.i18n.getMessage('default_message'),
   linkStats: {},
 };
+
+
+export function load(): Promise<void> {
+  const dataAsString = localStorage.getItem('structured-start-tab');
+  if (dataAsString) {
+    const data = JSON.parse(dataAsString) as Options;
+    Object.assign(OPTS, data);
+  }
+  return Promise.resolve();
+}
+
+export function write(): Promise<void> {
+  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
+  return Promise.resolve();
+}

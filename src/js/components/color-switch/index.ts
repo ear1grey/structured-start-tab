@@ -1,10 +1,10 @@
-import { BetterRange } from '../better-range/index.js';
+import { BetterRange } from '../better-range/index';
 
 function attachStyleSheet(shadow:ShadowRoot) {
   const e = document.createElement('link');
   e.setAttribute('rel', 'stylesheet');
   e.setAttribute('type', 'text/css');
-  e.setAttribute('href', 'js/color-switch/index.css');
+  e.setAttribute('href', 'js/components/color-switch/index.css');
   shadow.append(e);
 }
 
