@@ -5,7 +5,6 @@ import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import { ColorSwitch } from './components/color-switch/index.js';
-import { version } from './version.js';
 
 
 export interface Elems {
@@ -1123,7 +1122,7 @@ async function prepareAll() {
   prepareTrash();
   prepareBackgroundListener();
   toast.prepare();
-  toast.popup(`Structured Start Tab v${version}`);
+  toast.popup(`Structured Start Tab v${chrome.runtime.getManifest().version}`);
   toast.popup(chrome.i18n.getMessage('popup_toggle_sidebar'));
   tooltip.prepare(OPTS);
   migrateLinks();
