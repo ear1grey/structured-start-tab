@@ -442,17 +442,22 @@ function inDepthBookmarkTree(toTreat: chrome.bookmarks.BookmarkTreeNode, parentP
   }
 }
 
-function toggleCalendarPanel() {
+function toggleAgenda() {
+  if (OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) {
+    toast.html('agenda', chrome.i18n.getMessage('no_agenda_link'));
+    return;
+  }
   let panel = els.main.querySelector('#agendaPanel');
   if (!panel) {
     panel = createPanel(els.main);
     panel.id = 'agendaPanel';
-    panel.firstElementChild!.textContent = 'Agenda';
+    panel.firstElementChild!.textContent = chrome.i18n.getMessage('agenda');
   }
   for (const children of panel.lastElementChild!.children) {
     panel.lastElementChild!.removeChild(children);
   }
-  updateCalendar();
+  console.log(panel.lastElementChild!.children);
+  updateAgenda();
   if (panel.classList.contains('folded')) panel.classList.toggle('folded');
   let e = panel.parentElement;
   while (e && e !== els.main) {
@@ -463,11 +468,12 @@ function toggleCalendarPanel() {
   flash(panel as HTMLElement, 'highlight');
 }
 
-function updateCalendar() {
+function updateAgenda() {
+  if (OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
   const rootPanel = els.main.querySelector('#agendaPanel') as HTMLElement;
   if (!rootPanel) return;
   const xmlHttp = new XMLHttpRequest();
-  xmlHttp.open('GET', OPTS.calendarUrl, false);
+  xmlHttp.open('GET', OPTS.agendaUrl, false);
   xmlHttp.send();
   const events = parseIcs(xmlHttp.responseText);
   for (const event of events) {
@@ -1095,6 +1101,7 @@ function receiveBackgroundMessages(m:{item:string}) {
   switch (m.item) {
     case 'emptytrash': emptyTrash(); break;
     case 'togglebookmarks': toggleBookmarks(); break;
+    case 'toggleAgenda': toggleAgenda(); break;
     case 'toggle-sidebar': toggleBookmarks(); break;
     case 'toggle-heatmap': toggleHeatMap(); break;
     case 'withoutLink': duplicatePanel(false); break;
@@ -1182,7 +1189,7 @@ async function prepareAll() {
   migrateLinks();
   updateTopSites();
   updateBookmarksPanel();
-  toggleCalendarPanel();
+  updateAgenda();
   util.localizeHtml(document);
 }
 

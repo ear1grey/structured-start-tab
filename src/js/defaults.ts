@@ -27,7 +27,7 @@ export interface BooleanOpts {
 export interface StringOpts {
   html: string,
   backup: string,
-  calendarUrl: string,
+  agendaUrl: string,
 }
 
 export interface Options extends NumberOpts, BooleanOpts, StringOpts {}
@@ -56,5 +56,5 @@ export const OPTS: Options = {
   // StringOpts
   backup: '',
   html: chrome.i18n.getMessage('default_message'),
-  calendarUrl: 'https://calendar.google.com/calendar/ical/rpyass%40gmail.com/private-9f00ddf7a0af4a6cef0c29c85f1a1be3/basic.ics',
+  agendaUrl: chrome.i18n.getMessage('default_agenda_link'),
 };

@@ -36,7 +36,6 @@ export function parseIcs(content:string): IcalEvent[] {
     events.push(getEventInfo(strEvent, timeZone));
   }
 
-  console.log(events);
   return events;
 }
 

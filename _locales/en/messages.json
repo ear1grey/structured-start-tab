@@ -251,5 +251,20 @@
   },
   "option_context": {
     "message": "Options"
+  }, 
+  "agenda": {
+    "message": "Agenda"
+  }, 
+  "agenda_url": {
+    "message": "Put a ics link here :"
+  },
+  "default_agenda_link": {
+    "message": "www.ical.xyz/ical.ics"
+  },
+  "no_agenda_link": {
+    "message": "<h1>No link</h1><p>You need to set up an url in the option page before toggle the Agenda Panel</p>"
+  },
+  "toggleagenda": {
+    "message": "Show agenda"
   }
 }

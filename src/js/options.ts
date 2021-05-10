@@ -2,7 +2,7 @@
 
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
-import { OPTS, Options, BooleanOpts, NumberOpts } from './defaults.js';
+import { OPTS, Options, BooleanOpts, NumberOpts, StringOpts } from './defaults.js';
 import * as toast from './toast.js';
 import * as util from './util.js';
 
@@ -25,6 +25,17 @@ function setValue(prefs:Options, what: keyof NumberOpts, defaultValue = 0) {
 function getValue(what: keyof NumberOpts) {
   const elem = <HTMLInputElement> document.getElementById(what);
   OPTS[what] = elem.valueAsNumber;
+}
+
+function setText(prefs:Options, what: keyof StringOpts, defaultValue = '') {
+  const elem = <HTMLInputElement> document.getElementById(what);
+  console.log(prefs[what]);
+  elem.value = prefs[what] || defaultValue;
+}
+
+function getText(what: keyof StringOpts) {
+  const elem = <HTMLInputElement> document.getElementById(what);
+  OPTS[what] = elem.value!;
 }
 
 export function loadOptionsWithPromise() :Promise<void> {
@@ -54,6 +65,7 @@ function updatePrefsWithPage() {
   getValue('showBookmarksLimit');
   getValue('space');
   getValue('fontsize');
+  getText('agendaUrl');
 }
 
 function updatePageWithPrefs(prefs:Options) {
@@ -70,6 +82,7 @@ function updatePageWithPrefs(prefs:Options) {
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
   setValue(prefs, 'fontsize');
+  setText(prefs, 'agendaUrl');
 }
 
 interface NonEmptyDocumentFragment extends DocumentFragment {
@@ -130,6 +143,7 @@ function createPageWithPrefs(prefs:Options) {
     const layout = create(settings, 'section', {}, chrome.i18n.getMessage('layout'));
     const book = create(settings, 'section', {}, chrome.i18n.getMessage('bookmarks'));
     const feed = create(settings, 'section', {}, chrome.i18n.getMessage('messages'));
+    const agenda = create(settings, 'section', {}, chrome.i18n.getMessage('agenda'));
     create(book, 'checkbox', { id: 'showBookmarksSidebar' }, chrome.i18n.getMessage('showBookmarksSidebar'));
     create(book, 'checkbox', { id: 'hideBookmarksInPage' }, chrome.i18n.getMessage('hideBookmarksInPage'));
     create(book, 'number', { id: 'showBookmarksLimit' }, chrome.i18n.getMessage('showBookmarksLimit'));
@@ -143,6 +157,7 @@ function createPageWithPrefs(prefs:Options) {
     create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, chrome.i18n.getMessage('fontsize'));
     create(layout, 'checkbox', { id: 'useCustomScrollbar' }, chrome.i18n.getMessage('useCustomScrollbar'));
     create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
+    create(agenda, 'text', { id: 'agendaUrl' }, chrome.i18n.getMessage('agenda_url'));
   }
   updatePageWithPrefs(prefs);
 }
