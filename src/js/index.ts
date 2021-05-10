@@ -1111,6 +1111,12 @@ function migrateLinks() {
   for (const o of els.main.querySelectorAll('.highlight')) {
     o.classList.remove('highlight');
   }
+
+  /* Ensure no hangover locales in headings that result in panels
+   * that allow a change of name then change back on next load */
+  for (const o of els.main.querySelectorAll<HTMLElement>('[data-locale]')) {
+    delete o.dataset.locale;
+  }
 }
 
 async function prepareAll() {
