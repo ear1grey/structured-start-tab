@@ -1,6 +1,6 @@
 import { loadOptionsWithPromise, simulateClick, cloneTemplate } from './options.js';
 import { Options, OPTS, LinkStats } from './defaults.js';
-import { parseIcs, IcalEvent } from './icalparse.js';
+import { parseIcs } from './icalparse.js';
 import * as toast from './toast.js';
 import * as tooltip from './tooltip.js';
 import * as util from './util.js';
@@ -453,8 +453,8 @@ function toggleAgenda() {
     panel.id = 'agendaPanel';
     panel.firstElementChild!.textContent = chrome.i18n.getMessage('agenda');
   }
-  for (const children of panel.lastElementChild!.children) {
-    panel.lastElementChild!.removeChild(children);
+  while (panel.lastElementChild!.firstChild) {
+    panel.lastElementChild!.removeChild(panel.lastElementChild!.lastChild!);
   }
   console.log(panel.lastElementChild!.children);
   updateAgenda();
@@ -473,12 +473,18 @@ function updateAgenda() {
   const rootPanel = els.main.querySelector('#agendaPanel') as HTMLElement;
   if (!rootPanel) return;
   const xmlHttp = new XMLHttpRequest();
-  xmlHttp.open('GET', OPTS.agendaUrl, false);
-  xmlHttp.send();
-  const events = parseIcs(xmlHttp.responseText);
+  let events;
+  try {
+    xmlHttp.open('GET', OPTS.agendaUrl, false);
+    xmlHttp.send();
+    events = parseIcs(xmlHttp.responseText);
+  } catch (e) {
+    toast.html('agenda', chrome.i18n.getMessage('bad_agenda_link'));
+    return;
+  }
   for (const event of events) {
     const panel = createPanel(rootPanel.lastElementChild as HTMLElement);
-    panel.firstElementChild!.textContent = event.title + ' - ' + event.location;
+    panel.firstElementChild!.textContent = (event.location) ? event.title + ' - ' + event.location : event.title;
     const p = document.createElement('p');
     p.textContent = 'Start : ' + event.startDate + '\n' + 'End : ' + event.endDate + '\n';
     panel.lastElementChild?.append(p);

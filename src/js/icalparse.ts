@@ -33,14 +33,17 @@ export function parseIcs(content:string): IcalEvent[] {
   const events:IcalEvent[] = [];
 
   for (const strEvent of strEvents) {
-    events.push(getEventInfo(strEvent, timeZone));
+    const event = getEventInfo(strEvent, timeZone);
+    if (event) {
+      events.push(event);
+    }
   }
 
   return events;
 }
 
 
-function getEventInfo(strEvent: string[], timeZone: string): IcalEvent {
+function getEventInfo(strEvent: string[], timeZone: string): IcalEvent | null {
   let title = '';
   let dtSTART = '';
   let dtEnd = '';
@@ -58,7 +61,11 @@ function getEventInfo(strEvent: string[], timeZone: string): IcalEvent {
   let hour = parseInt(dtSTART.substr(9, 2));
   let min = parseInt(dtSTART.substr(11, 2));
   let sec = parseInt(dtSTART.substr(13, 2));
-  const startDate = new Date(Date.UTC(year, month, day, hour, min, sec)).toLocaleString('en-GB', { timeZone: timeZone });
+  const startDateNumber = new Date(Date.UTC(year, month, day, hour, min, sec));
+
+  if (startDateNumber < new Date(Date.now())) return null;
+
+  const startDate = startDateNumber.toLocaleString('en-GB', { timeZone: timeZone });
 
   year = parseInt(dtEnd.substr(0, 4));
   month = parseInt(dtEnd.substr(4, 2)) - 1;

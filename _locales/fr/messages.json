@@ -269,5 +269,8 @@
   },
   "toggleagenda": {
     "message": "Afficher l'agenda"
+  },
+  "bad_agenda_link": {
+    "message": "<h1>Mauvais lien</h1><p>Vérifiez l'url de l'agenda dans les options</p>"
   }
 }
