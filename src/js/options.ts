@@ -66,6 +66,7 @@ function updatePrefsWithPage() {
   getValue('space');
   getValue('fontsize');
   getText('agendaUrl');
+  getValue('agendaNb');
 }
 
 function updatePageWithPrefs(prefs:Options) {
@@ -83,6 +84,7 @@ function updatePageWithPrefs(prefs:Options) {
   setValue(prefs, 'space');
   setValue(prefs, 'fontsize');
   setText(prefs, 'agendaUrl');
+  setValue(prefs, 'agendaNb');
 }
 
 interface NonEmptyDocumentFragment extends DocumentFragment {
@@ -158,6 +160,7 @@ function createPageWithPrefs(prefs:Options) {
     create(layout, 'checkbox', { id: 'useCustomScrollbar' }, chrome.i18n.getMessage('useCustomScrollbar'));
     create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
     create(agenda, 'text', { id: 'agendaUrl' }, chrome.i18n.getMessage('agenda_url'));
+    create(agenda, 'number', { id: 'agendaNb' }, chrome.i18n.getMessage('agenda_nb'));
   }
   updatePageWithPrefs(prefs);
 }

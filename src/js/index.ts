@@ -482,11 +482,11 @@ function updateAgenda() {
     toast.html('agenda', chrome.i18n.getMessage('bad_agenda_link'));
     return;
   }
-  for (const event of events) {
+  for (const event of events.slice(0, OPTS.agendaNb)) {
     const panel = createPanel(rootPanel.lastElementChild as HTMLElement);
     panel.firstElementChild!.textContent = (event.location) ? event.title + ' - ' + event.location : event.title;
     const p = document.createElement('p');
-    p.textContent = 'Start : ' + event.startDate + '\n' + 'End : ' + event.endDate + '\n';
+    p.textContent = chrome.i18n.getMessage('start') + ': ' + event.startDate + ' | ' + chrome.i18n.getMessage('end') + ': ' + event.endDate;
     panel.lastElementChild?.append(p);
   }
 }

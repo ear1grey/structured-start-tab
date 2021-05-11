@@ -272,5 +272,14 @@
   },
   "bad_agenda_link": {
     "message": "<h1>Mauvais lien</h1><p>Vérifiez l'url de l'agenda dans les options</p>"
+  },
+  "agenda_nb": {
+    "message": "Entrez le nombre d'événements de votre calendrier que vous souhaitez voir apparaître."
+  },
+  "start": {
+    "message": "Début"
+  },
+  "end": {
+    "message": "Fin"
   }
 }

@@ -10,6 +10,7 @@ export interface NumberOpts {
   showBookmarksLimit: number,
   space: number,
   fontsize: number,
+  agendaNb: number,
 }
 
 export interface BooleanOpts {
@@ -41,6 +42,7 @@ export const OPTS: Options = {
   showBookmarksLimit: 20,
   showToast: 5,
   space: 100,
+  agendaNb: 5,
 
   // BooleanOpts
   hideBookmarksInPage: true,

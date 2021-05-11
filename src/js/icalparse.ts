@@ -3,6 +3,7 @@ export interface IcalEvent {
   startDate: string,
   endDate: string,
   location: string,
+  utcDate: number,
 }
 
 export function parseIcs(content:string): IcalEvent[] {
@@ -39,6 +40,10 @@ export function parseIcs(content:string): IcalEvent[] {
     }
   }
 
+  events.sort(function (a, b) {
+    return b.utcDate - a.utcDate;
+  });
+
   return events;
 }
 
@@ -61,12 +66,13 @@ function getEventInfo(strEvent: string[], timeZone: string): IcalEvent | null {
   let hour = parseInt(dtSTART.substr(9, 2));
   let min = parseInt(dtSTART.substr(11, 2));
   let sec = parseInt(dtSTART.substr(13, 2));
-  const startDateNumber = new Date(Date.UTC(year, month, day, hour, min, sec));
+
+  const utcDate = Date.UTC(year, month, day, hour, min, sec);
+  const startDateNumber = new Date(utcDate);
 
   if (startDateNumber < new Date(Date.now())) return null;
 
   const startDate = startDateNumber.toLocaleString('en-GB', { timeZone: timeZone });
-
   year = parseInt(dtEnd.substr(0, 4));
   month = parseInt(dtEnd.substr(4, 2)) - 1;
   day = parseInt(dtEnd.substr(6, 2));
@@ -80,5 +86,6 @@ function getEventInfo(strEvent: string[], timeZone: string): IcalEvent | null {
     startDate: startDate,
     endDate: endDate,
     location: location,
+    utcDate: utcDate,
   };
 }
