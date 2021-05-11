@@ -453,10 +453,6 @@ function toggleAgenda() {
     panel.id = 'agendaPanel';
     panel.firstElementChild!.textContent = chrome.i18n.getMessage('agenda');
   }
-  while (panel.lastElementChild!.firstChild) {
-    panel.lastElementChild!.removeChild(panel.lastElementChild!.lastChild!);
-  }
-  console.log(panel.lastElementChild!.children);
   updateAgenda();
   if (panel.classList.contains('folded')) panel.classList.toggle('folded');
   let e = panel.parentElement;
@@ -472,6 +468,9 @@ function updateAgenda() {
   if (OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
   const rootPanel = els.main.querySelector('#agendaPanel') as HTMLElement;
   if (!rootPanel) return;
+  while (rootPanel.lastElementChild!.firstChild) {
+    rootPanel.lastElementChild!.removeChild(rootPanel.lastElementChild!.lastChild!);
+  }
   const xmlHttp = new XMLHttpRequest();
   let events;
   try {
