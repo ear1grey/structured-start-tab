@@ -115,7 +115,11 @@ function create(where:Element, type:string, attrs:ElAttrs, txt:string):Element {
     if (txt) {
       const txtElem = elemInDoc.querySelector('[name=text]');
       if (txtElem) {
-        txtElem.textContent = txt;
+        if (txt.includes('<a')) {
+          txtElem.innerHTML = txt;
+        } else {
+          txtElem.textContent = txt;
+        }
       }
     }
     elemInDoc.addEventListener('input', saveOptions);
@@ -130,6 +134,7 @@ function createPageWithPrefs(prefs:Options) {
     const layout = create(settings, 'section', {}, chrome.i18n.getMessage('layout'));
     const book = create(settings, 'section', {}, chrome.i18n.getMessage('bookmarks'));
     const feed = create(settings, 'section', {}, chrome.i18n.getMessage('messages'));
+    const configureShortcut = create(settings, 'section', {}, chrome.i18n.getMessage('configure_shortcut_title'));
     create(book, 'checkbox', { id: 'showBookmarksSidebar' }, chrome.i18n.getMessage('showBookmarksSidebar'));
     create(book, 'checkbox', { id: 'hideBookmarksInPage' }, chrome.i18n.getMessage('hideBookmarksInPage'));
     create(book, 'number', { id: 'showBookmarksLimit' }, chrome.i18n.getMessage('showBookmarksLimit'));
@@ -143,6 +148,7 @@ function createPageWithPrefs(prefs:Options) {
     create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, chrome.i18n.getMessage('fontsize'));
     create(layout, 'checkbox', { id: 'useCustomScrollbar' }, chrome.i18n.getMessage('useCustomScrollbar'));
     create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
+    create(configureShortcut, 'show', { id: 'textConfigure' }, chrome.i18n.getMessage('configure_shortcut'));
   }
   updatePageWithPrefs(prefs);
 }
