@@ -11,6 +11,7 @@ export const OPTS: types.Options = {
   showBookmarksLimit: 20,
   showToast: 5,
   space: 100,
+  agendaNb: 5,
 
   // BooleanOpts
   hideBookmarksInPage: true,
@@ -27,6 +28,7 @@ export const OPTS: types.Options = {
   backup: '',
   html: chrome.i18n.getMessage('default_message'),
   linkStats: {},
+  agendaUrl: chrome.i18n.getMessage('default_agenda_link'),
 };
 
 

@@ -17,6 +17,10 @@ const menuItems:chrome.contextMenus.CreateProperties[] = [
     title: chrome.i18n.getMessage('togglebookmarks'),
   },
   {
+    id: 'toggleAgenda',
+    title: chrome.i18n.getMessage('toggleagenda'),
+  },
+  {
     id: 'topsitespanel',
     title: chrome.i18n.getMessage('topsitespanel'),
   },

@@ -5,7 +5,7 @@ import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import { ColorSwitch } from './components/color-switch/index.js';
-
+import { parseIcs } from './lib/icalparse.js';
 
 export interface Elems {
   [index:string]: HTMLElement,
@@ -438,6 +438,53 @@ function inDepthBookmarkTree(toTreat: chrome.bookmarks.BookmarkTreeNode, parentP
     }
   } else {
     parentPanel.lastElementChild!.append(createExampleLink(toTreat.title, toTreat.url));
+  }
+}
+
+function toggleAgenda() {
+  if (!OPTS.agendaUrl || OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) {
+    toast.html('agenda', chrome.i18n.getMessage('no_agenda_link'));
+    return;
+  }
+  let panel = els.main.querySelector('#agendaPanel');
+  if (!panel) {
+    panel = createPanel(els.main);
+    panel.id = 'agendaPanel';
+    panel.firstElementChild!.textContent = chrome.i18n.getMessage('agenda');
+  }
+  updateAgenda();
+  if (panel.classList.contains('folded')) panel.classList.toggle('folded');
+  let e = panel.parentElement;
+  while (e && e !== els.main) {
+    if (e.classList.contains('folded')) e.classList.toggle('folded');
+    e = e.parentElement;
+  }
+  panel.scrollIntoView({ behavior: 'smooth' });
+  flash(panel as HTMLElement, 'highlight');
+}
+
+async function updateAgenda() {
+  if (!OPTS.agendaUrl || OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
+  const rootPanel = els.main.querySelector('#agendaPanel') as HTMLElement;
+  if (!rootPanel) return;
+  while (rootPanel.lastElementChild!.firstChild) {
+    rootPanel.lastElementChild!.removeChild(rootPanel.lastElementChild!.lastChild!);
+  }
+  let events;
+  try {
+    const response = await fetch(OPTS.agendaUrl);
+    const text = await response.text();
+    events = parseIcs(text);
+  } catch (e) {
+    toast.html('agenda', chrome.i18n.getMessage('bad_agenda_link'));
+    return;
+  }
+  for (const event of events.slice(0, OPTS.agendaNb)) {
+    const panel = createPanel(rootPanel.lastElementChild as HTMLElement);
+    panel.firstElementChild!.textContent = (event.location) ? event.title + ' - ' + event.location : event.title;
+    const p = document.createElement('p');
+    p.textContent = chrome.i18n.getMessage('start') + ': ' + event.startDate + ' | ' + chrome.i18n.getMessage('end') + ': ' + event.endDate;
+    panel.lastElementChild?.append(p);
   }
 }
 
@@ -1051,6 +1098,7 @@ function receiveBackgroundMessages(m:{item:string}) {
   switch (m.item) {
     case 'emptytrash': emptyTrash(); break;
     case 'togglebookmarks': toggleBookmarks(); break;
+    case 'toggleAgenda': toggleAgenda(); break;
     case 'toggle-sidebar': toggleBookmarks(); break;
     case 'toggle-heatmap': toggleHeatMap(); break;
     case 'withoutLink': duplicatePanel(false); break;
@@ -1134,6 +1182,7 @@ async function prepareAll() {
   migrateLinks();
   updateTopSites();
   updateBookmarksPanel();
+  updateAgenda();
   util.localizeHtml(document);
 }
 

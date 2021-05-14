@@ -254,5 +254,32 @@
   },
   "option_context": {
     "message": "Options"
+  }, 
+  "agenda": {
+    "message": "Agenda"
+  }, 
+  "agenda_url": {
+    "message": "Mettez un lien <code>.ics</code> ici :"
+  },
+  "default_agenda_link": {
+    "message": "www.example.org/mycalendar.ics"
+  },
+  "no_agenda_link": {
+    "message": "<h1>Pas de lien</h1><p>Il faut renseigner une URL d'agenda dans les options avant d'activer la panneau Agenda<p>"
+  },
+  "toggleagenda": {
+    "message": "Afficher l'agenda"
+  },
+  "bad_agenda_link": {
+    "message": "<h1>Mauvais lien</h1><p>Vérifiez l'URL de l'agenda dans les options</p>"
+  },
+  "agenda_nb": {
+    "message": "Entrez le nombre d'événements de votre calendrier que vous souhaitez voir apparaître."
+  },
+  "start": {
+    "message": "Début"
+  },
+  "end": {
+    "message": "Fin"
   }
 }

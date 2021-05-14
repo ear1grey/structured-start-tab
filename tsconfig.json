@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./app/js",
-    "sourceMap": true,
+    "sourceMap": false,
     "strictNullChecks": true,
     "strict": true,
     "noImplicitAny": true,

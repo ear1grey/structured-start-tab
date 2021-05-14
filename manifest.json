@@ -11,7 +11,8 @@
     "bookmarks",
     "chrome://favicon/",
     "contextMenus",
-    "topSites"
+    "topSites",
+    "https://calendar.google.com/calendar/*"
   ],
   "background": {
     "persistent": false,

@@ -8,27 +8,46 @@ import * as types from './lib/types.js';
 import { OPTS } from './lib/options.js';
 import * as options from './lib/options.js';
 
-
 function setCheckBox(prefs:types.Options, what: keyof types.BooleanOpts) {
-  const elem = <HTMLInputElement> document.getElementById(what);
+  const elem = document.getElementById(what) as HTMLInputElement;
   elem.checked = prefs[what];
 }
 
 function getCheckBox(what: keyof types.BooleanOpts) {
-  const elem = <HTMLInputElement> document.getElementById(what);
+  const elem = document.getElementById(what) as HTMLInputElement;
   OPTS[what] = elem.checked;
 }
 
 function setValue(prefs:types.Options, what: keyof types.NumberOpts, defaultValue = 0) {
-  const elem = <HTMLInputElement> document.getElementById(what);
+  const elem = document.getElementById(what) as HTMLInputElement;
   elem.valueAsNumber = prefs[what] || defaultValue;
 }
 
 function getValue(what: keyof types.NumberOpts) {
-  const elem = <HTMLInputElement> document.getElementById(what);
+  const elem = document.getElementById(what) as HTMLInputElement;
   OPTS[what] = elem.valueAsNumber;
 }
 
+function setText(prefs:types.Options, what: keyof types.StringOpts, defaultValue = '') {
+  const elem = document.getElementById(what) as HTMLInputElement;
+  elem.value = prefs[what] || defaultValue;
+}
+
+function getText(what: keyof types.StringOpts) {
+  const elem = document.getElementById(what) as HTMLInputElement;
+  OPTS[what] = elem.value!;
+}
+
+export function loadOptionsWithPromise() :Promise<void> {
+  return new Promise((resolve) => {
+    const dataAsString = localStorage.getItem('structured-start-tab');
+    if (dataAsString) {
+      const data = JSON.parse(dataAsString) as types.Options;
+      Object.assign(OPTS, data);
+    }
+    resolve();
+  });
+}
 
 // incorporate the latest values of the page into
 // the OPTS object that gets stored.
@@ -46,6 +65,8 @@ function updatePrefsWithPage() {
   getValue('showBookmarksLimit');
   getValue('space');
   getValue('fontsize');
+  getText('agendaUrl');
+  getValue('agendaNb');
 }
 
 function updatePageWithPrefs(prefs:types.Options) {
@@ -62,6 +83,8 @@ function updatePageWithPrefs(prefs:types.Options) {
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
   setValue(prefs, 'fontsize');
+  setText(prefs, 'agendaUrl');
+  setValue(prefs, 'agendaNb');
 }
 
 interface ElAttrs {
@@ -109,6 +132,7 @@ function createPageWithPrefs(prefs:types.Options) {
     const layout = create(settings, 'section', {}, chrome.i18n.getMessage('layout'));
     const book = create(settings, 'section', {}, chrome.i18n.getMessage('bookmarks'));
     const feed = create(settings, 'section', {}, chrome.i18n.getMessage('messages'));
+    const agenda = create(settings, 'section', {}, chrome.i18n.getMessage('agenda'));
     create(book, 'checkbox', { id: 'showBookmarksSidebar' }, chrome.i18n.getMessage('showBookmarksSidebar'));
     create(book, 'checkbox', { id: 'hideBookmarksInPage' }, chrome.i18n.getMessage('hideBookmarksInPage'));
     create(book, 'number', { id: 'showBookmarksLimit' }, chrome.i18n.getMessage('showBookmarksLimit'));
@@ -122,6 +146,8 @@ function createPageWithPrefs(prefs:types.Options) {
     create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, chrome.i18n.getMessage('fontsize'));
     create(layout, 'checkbox', { id: 'useCustomScrollbar' }, chrome.i18n.getMessage('useCustomScrollbar'));
     create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
+    create(agenda, 'text', { id: 'agendaUrl' }, chrome.i18n.getMessage('agenda_url'));
+    create(agenda, 'number', { id: 'agendaNb' }, chrome.i18n.getMessage('agenda_nb'));
   }
   updatePageWithPrefs(prefs);
 }

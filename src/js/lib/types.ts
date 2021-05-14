@@ -7,6 +7,7 @@ export interface NumberOpts {
   showBookmarksLimit: number,
   space: number,
   fontsize: number,
+  agendaNb: number,
 }
 
 export interface BooleanOpts {
@@ -24,6 +25,7 @@ export interface BooleanOpts {
 export interface StringOpts {
   html: string,
   backup: string,
+  agendaUrl: string,
 }
 
 export interface StatsOpts {
