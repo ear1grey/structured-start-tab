@@ -443,7 +443,7 @@ function inDepthBookmarkTree(toTreat: chrome.bookmarks.BookmarkTreeNode, parentP
 }
 
 function toggleAgenda() {
-  if (OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) {
+  if (!OPTS.agendaUrl || OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) {
     toast.html('agenda', chrome.i18n.getMessage('no_agenda_link'));
     return;
   }
@@ -464,19 +464,18 @@ function toggleAgenda() {
   flash(panel as HTMLElement, 'highlight');
 }
 
-function updateAgenda() {
-  if (OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
+async function updateAgenda() {
+  if (!OPTS.agendaUrl || OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
   const rootPanel = els.main.querySelector('#agendaPanel') as HTMLElement;
   if (!rootPanel) return;
   while (rootPanel.lastElementChild!.firstChild) {
     rootPanel.lastElementChild!.removeChild(rootPanel.lastElementChild!.lastChild!);
   }
-  const xmlHttp = new XMLHttpRequest();
   let events;
   try {
-    xmlHttp.open('GET', OPTS.agendaUrl, false);
-    xmlHttp.send();
-    events = parseIcs(xmlHttp.responseText);
+    const response = await fetch(OPTS.agendaUrl);
+    const text = await response.text();
+    events = parseIcs(text);
   } catch (e) {
     toast.html('agenda', chrome.i18n.getMessage('bad_agenda_link'));
     return;

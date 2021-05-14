@@ -29,7 +29,6 @@ function getValue(what: keyof NumberOpts) {
 
 function setText(prefs:Options, what: keyof StringOpts, defaultValue = '') {
   const elem = <HTMLInputElement> document.getElementById(what);
-  console.log(prefs[what]);
   elem.value = prefs[what] || defaultValue;
 }
 
