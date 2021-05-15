@@ -274,8 +274,47 @@ section section {
   width: min-content;
 }
 
+section.vertical nav {
+  flex-direction: column;
+}
+
+section.vertical section {
+  width:auto;
+}
+
 section section nav {
   flex-wrap: wrap;
+}
+
+.switch input {
+	position: absolute !important;
+	width: 0.0625em;
+}
+
+.switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 79%;
+}
+
+.switch label {
+	text-align: center;
+	padding: 0.5em 1em;
+	margin-right: -0.0625em;
+	border: 0.0625em solid rgba(0, 0, 0, 0.2);
+}
+
+.switch input:checked + label {
+	background-color: lightgrey;
+	box-shadow: none;
+}
+
+#radioHorizontal + label {
+	border-radius: 0.25em 0 0 0.25em;
+}
+
+#radioVertical + label {
+	border-radius: 0 0.25em 0.25em 0;
 }
 
 main * section.folded,

@@ -106,7 +106,9 @@ function editStart(elem:HTMLElement) {
     if (elem.tagName === 'SECTION') {
       cloneToDialog('#template_edit_panel');
       setValue('#editname', elem.firstElementChild!.textContent);
-      (document.querySelector('#editname') as HTMLInputElement).select();
+      if (elem.classList.contains('vertical')) {
+        (document.querySelector('#radioVertical') as HTMLInputElement).checked = true;
+      }
     } else {
       return;
     }
@@ -181,6 +183,11 @@ function editOk() {
   } else {
     if (els.editing.tagName === 'SECTION') {
       els.editing.firstElementChild!.textContent = getValue('#editname');
+      if ((document.querySelector('#radioVertical') as HTMLInputElement).checked) {
+        els.editing.classList.add('vertical');
+      } else {
+        els.editing.classList.remove('vertical');
+      }
     } else {
       return;
     }

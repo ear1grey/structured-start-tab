@@ -87,6 +87,15 @@
     <h2 data-locale="text">Text</h2>
     <color-switch id=fgcol auto="Automatic" manual="Manual" value='#000000'></color-switch>
   </label>
+  <label>
+    <h2 data-locale="direction">Direction</h2>
+    <div class="switch">
+      <input type="radio" id="radioHorizontal" name="direction" checked/>
+      <label for="radioHorizontal" data-locale="horizontal">Horizontal</label>
+      <input type="radio" id="radioVertical" name="direction"/>
+      <label for="radioVertical" data-locale="vertical">Vertical</label>
+    </div>
+  </label>
   <div id=okcancel>
     <button id=editok value="ok">OK</button>
     <button data-locale="cancel" id=editcancel value="cancel">Cancel</button>
