@@ -117,7 +117,11 @@ function create(where:Element, type:string, attrs:ElAttrs, txt:string):Element {
     if (txt) {
       const txtElem = elemInDoc.querySelector('[name=text]');
       if (txtElem) {
-        txtElem.textContent = txt;
+        if (txt.includes('<')) {
+          txtElem.innerHTML = txt;
+        } else {
+          txtElem.textContent = txt;
+        }
       }
     }
     elemInDoc.addEventListener('input', saveOptions);
@@ -133,6 +137,7 @@ function createPageWithPrefs(prefs:types.Options) {
     const book = create(settings, 'section', {}, chrome.i18n.getMessage('bookmarks'));
     const feed = create(settings, 'section', {}, chrome.i18n.getMessage('messages'));
     const agenda = create(settings, 'section', {}, chrome.i18n.getMessage('agenda'));
+    const configureShortcut = create(settings, 'section', {}, chrome.i18n.getMessage('configure_shortcut_title'));
     create(book, 'checkbox', { id: 'showBookmarksSidebar' }, chrome.i18n.getMessage('showBookmarksSidebar'));
     create(book, 'checkbox', { id: 'hideBookmarksInPage' }, chrome.i18n.getMessage('hideBookmarksInPage'));
     create(book, 'number', { id: 'showBookmarksLimit' }, chrome.i18n.getMessage('showBookmarksLimit'));
@@ -148,6 +153,7 @@ function createPageWithPrefs(prefs:types.Options) {
     create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
     create(agenda, 'text', { id: 'agendaUrl' }, chrome.i18n.getMessage('agenda_url'));
     create(agenda, 'number', { id: 'agendaNb' }, chrome.i18n.getMessage('agenda_nb'));
+    create(configureShortcut, 'show', { id: 'textConfigure' }, chrome.i18n.getMessage('configure_shortcut'));
   }
   updatePageWithPrefs(prefs);
 }

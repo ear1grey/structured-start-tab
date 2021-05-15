@@ -39,7 +39,7 @@ export function cloneTemplate(selector:string):NonEmptyDocumentFragment {
     localizeHtml(template.content);
     return document.importNode(template.content, true) as NonEmptyDocumentFragment;
   }
-  throw new Error('Template not found!');
+  throw new Error('Template not found: ' + selector);
 }
 
 export function cloneTemplateToTarget(selector:string, where:HTMLElement) :HTMLElement {
