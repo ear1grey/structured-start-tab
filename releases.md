@@ -1,8 +1,12 @@
 # Release History
 
-Every release for the foreseeable future will be an alpha level release.  This means you can expect an evolving and improving feature set, and also bugs.  Please report bugs and request features via the Suggestions button on the toolbar.
+Every release for the foreseeable future will be an alpha level release.  This means you can expect an evolving and improving feature set, and also bugs.
 
 ## Alpha Releases
+* 1.8.3 Quick fix for not-editing bug (hangover from i18n conversion)
+* 1.8.2 Quick fix for component URL bug
+* 1.8.1 Internal test
+* 1.8.0 [Finesse](https://github.com/ear1grey/structured-start-tab/milestone/14?closed=1)
 * 1.7.0 [i18n](https://github.com/ear1grey/structured-start-tab/milestone/17)
 * 1.6.3 Sidebar on by default.
 * 1.6.2 Tweak landing page again.

@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
     "outDir": "./app/js",
-    "sourceMap": true,
+    "sourceMap": false,
     "strictNullChecks": true,
     "strict": true,
     "noImplicitAny": true,
     "target": "es2020",
     "module": "es2020",
     "allowJs": true,
-    "esModuleInterop": true
-  },
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true
+    },
   "include": [
     "src/js"
   ],

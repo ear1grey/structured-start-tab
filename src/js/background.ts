@@ -17,6 +17,10 @@ const menuItems:chrome.contextMenus.CreateProperties[] = [
     title: chrome.i18n.getMessage('togglebookmarks'),
   },
   {
+    id: 'toggleAgenda',
+    title: chrome.i18n.getMessage('toggleagenda'),
+  },
+  {
     id: 'topsitespanel',
     title: chrome.i18n.getMessage('topsitespanel'),
   },
@@ -56,7 +60,7 @@ const menuItems:chrome.contextMenus.CreateProperties[] = [
 
 const urls = [
   chrome.runtime.getURL('app/index.html'),
-  chrome.runtime.getURL('app/options.html'),
+  chrome.runtime.getURL('app/options-page.html'),
   'chrome://newtab/',
 ];
 

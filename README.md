@@ -2,15 +2,19 @@
 
 A browser extension that replaces the default tab content with a page of organised links.  Works in Google Chrome, Mozilla Firefox and Microsoft Edge.
 
-## Install 
+## Install
 
 * [Chrome Web Store](https://chrome.google.com/webstore/detail/structured-start-tab/pldheaomfiegamcicehmijhaijcocidb)
 
 ## Contribute
 
-* Please add suggestions, feature requests and bug reports to the [issue tracker](https://github.com/ear1grey/structured-start-tab/issues). 
+* Please add suggestions, feature requests and bug reports to the [issue tracker](https://github.com/ear1grey/structured-start-tab/issues).
 * Code contributions are most welcome, please submit a PR.
 * Future release plans can be seen in the [open milestones](https://github.com/ear1grey/structured-start-tab/milestones?state=open)
+
+## Versions
+
+* From version 1.8.0 versions are managed by running `npm version <major|minor|patch>`.  This will increment the version number, rebuild the code and assemble a zip for release.  Prior to running `npm version`, the git working director must be clean (with no uncommitted work) and code must lint without error or the build will fail. After versioning, a git push will be necessary to sync the git tag with GitHub - this push step has purposefully not been automated (yet).
 
 ## License
 

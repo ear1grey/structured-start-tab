@@ -2,36 +2,47 @@
 
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
-import { OPTS, Options, BooleanOpts, NumberOpts } from './defaults.js';
-import * as toast from './toast.js';
-import * as util from './util.js';
+import * as toast from './lib/toast.js';
+import * as util from './lib/util.js';
+import * as types from './lib/types.js';
+import { OPTS } from './lib/options.js';
+import * as options from './lib/options.js';
 
-
-function setCheckBox(prefs:Options, what: keyof BooleanOpts) {
-  const elem = <HTMLInputElement> document.getElementById(what);
+function setCheckBox(prefs:types.Options, what: keyof types.BooleanOpts) {
+  const elem = document.getElementById(what) as HTMLInputElement;
   elem.checked = prefs[what];
 }
 
-function getCheckBox(what: keyof BooleanOpts) {
-  const elem = <HTMLInputElement> document.getElementById(what);
+function getCheckBox(what: keyof types.BooleanOpts) {
+  const elem = document.getElementById(what) as HTMLInputElement;
   OPTS[what] = elem.checked;
 }
 
-function setValue(prefs:Options, what: keyof NumberOpts, defaultValue = 0) {
-  const elem = <HTMLInputElement> document.getElementById(what);
+function setValue(prefs:types.Options, what: keyof types.NumberOpts, defaultValue = 0) {
+  const elem = document.getElementById(what) as HTMLInputElement;
   elem.valueAsNumber = prefs[what] || defaultValue;
 }
 
-function getValue(what: keyof NumberOpts) {
-  const elem = <HTMLInputElement> document.getElementById(what);
+function getValue(what: keyof types.NumberOpts) {
+  const elem = document.getElementById(what) as HTMLInputElement;
   OPTS[what] = elem.valueAsNumber;
+}
+
+function setText(prefs:types.Options, what: keyof types.StringOpts, defaultValue = '') {
+  const elem = document.getElementById(what) as HTMLInputElement;
+  elem.value = prefs[what] || defaultValue;
+}
+
+function getText(what: keyof types.StringOpts) {
+  const elem = document.getElementById(what) as HTMLInputElement;
+  OPTS[what] = elem.value!;
 }
 
 export function loadOptionsWithPromise() :Promise<void> {
   return new Promise((resolve) => {
     const dataAsString = localStorage.getItem('structured-start-tab');
     if (dataAsString) {
-      const data = JSON.parse(dataAsString) as Options;
+      const data = JSON.parse(dataAsString) as types.Options;
       Object.assign(OPTS, data);
     }
     resolve();
@@ -54,9 +65,11 @@ function updatePrefsWithPage() {
   getValue('showBookmarksLimit');
   getValue('space');
   getValue('fontsize');
+  getText('agendaUrl');
+  getValue('agendaNb');
 }
 
-function updatePageWithPrefs(prefs:Options) {
+function updatePageWithPrefs(prefs:types.Options) {
   setCheckBox(prefs, 'lock');
   setCheckBox(prefs, 'allowCollapsingLocked');
   setCheckBox(prefs, 'savePanelStatusLocked');
@@ -70,19 +83,8 @@ function updatePageWithPrefs(prefs:Options) {
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
   setValue(prefs, 'fontsize');
-}
-
-interface NonEmptyDocumentFragment extends DocumentFragment {
-  lastElementChild:HTMLElement
-}
-
-export function cloneTemplate(selector:string):NonEmptyDocumentFragment {
-  const template = document.querySelector<HTMLTemplateElement>(selector);
-  if (template && template.content.lastElementChild) {
-    util.localizeHtml(template.content);
-    return document.importNode(template.content, true) as NonEmptyDocumentFragment;
-  }
-  throw new Error('Template not found!');
+  setText(prefs, 'agendaUrl');
+  setValue(prefs, 'agendaNb');
 }
 
 interface ElAttrs {
@@ -98,7 +100,7 @@ interface ElAttrs {
   * @param txt - text for the label
   */
 function create(where:Element, type:string, attrs:ElAttrs, txt:string):Element {
-  const elem = cloneTemplate('#template_' + type);
+  const elem = util.cloneTemplate('#template_' + type);
   where.append(elem);
 
   const elemInDoc = where.lastElementChild!;
@@ -115,7 +117,11 @@ function create(where:Element, type:string, attrs:ElAttrs, txt:string):Element {
     if (txt) {
       const txtElem = elemInDoc.querySelector('[name=text]');
       if (txtElem) {
-        txtElem.textContent = txt;
+        if (txt.includes('<')) {
+          txtElem.innerHTML = txt;
+        } else {
+          txtElem.textContent = txt;
+        }
       }
     }
     elemInDoc.addEventListener('input', saveOptions);
@@ -124,12 +130,14 @@ function create(where:Element, type:string, attrs:ElAttrs, txt:string):Element {
   return elemInDoc;
 }
 
-function createPageWithPrefs(prefs:Options) {
+function createPageWithPrefs(prefs:types.Options) {
   const settings = document.querySelector('#settings');
   if (settings) {
     const layout = create(settings, 'section', {}, chrome.i18n.getMessage('layout'));
     const book = create(settings, 'section', {}, chrome.i18n.getMessage('bookmarks'));
     const feed = create(settings, 'section', {}, chrome.i18n.getMessage('messages'));
+    const agenda = create(settings, 'section', {}, chrome.i18n.getMessage('agenda'));
+    const configureShortcut = create(settings, 'section', {}, chrome.i18n.getMessage('configure_shortcut_title'));
     create(book, 'checkbox', { id: 'showBookmarksSidebar' }, chrome.i18n.getMessage('showBookmarksSidebar'));
     create(book, 'checkbox', { id: 'hideBookmarksInPage' }, chrome.i18n.getMessage('hideBookmarksInPage'));
     create(book, 'number', { id: 'showBookmarksLimit' }, chrome.i18n.getMessage('showBookmarksLimit'));
@@ -143,6 +151,9 @@ function createPageWithPrefs(prefs:Options) {
     create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, chrome.i18n.getMessage('fontsize'));
     create(layout, 'checkbox', { id: 'useCustomScrollbar' }, chrome.i18n.getMessage('useCustomScrollbar'));
     create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
+    create(agenda, 'text', { id: 'agendaUrl' }, chrome.i18n.getMessage('agenda_url'));
+    create(agenda, 'number', { id: 'agendaNb' }, chrome.i18n.getMessage('agenda_nb'));
+    create(configureShortcut, 'show', { id: 'textConfigure' }, chrome.i18n.getMessage('configure_shortcut'));
   }
   updatePageWithPrefs(prefs);
 }
@@ -157,7 +168,7 @@ function exportHTML() {
 }
 
 function importHTML() {
-  simulateClick('#fileupload');
+  util.simulateClick('#fileupload');
 }
 
 function importLoadedFile(file:ProgressEvent<FileReader>) {
@@ -198,7 +209,7 @@ function resetHTML() {
     exportHTML();
   }
   OPTS.html = chrome.i18n.getMessage('default_message');
-  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
+  options.write();
 }
 
 
@@ -220,7 +231,7 @@ function prepareListeners() {
 
 
 export async function loadOptions() :Promise<void> {
-  await loadOptionsWithPromise();
+  await options.load();
   createPageWithPrefs(OPTS);
   prepareListeners();
   util.prepareCSSVariables(OPTS);
@@ -233,16 +244,11 @@ export function saveOptions() :void {
   updatePrefsWithPage();
   updatePageWithPrefs(OPTS);
   util.prepareCSSVariables(OPTS);
-  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
-}
-
-export function simulateClick(selector:string) :void {
-  const inp = document.querySelector<HTMLElement>(selector);
-  inp?.click();
+  options.write();
 }
 
 function toggleBookmarks() {
-  simulateClick('#showBookmarksSidebar');
+  util.simulateClick('#showBookmarksSidebar');
 }
 
 function receiveBackgroundMessages(m:{item:string}) {
@@ -252,3 +258,5 @@ function receiveBackgroundMessages(m:{item:string}) {
     default: break;
   }
 }
+
+window.addEventListener('load', loadOptions);

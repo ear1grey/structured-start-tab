@@ -260,5 +260,38 @@
   },
   "vertical": {
     "message": "Vertical"
+  }, 
+  "agenda": {
+    "message": "Agenda"
+  }, 
+  "agenda_url": {
+    "message": "Put a <code>.ics</code> link here :"
+  },
+  "default_agenda_link": {
+    "message": "www.example.org/mycalendar.ics"
+  },
+  "no_agenda_link": {
+    "message": "<h1>No link</h1><p>You need to setup a URL in the option page before toggle the Agenda Panel</p>"
+  },
+  "toggleagenda": {
+    "message": "Show agenda"
+  },
+  "bad_agenda_link": {
+    "message": "<h1>Bad link</h1><p>Verify the agenda URL in the options</p>"
+  },
+  "agenda_nb": {
+    "message": "Enter the number of events in your calendar that you want to appear."
+  },
+  "start": {
+    "message": "Start"
+  },
+  "end": {
+    "message": "End"
+  },
+  "configure_shortcut_title": {
+    "message": "Configuring keyboard shortcuts"
+  },
+  "configure_shortcut": {
+    "message": "<p>The keyboard shortcuts used to toggle the sidebar (and other features) can be configured to suit your preferemce.  Depending on your browser the way to do this will be different, so please consult these guides.</p><ul><li><a href=\"https://obie.ai/blog/how-to-add-and-remove-custom-keyboard-shortcuts-and-hotkeys-for-a-chrome-extension-in-5-seconds-flat/\">Chrome</a></li><li><a href=\"https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox\">Firefox</a></li></ul>"
   }
 }

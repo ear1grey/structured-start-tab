@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>Structured Start Tab Options</title>
-<link rel="stylesheet" href="style/options.css">
-<script type=module src="./js/options-start.js"></script>
+<link rel="stylesheet" href="style/options-page.css">
+<script type=module src="./js/options-page.js"></script>
 
 <header>
   <h1>Structured Start Tab Options</h1>
@@ -61,6 +61,19 @@
 <template id="template_range">
   <label name=label>
     <input name=input type=range>
+    <p name=text></p>
+  </label>
+</template>
+
+<template id="template_text">
+  <label name=label>
+    <input name=input type=text>
+    <p name=text></p>
+  </label>
+</template>
+
+<template id="template_show">
+  <label name=label>
     <p name=text></p>
   </label>
 </template>

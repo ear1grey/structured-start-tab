@@ -1,58 +1,59 @@
 {
-    "manifest_version": 2,
-    "version": "1.8.0",
-    "name": "Structured Start Tab",
-    "description": "Show a structured page when a new tab is opened.",
-    "author": "Rich Boakes",
-    "default_locale": "en",
-    "permissions": [
-        "tabs",
-        "storage",
-        "bookmarks",
-        "chrome://favicon/",
-        "contextMenus",
-        "topSites"
-    ],
-    "background": {
-        "persistent": false,
-        "scripts": [
-            "app/js/background.js"
-        ]
+  "manifest_version": 2,
+  "version": "1.8.3",
+  "name": "Structured Start Tab",
+  "description": "Show a structured page when a new tab is opened.",
+  "author": "Rich Boakes",
+  "default_locale": "en",
+  "permissions": [
+    "tabs",
+    "storage",
+    "bookmarks",
+    "chrome://favicon/",
+    "contextMenus",
+    "topSites",
+    "https://calendar.google.com/calendar/*"
+  ],
+  "background": {
+    "persistent": false,
+    "scripts": [
+      "app/js/background.js"
+    ]
+  },
+  "icons": {
+    "16": "app/style/i/16.png",
+    "48": "app/style/i/48.png",
+    "96": "app/style/i/96.png",
+    "128": "app/style/i/128.png",
+    "580": "app/style/i/580.png"
+  },
+  "browser_action": {
+    "default_icon": "app/style/i/48.png"
+  },
+  "chrome_url_overrides": {
+    "newtab": "app/index.html"
+  },
+  "options_ui": {
+    "page": "app/options-page.html"
+  },
+  "web_accessible_resources": [
+    "data/*",
+    "chrome://settings/strings.js"
+  ],
+  "commands": {
+    "toggle-sidebar": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+B",
+        "mac": "MacCtrl+Shift+B"
+      },
+      "description": "Toggle Sidebar"
     },
-    "icons": {
-        "16": "app/style/i/16.png",
-        "48": "app/style/i/48.png",
-        "96": "app/style/i/96.png",
-        "128": "app/style/i/128.png",
-        "580": "app/style/i/580.png"
-    },
-    "browser_action": {
-        "default_icon": "app/style/i/48.png"
-    },
-    "chrome_url_overrides": {
-        "newtab": "app/index.html"
-    },
-    "options_ui": {
-        "page": "app/options.html"
-    },
-    "web_accessible_resources": [
-        "data/*",
-        "chrome://settings/strings.js"
-    ],
-    "commands": {
-        "toggle-sidebar": {
-            "suggested_key": {
-                "default": "Ctrl+Shift+B",
-                "mac": "MacCtrl+Shift+B"
-            },
-            "description": "Toggle Sidebar"
-        },
-        "toggle-heatmap": {
-            "suggested_key": {
-                "default": "Ctrl+Shift+I",
-                "mac": "MacCtrl+Shift+I"
-            },
-            "description": "Toggle HeatMap"
-        }
+    "toggle-heatmap": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+I",
+        "mac": "MacCtrl+Shift+I"
+      },
+      "description": "Toggle HeatMap"
     }
+  }
 }

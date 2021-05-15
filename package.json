@@ -1,6 +1,6 @@
 {
   "name": "structured-start-tab",
-  "version": "1.8.0",
+  "version": "1.8.3",
   "description": "Structured Start Tab",
   "author": "Rich Boakes <rich@boakes.org>",
   "contributors": [
@@ -13,11 +13,13 @@
   "main": "index.js",
   "scripts": {
     "lint": "npx eslint src --ext .js,.jsx,.ts,.tsx",
-    "build": "node autobuild;rm -rf app && mkdir app && cp -R src/* app && tsc; find app -name \\*.ts -delete",
+    "build": "rm -rf app && mkdir app && cp -R src/* app && tsc; find app -name \\*.ts -delete",
     "zip": "rm sst.zip;rm sst.xpi;find . -name '.DS_Store' -type f -delete;zip -u -8 -v -r sst.zip app _locales manifest.json release.md;cp sst.zip sst.xpi;echo 'bump versions in releases.md, manifest.json and package.json...'",
     "all": "npm run build;npm run zip;",
     "test-moz": "web-ext --firefox=firefoxdeveloperedition run ",
-    "sync-version": "node autobuild.js"
+    "preversion": "npm run lint",
+    "version": "node update-manifest-version.js; git add manifest.json;",
+    "postversion": "npm run all"
   },
   "repository": {
     "type": "git",

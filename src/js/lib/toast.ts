@@ -1,10 +1,9 @@
-import { OPTS } from './defaults.js';
+import { OPTS } from './options.js';
 
 function isDupe(msg: string) {
   const slices = document.querySelectorAll<HTMLElement>('#toast>.toast');
-  for (const slice of slices) {
-    if (slice.dataset.name === msg || slice.textContent === msg) return true;
-  }
+  const slice = slices.item(slices.length - 1);
+  if (slice && (slice.dataset.name === msg || slice.textContent === msg)) return true;
   return false;
 }
 
