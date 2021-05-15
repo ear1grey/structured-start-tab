@@ -250,7 +250,7 @@ section.hide nav {
 
 main>section>nav,
 main>section {
-  flex-wrap: none;
+  flex-wrap: nowrap;
   margin: var(--medium);
 }
 
