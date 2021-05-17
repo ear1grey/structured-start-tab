@@ -824,10 +824,6 @@ function dragDrop(e: DragEvent) {
       extractDataFromDrop(e);
     }
     // handle all cases
-    if (dragging.el.classList.contains('new')) {
-      dragging.el.classList.remove('new');
-      if (OPTS.editOnNewDrop) editStart(dragging.el);
-    }
     saveChanges();
   }
 }
@@ -847,6 +843,12 @@ function dragEnd() {
   dragging.el.classList.remove('dragging');
   dragging.el.classList.remove('fresh');
   // event must have been cancelled because `dragging` should be reset on drop
+
+  if (dragging.el.classList.contains('new')) {
+    const elem = document.querySelector('.new') as HTMLElement;
+    if (OPTS.editOnNewDrop) editStart(elem);
+    elem.classList.remove('new');
+  }
 
   if (dragging.dummy) {
     dragging.dummy.remove();
