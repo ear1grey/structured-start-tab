@@ -5,6 +5,7 @@ import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import { ColorSwitch } from './components/color-switch/index.js';
+import { updateAgendaBackground } from './background.js';
 
 export interface Elems {
   [index:string]: HTMLElement,
@@ -471,6 +472,14 @@ function toggleAgenda() {
 
 function updateAgenda() {
   if (!OPTS.agendaUrl || OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
+  if (OPTS.events.length === 0) {
+    updateAgendaBackground().then(displayNewAgenda);
+  } else {
+    displayNewAgenda();
+  }
+}
+
+function displayNewAgenda() {
   const rootPanel = els.main.querySelector('#agendaPanel') as HTMLElement;
   if (!rootPanel) return;
   while (rootPanel.lastElementChild!.firstChild) {

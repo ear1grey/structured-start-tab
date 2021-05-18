@@ -118,7 +118,7 @@ function commandReceived(command:string) {
   });
 }
 
-async function updateAgenda() {
+export async function updateAgendaBackground(): Promise<void> {
   await options.load();
   if (!OPTS.agendaUrl || OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
   try {
@@ -131,6 +131,6 @@ async function updateAgenda() {
 
 chrome.runtime.onInstalled.addListener(menuInstaller);
 chrome.contextMenus.onClicked.addListener(menuClicked);
-chrome.alarms.onAlarm.addListener(updateAgenda);
+chrome.alarms.onAlarm.addListener(updateAgendaBackground);
 
 chrome.commands.onCommand.addListener(commandReceived);
