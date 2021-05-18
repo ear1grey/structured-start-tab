@@ -1,12 +1,10 @@
-export interface IcalEvent {
-  title: string,
-  startDate: string,
-  endDate: string,
-  location: string,
-  utcDate: number,
-}
+import * as options from './options.js';
+import { OPTS } from './options.js';
 
-export function parseIcs(content:string): IcalEvent[] {
+import { IcalEvent } from './types';
+
+
+export async function parseIcs(content:string): Promise<void> {
   const lines = content.split('\r\n');
   const index = [];
   const indexEnd = [];
@@ -44,7 +42,9 @@ export function parseIcs(content:string): IcalEvent[] {
     return b.utcDate - a.utcDate;
   });
 
-  return events;
+  await options.load();
+  OPTS.events = events;
+  options.write();
 }
 
 
