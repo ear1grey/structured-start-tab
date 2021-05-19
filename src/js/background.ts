@@ -102,7 +102,7 @@ function menuInstaller(details: chrome.runtime.InstalledDetails) {
     chrome.storage.local.clear();
   }
   chrome.alarms.create('agendaUpdate', {
-    periodInMinutes: 1,
+    periodInMinutes: 15,
   });
 }
 
