@@ -293,5 +293,14 @@
   },
   "configure_shortcut": {
     "message": "<p>The keyboard shortcuts used to toggle the sidebar (and other features) can be configured to suit your preferemce.  Depending on your browser the way to do this will be different, so please consult these guides.</p><ul><li><a href=\"https://obie.ai/blog/how-to-add-and-remove-custom-keyboard-shortcuts-and-hotkeys-for-a-chrome-extension-in-5-seconds-flat/\">Chrome</a></li><li><a href=\"https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox\">Firefox</a></li></ul>"
+  },
+  "title_agenda_nb": {
+    "message": "Number of words to be displayed from the event title"
+  },
+  "showLocationAgenda": {
+    "message": "Display the location of the event"
+  },
+  "showEndDateAgenda": {
+    "message": "Display the end date of the event"
   }
 }

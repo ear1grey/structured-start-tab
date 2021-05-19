@@ -12,6 +12,7 @@ export const OPTS: types.Options = {
   showToast: 5,
   space: 100,
   agendaNb: 5,
+  titleAgendaNb: 5,
 
   // BooleanOpts
   hideBookmarksInPage: true,
@@ -23,6 +24,8 @@ export const OPTS: types.Options = {
   editOnNewDrop: true,
   allowCollapsingLocked: true,
   savePanelStatusLocked: false,
+  showLocationAgenda: true,
+  showEndDateAgenda: true,
 
   // StringOpts
   backup: '',
