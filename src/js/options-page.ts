@@ -61,12 +61,15 @@ function updatePrefsWithPage() {
   getCheckBox('proportionalSections');
   getCheckBox('useCustomScrollbar');
   getCheckBox('editOnNewDrop');
+  getCheckBox('showLocationAgenda');
+  getCheckBox('showEndDateAgenda');
   getValue('showToast');
   getValue('showBookmarksLimit');
   getValue('space');
   getValue('fontsize');
   getText('agendaUrl');
   getValue('agendaNb');
+  getValue('titleAgendaNb');
 }
 
 function updatePageWithPrefs(prefs:types.Options) {
@@ -79,12 +82,15 @@ function updatePageWithPrefs(prefs:types.Options) {
   setCheckBox(prefs, 'proportionalSections');
   setCheckBox(prefs, 'useCustomScrollbar');
   setCheckBox(prefs, 'editOnNewDrop');
+  setCheckBox(prefs, 'showLocationAgenda');
+  setCheckBox(prefs, 'showEndDateAgenda');
   setValue(prefs, 'showToast');
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
   setValue(prefs, 'fontsize');
   setText(prefs, 'agendaUrl');
   setValue(prefs, 'agendaNb');
+  setValue(prefs, 'titleAgendaNb');
 }
 
 interface ElAttrs {
@@ -153,6 +159,9 @@ function createPageWithPrefs(prefs:types.Options) {
     create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
     create(agenda, 'text', { id: 'agendaUrl' }, chrome.i18n.getMessage('agenda_url'));
     create(agenda, 'number', { id: 'agendaNb' }, chrome.i18n.getMessage('agenda_nb'));
+    create(agenda, 'number', { id: 'titleAgendaNb' }, chrome.i18n.getMessage('title_agenda_nb'));
+    create(agenda, 'checkbox', { id: 'showLocationAgenda' }, chrome.i18n.getMessage('showLocationAgenda'));
+    create(agenda, 'checkbox', { id: 'showEndDateAgenda' }, chrome.i18n.getMessage('showEndDateAgenda'));
     create(configureShortcut, 'show', { id: 'textConfigure' }, chrome.i18n.getMessage('configure_shortcut'));
   }
   updatePageWithPrefs(prefs);

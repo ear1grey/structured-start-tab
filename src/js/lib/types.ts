@@ -16,6 +16,7 @@ export interface NumberOpts {
   space: number,
   fontsize: number,
   agendaNb: number,
+  titleAgendaNb: number,
 }
 
 export interface BooleanOpts {
@@ -28,6 +29,8 @@ export interface BooleanOpts {
   editOnNewDrop: boolean,
   allowCollapsingLocked: boolean,
   savePanelStatusLocked: boolean,
+  showLocationAgenda: boolean,
+  showEndDateAgenda: boolean,
 }
 
 export interface StringOpts {
