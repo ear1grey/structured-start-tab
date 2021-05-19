@@ -39,7 +39,7 @@ export async function parseIcs(content:string): Promise<void> {
   }
 
   events.sort(function (a, b) {
-    return b.utcDate - a.utcDate;
+    return a.utcDate - b.utcDate;
   });
 
   await options.load();
