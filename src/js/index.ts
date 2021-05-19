@@ -5,7 +5,7 @@ import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import { ColorSwitch } from './components/color-switch/index.js';
-import { parseIcs } from './lib/icalparse.js';
+import { updateAgendaBackground } from './background.js';
 
 export interface Elems {
   [index:string]: HTMLElement,
@@ -472,30 +472,23 @@ function toggleAgenda() {
 
 async function updateAgenda() {
   if (!OPTS.agendaUrl || OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
+  if (OPTS.events.length === 0) {
+    await updateAgendaBackground();
+    displayNewAgenda();
+  } else {
+    displayNewAgenda();
+  }
+}
+
+function displayNewAgenda() {
   const rootPanel = els.main.querySelector('#agendaPanel') as HTMLElement;
   if (!rootPanel) return;
   while (rootPanel.lastElementChild!.firstChild) {
     rootPanel.lastElementChild!.removeChild(rootPanel.lastElementChild!.lastChild!);
   }
-  let events;
-  try {
-    const response = await fetch(OPTS.agendaUrl);
-    const text = await response.text();
-    events = parseIcs(text);
-  } catch (e) {
-    toast.html('agenda', chrome.i18n.getMessage('bad_agenda_link'));
-    return;
-  }
-  for (const event of events.slice(0, OPTS.agendaNb)) {
-    const panel = createPanel(rootPanel.lastElementChild as HTMLElement, false);
-    const titleSplit = event.title.split(' ');
-    let title = titleSplit.slice(0, OPTS.titleAgendaNb).join(' ');
-    if (titleSplit.length > OPTS.titleAgendaNb) {
-      title += ' ...';
-      panel.firstElementChild!.setAttribute('data-info', event.title);
-      tooltip.setTooltip(panel.firstElementChild! as HTMLElement);
-    }
-    panel.firstElementChild!.textContent = (event.location && OPTS.showLocationAgenda) ? title + ' - ' + event.location : title;
+  for (const event of OPTS.events.slice(0, OPTS.agendaNb)) {
+    const panel = createPanel(rootPanel.lastElementChild as HTMLElement);
+    panel.firstElementChild!.textContent = (event.location) ? event.title + ' - ' + event.location : event.title;
     const p = document.createElement('p');
     if (event.startDate.includes('Invalid') || event.endDate.includes('Invalid')) console.error('Invalid Date : ' + event.title);
     else {

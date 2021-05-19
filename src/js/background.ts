@@ -1,3 +1,7 @@
+import { parseIcs } from './lib/icalparse.js';
+import { OPTS } from './lib/options.js';
+import * as options from './lib/options.js';
+
 // define the menu item
 const menuItems:chrome.contextMenus.CreateProperties[] = [
   {
@@ -97,6 +101,9 @@ function menuInstaller(details: chrome.runtime.InstalledDetails) {
     });
     chrome.storage.local.clear();
   }
+  chrome.alarms.create('agendaUpdate', {
+    periodInMinutes: 15,
+  });
 }
 
 function commandReceived(command:string) {
@@ -111,7 +118,19 @@ function commandReceived(command:string) {
   });
 }
 
+export async function updateAgendaBackground(): Promise<void> {
+  await options.load();
+  if (!OPTS.agendaUrl || OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
+  try {
+    const response = await fetch(OPTS.agendaUrl);
+    const text = await response.text();
+    await parseIcs(text);
+  } catch (e) {}
+  await options.write();
+}
+
 chrome.runtime.onInstalled.addListener(menuInstaller);
 chrome.contextMenus.onClicked.addListener(menuClicked);
+chrome.alarms.onAlarm.addListener(updateAgendaBackground);
 
 chrome.commands.onCommand.addListener(commandReceived);

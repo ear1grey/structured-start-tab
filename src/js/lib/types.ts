@@ -2,6 +2,14 @@ export interface LinkStats {
   [url:string]:number,
 }
 
+export interface IcalEvent {
+  title: string,
+  startDate: string,
+  endDate: string,
+  location: string,
+  utcDate: number,
+}
+
 export interface NumberOpts {
   showToast: number,
   showBookmarksLimit: number,
@@ -31,8 +39,9 @@ export interface StringOpts {
   agendaUrl: string,
 }
 
-export interface StatsOpts {
-  linkStats: LinkStats
+export interface ObjectOpts {
+  linkStats: LinkStats,
+  events: IcalEvent[],
 }
 
-export interface Options extends NumberOpts, BooleanOpts, StringOpts, StatsOpts {}
+export interface Options extends NumberOpts, BooleanOpts, StringOpts, ObjectOpts {}

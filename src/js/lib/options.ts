@@ -31,6 +31,7 @@ export const OPTS: types.Options = {
   backup: '',
   html: chrome.i18n.getMessage('default_message'),
   linkStats: {},
+  events: [],
   agendaUrl: chrome.i18n.getMessage('default_agenda_link'),
 };
 

@@ -6,8 +6,8 @@
   "contributors": [
     "Rich Boakes <rich@boakes.org>",
     "Jacek Kopecký <jacek@jacek.cz>",
-    "https://github.com/toto101230",
-    "https://github.com/YassineSMR"
+    "Thomas PIENNE <https://github.com/toto101230>",
+    "Yassine SMARA <yassine.smara@laposte.net>"
   ],
   "license": "MPL-2.0",
   "main": "index.js",

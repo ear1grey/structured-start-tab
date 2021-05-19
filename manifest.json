@@ -12,13 +12,12 @@
     "chrome://favicon/",
     "contextMenus",
     "topSites",
-    "https://calendar.google.com/calendar/*"
+    "https://calendar.google.com/calendar/*",
+    "alarms"
   ],
   "background": {
     "persistent": false,
-    "scripts": [
-      "app/js/background.js"
-    ]
+    "page": "app/background.html"
   },
   "icons": {
     "16": "app/style/i/16.png",
