@@ -41,7 +41,7 @@ export function parseIcs(content:string): IcalEvent[] {
   }
 
   events.sort(function (a, b) {
-    return b.utcDate - a.utcDate;
+    return a.utcDate - b.utcDate;
   });
 
   return events;

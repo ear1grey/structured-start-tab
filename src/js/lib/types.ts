@@ -8,6 +8,7 @@ export interface NumberOpts {
   space: number,
   fontsize: number,
   agendaNb: number,
+  titleAgendaNb: number,
 }
 
 export interface BooleanOpts {

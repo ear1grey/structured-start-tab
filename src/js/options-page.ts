@@ -67,6 +67,7 @@ function updatePrefsWithPage() {
   getValue('fontsize');
   getText('agendaUrl');
   getValue('agendaNb');
+  getValue('titleAgendaNb');
 }
 
 function updatePageWithPrefs(prefs:types.Options) {
@@ -85,6 +86,7 @@ function updatePageWithPrefs(prefs:types.Options) {
   setValue(prefs, 'fontsize');
   setText(prefs, 'agendaUrl');
   setValue(prefs, 'agendaNb');
+  setValue(prefs, 'titleAgendaNb');
 }
 
 interface ElAttrs {
@@ -153,6 +155,7 @@ function createPageWithPrefs(prefs:types.Options) {
     create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
     create(agenda, 'text', { id: 'agendaUrl' }, chrome.i18n.getMessage('agenda_url'));
     create(agenda, 'number', { id: 'agendaNb' }, chrome.i18n.getMessage('agenda_nb'));
+    create(agenda, 'number', { id: 'titleAgendaNb' }, chrome.i18n.getMessage('title_agenda_nb'));
     create(configureShortcut, 'show', { id: 'textConfigure' }, chrome.i18n.getMessage('configure_shortcut'));
   }
   updatePageWithPrefs(prefs);

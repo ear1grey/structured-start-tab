@@ -488,7 +488,14 @@ async function updateAgenda() {
   }
   for (const event of events.slice(0, OPTS.agendaNb)) {
     const panel = createPanel(rootPanel.lastElementChild as HTMLElement, false);
-    panel.firstElementChild!.textContent = (event.location) ? event.title + ' - ' + event.location : event.title;
+    const titleSplit = event.title.split(' ');
+    let title = titleSplit.slice(0, OPTS.titleAgendaNb).join(' ');
+    if (titleSplit.length > OPTS.titleAgendaNb) {
+      title += ' ...';
+      panel.firstElementChild!.setAttribute('data-info', event.title);
+      tooltip.setTooltip(panel.firstElementChild! as HTMLElement);
+    }
+    panel.firstElementChild!.textContent = (event.location) ? title + ' - ' + event.location : title;
     const p = document.createElement('p');
     if (event.startDate.includes('Invalid') || event.endDate.includes('Invalid')) console.error('Invalid Date : ' + event.title);
     else p.textContent = chrome.i18n.getMessage('start') + ': ' + event.startDate + ' | ' + chrome.i18n.getMessage('end') + ': ' + event.endDate;

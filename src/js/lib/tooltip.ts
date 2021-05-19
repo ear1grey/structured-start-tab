@@ -51,3 +51,12 @@ export function prepare(O: types.Options, selector = '[data-info]') :void {
   document.body.append(tip);
   hide();
 }
+
+export function setTooltip(elem: HTMLElement) :void {
+  elem.addEventListener('mousemove', reposition);
+  elem.addEventListener('mouseout', hide);
+  tip = document.createElement('p');
+  tip.id = 'tinytooltip';
+  document.body.append(tip);
+  hide();
+}
