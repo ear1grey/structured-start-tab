@@ -354,13 +354,15 @@ function addLink(target? : HTMLElement) {
   flash(a, 'highlight');
 }
 
-function createPanel(target : HTMLElement) {
+function createPanel(target : HTMLElement, animation = true) {
   const div = util.cloneTemplateToTarget('#template_panel', target);
   div.firstElementChild!.textContent = chrome.i18n.getMessage('panel');
-  div.scrollIntoView({ behavior: 'smooth' });
-  toast.html('addpanel', chrome.i18n.getMessage('add_panel_auto'));
-  div.classList.add('flash');
-  div.addEventListener('animationend', () => { div.classList.remove('flash'); });
+  if (animation) {
+    div.scrollIntoView({ behavior: 'smooth' });
+    toast.html('addpanel', chrome.i18n.getMessage('add_panel_auto'));
+    div.classList.add('flash');
+    div.addEventListener('animationend', () => { div.classList.remove('flash'); });
+  }
   return div;
 }
 
@@ -455,7 +457,7 @@ function toggleAgenda() {
   }
   let panel = els.main.querySelector('#agendaPanel');
   if (!panel) {
-    panel = createPanel(els.main);
+    panel = createPanel(els.main, false);
     panel.id = 'agendaPanel';
     panel.firstElementChild!.textContent = chrome.i18n.getMessage('agenda');
   }
@@ -466,8 +468,6 @@ function toggleAgenda() {
     if (e.classList.contains('folded')) e.classList.toggle('folded');
     e = e.parentElement;
   }
-  panel.scrollIntoView({ behavior: 'smooth' });
-  flash(panel as HTMLElement, 'highlight');
 }
 
 async function updateAgenda() {
@@ -487,10 +487,11 @@ async function updateAgenda() {
     return;
   }
   for (const event of events.slice(0, OPTS.agendaNb)) {
-    const panel = createPanel(rootPanel.lastElementChild as HTMLElement);
+    const panel = createPanel(rootPanel.lastElementChild as HTMLElement, false);
     panel.firstElementChild!.textContent = (event.location) ? event.title + ' - ' + event.location : event.title;
     const p = document.createElement('p');
-    p.textContent = chrome.i18n.getMessage('start') + ': ' + event.startDate + ' | ' + chrome.i18n.getMessage('end') + ': ' + event.endDate;
+    if (event.startDate.includes('Invalid') || event.endDate.includes('Invalid')) console.error('Invalid Date : ' + event.title);
+    else p.textContent = chrome.i18n.getMessage('start') + ': ' + event.startDate + ' | ' + chrome.i18n.getMessage('end') + ': ' + event.endDate;
     panel.lastElementChild?.append(p);
   }
 }
