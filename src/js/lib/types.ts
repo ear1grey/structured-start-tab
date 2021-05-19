@@ -21,6 +21,8 @@ export interface BooleanOpts {
   editOnNewDrop: boolean,
   allowCollapsingLocked: boolean,
   savePanelStatusLocked: boolean,
+  showLocationAgenda: boolean,
+  showEndDateAgenda: boolean,
 }
 
 export interface StringOpts {

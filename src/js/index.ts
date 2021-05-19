@@ -495,10 +495,13 @@ async function updateAgenda() {
       panel.firstElementChild!.setAttribute('data-info', event.title);
       tooltip.setTooltip(panel.firstElementChild! as HTMLElement);
     }
-    panel.firstElementChild!.textContent = (event.location) ? title + ' - ' + event.location : title;
+    panel.firstElementChild!.textContent = (event.location && OPTS.showLocationAgenda) ? title + ' - ' + event.location : title;
     const p = document.createElement('p');
     if (event.startDate.includes('Invalid') || event.endDate.includes('Invalid')) console.error('Invalid Date : ' + event.title);
-    else p.textContent = chrome.i18n.getMessage('start') + ': ' + event.startDate + ' | ' + chrome.i18n.getMessage('end') + ': ' + event.endDate;
+    else {
+      p.textContent = chrome.i18n.getMessage('start') + ': ' + event.startDate;
+      if (OPTS.showEndDateAgenda) p.textContent += ' | ' + chrome.i18n.getMessage('end') + ': ' + event.endDate;
+    }
     panel.lastElementChild?.append(p);
   }
 }

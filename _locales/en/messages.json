@@ -296,5 +296,11 @@
   },
   "title_agenda_nb": {
     "message": "Number of words to be displayed from the event title"
+  },
+  "showLocationAgenda": {
+    "message": "Display the location of the event"
+  },
+  "showEndDateAgenda": {
+    "message": "Display the end date of the event"
   }
 }

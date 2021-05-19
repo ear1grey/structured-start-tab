@@ -24,6 +24,8 @@ export const OPTS: types.Options = {
   editOnNewDrop: true,
   allowCollapsingLocked: true,
   savePanelStatusLocked: false,
+  showLocationAgenda: true,
+  showEndDateAgenda: true,
 
   // StringOpts
   backup: '',
