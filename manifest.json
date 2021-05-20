@@ -56,8 +56,8 @@
     },
     "toggle-presentation": {
       "suggested_key": {
-        "default": "Ctrl+Shift+P",
-        "mac": "MacCtrl+Shift+P"
+        "default": "Ctrl+Shift+L",
+        "mac": "MacCtrl+Shift+L"
       },
       "description": "Toggle presentation mode"
     }
