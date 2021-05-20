@@ -109,6 +109,9 @@ function editStart(elem:HTMLElement) {
       if (elem.classList.contains('vertical')) {
         (document.querySelector('#radioVertical') as HTMLInputElement).checked = true;
       }
+      if (elem.classList.contains('private')) {
+        (document.querySelector('#privateInput') as HTMLInputElement).checked = true;
+      }
     } else {
       return;
     }
@@ -187,6 +190,12 @@ function editOk() {
         els.editing.classList.add('vertical');
       } else {
         els.editing.classList.remove('vertical');
+      }
+      if ((document.querySelector('#privateInput') as HTMLInputElement).checked) {
+        els.editing.classList.add('private');
+      } else {
+        els.editing.classList.remove('private');
+        els.editing.classList.remove('blur');
       }
     } else {
       return;
@@ -1107,6 +1116,20 @@ function lock() {
   }
 }
 
+function togglePresentation() {
+  const panels = document.querySelectorAll('.private');
+  els.main.classList.toggle('private-on');
+  if (els.main.classList.contains('private-on')) {
+    for (const p of panels) {
+      p.classList.add('blur');
+    }
+  } else {
+    for (const p of panels) {
+      p.classList.remove('blur');
+    }
+  }
+}
+
 function receiveBackgroundMessages(m:{item:string}) {
   switch (m.item) {
     case 'emptytrash': emptyTrash(); break;
@@ -1114,6 +1137,7 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'toggleAgenda': toggleAgenda(); break;
     case 'toggle-sidebar': toggleBookmarks(); break;
     case 'toggle-heatmap': toggleHeatMap(); break;
+    case 'toggle-presentation': togglePresentation(); break;
     case 'withoutLink': duplicatePanel(false); break;
     case 'withLink': duplicatePanel(true); break;
     case 'topsitespanel': addTopSitesPanel(); break;

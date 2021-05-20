@@ -17,6 +17,10 @@ const menuItems:chrome.contextMenus.CreateProperties[] = [
     title: chrome.i18n.getMessage('lock_context'),
   },
   {
+    id: 'toggle-presentation',
+    title: chrome.i18n.getMessage('presentation_mode'),
+  },
+  {
     id: 'togglebookmarks',
     title: chrome.i18n.getMessage('togglebookmarks'),
   },

@@ -305,5 +305,11 @@
   },
   "showEndDateAgenda": {
     "message": "Afficher la date de fin de l'événement"
+  },
+  "private": {
+    "message": "Panneau privé"
+  },
+  "presentation_mode": {
+    "message": "Activer le mode présentation"
   }
 }

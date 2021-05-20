@@ -302,5 +302,11 @@
   },
   "showEndDateAgenda": {
     "message": "Display the end date of the event"
+  },
+  "private": {
+    "message": "Pannel private"
+  },
+  "presentation_mode": {
+    "message": "Toggle presentation mode"
   }
 }
