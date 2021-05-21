@@ -80,6 +80,7 @@ function getEventInfo(strEvent: string[], timeZone: string): IcalEvent | null {
   const startDateNumber = new Date(utcDate);
   if (startDateNumber < new Date(Date.now())) return null;
   result.startDate = startDateNumber.toLocaleString('en-GB', { timeZone: timeZone });
+  result.title = getDateString(startDateNumber) + result.title;
 
   year = parseInt(dtEnd.substr(0, 4));
   month = parseInt(dtEnd.substr(4, 2)) - 1;
@@ -90,4 +91,19 @@ function getEventInfo(strEvent: string[], timeZone: string): IcalEvent | null {
   result.endDate = new Date(Date.UTC(year, month, day, hour, min, sec)).toLocaleString('en-GB', { timeZone: timeZone });
 
   return result;
+}
+
+function getDateString(date:Date) : string {
+  const today = new Date();
+  const a = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const b = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  const diff = Math.floor((b - a) / (1000 * 60 * 60 * 24));
+
+  if (diff >= 1) {
+    return '+' + diff.toString() + ' ';
+  }
+
+  if (isNaN(date.getHours())) return '';
+
+  return String(date.getHours()) + ':' + String(date.getMinutes()) + ' ';
 }

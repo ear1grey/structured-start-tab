@@ -474,10 +474,8 @@ async function updateAgenda() {
   if (!OPTS.agendaUrl || OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
   if (OPTS.events.length === 0) {
     await updateAgendaBackground();
-    displayNewAgenda();
-  } else {
-    displayNewAgenda();
   }
+  displayNewAgenda();
 }
 
 function displayNewAgenda() {
