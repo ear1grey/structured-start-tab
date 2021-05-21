@@ -105,5 +105,5 @@ function getDateString(date:Date) : string {
 
   if (isNaN(date.getHours())) return '';
 
-  return String(date.getHours()) + ':' + String(date.getMinutes()) + ' ';
+  return String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0') + ' ';
 }
