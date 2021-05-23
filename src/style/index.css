@@ -74,7 +74,7 @@ main {
 }
 
 .blur {
-  filter: blur(2em);
+  visibility: hidden;
 }
 
 #sidebar {
