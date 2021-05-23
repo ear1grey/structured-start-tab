@@ -53,6 +53,13 @@
         "mac": "MacCtrl+Shift+I"
       },
       "description": "Toggle HeatMap"
+    },
+    "toggle-presentation": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+L",
+        "mac": "MacCtrl+Shift+L"
+      },
+      "description": "Toggle presentation mode"
     }
   }
 }

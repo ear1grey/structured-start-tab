@@ -73,6 +73,10 @@ main {
   background-color: hsl(240,100%,50%);
 }
 
+.blur {
+  visibility: hidden;
+}
+
 #sidebar {
   grid-area: sidebar;
   overflow: hidden;
