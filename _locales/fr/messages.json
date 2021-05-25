@@ -311,5 +311,8 @@
   },
   "presentation_mode": {
     "message": "Activer le mode présentation"
-  }
+  },
+  "flex": {
+    "message": "Forcer l'affichage sur une seule ligne"
+  } 
 }

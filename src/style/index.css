@@ -286,6 +286,10 @@ section.vertical section {
   width:auto;
 }
 
+.flex-disabled nav {
+  flex-wrap: nowrap;
+}
+
 section section nav {
   flex-wrap: wrap;
 }

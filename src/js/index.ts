@@ -112,6 +112,9 @@ function editStart(elem:HTMLElement) {
       if (elem.classList.contains('private')) {
         (document.querySelector('#privateInput') as HTMLInputElement).checked = true;
       }
+      if (elem.classList.contains('flex-disabled')) {
+        (document.querySelector('#flexInput') as HTMLInputElement).checked = true;
+      }
     } else {
       return;
     }
@@ -190,6 +193,11 @@ function editOk() {
         els.editing.classList.add('vertical');
       } else {
         els.editing.classList.remove('vertical');
+      }
+      if ((document.querySelector('#flexInput') as HTMLInputElement).checked) {
+        els.editing.classList.add('flex-disabled');
+      } else {
+        els.editing.classList.remove('flex-disabled');
       }
       if ((document.querySelector('#privateInput') as HTMLInputElement).checked) {
         els.editing.classList.add('private');

@@ -308,5 +308,8 @@
   },
   "presentation_mode": {
     "message": "Toggle presentation mode"
-  }
+  },
+  "flex": {
+    "message": "Force single line display"
+  }  
 }
