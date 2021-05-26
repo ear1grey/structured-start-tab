@@ -25,8 +25,8 @@ const menuItems:chrome.contextMenus.CreateProperties[] = [
     title: chrome.i18n.getMessage('togglebookmarks'),
   },
   {
-    id: 'toggleAgenda',
-    title: chrome.i18n.getMessage('toggleagenda'),
+    id: 'addAgenda',
+    title: chrome.i18n.getMessage('addAgenda'),
   },
   {
     id: 'topsitespanel',
@@ -126,7 +126,7 @@ export async function updateAgendaBackground(): Promise<void> {
   await options.load();
   for (let index = 0; index < OPTS.agendas.length; index++) {
     const agenda = OPTS.agendas[index];
-    if (!agenda.agendaUrl) return;
+    if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
     try {
       const response = await fetch(agenda.agendaUrl);
       const text = await response.text();

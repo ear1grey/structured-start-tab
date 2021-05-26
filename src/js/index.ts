@@ -486,13 +486,15 @@ function addAgenda() {
       events: [],
     },
   );
+  console.log(OPTS.agendas);
+  options.write();
   updateAgenda();
 }
 
 async function updateAgenda() {
   for (let index = 0; index < OPTS.agendas.length; index++) {
     const agenda = OPTS.agendas[index];
-    if (!agenda.agendaUrl) return;
+    if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
     if (agenda.events.length === 0) {
       await updateAgendaBackground();
     }
@@ -1145,7 +1147,7 @@ function receiveBackgroundMessages(m:{item:string}) {
   switch (m.item) {
     case 'emptytrash': emptyTrash(); break;
     case 'togglebookmarks': toggleBookmarks(); break;
-    case 'toggleAgenda': addAgenda(); break;
+    case 'addAgenda': addAgenda(); break;
     case 'toggle-sidebar': toggleBookmarks(); break;
     case 'toggle-heatmap': toggleHeatMap(); break;
     case 'toggle-presentation': togglePresentation(); break;
