@@ -4,7 +4,7 @@ import { OPTS } from './options.js';
 import { IcalEvent } from './types';
 
 
-export async function parseIcs(content:string): Promise<void> {
+export async function parseIcs(content:string, i:number): Promise<void> {
   const lines = content.split('\r\n');
   const index = [];
   const indexEnd = [];
@@ -43,7 +43,7 @@ export async function parseIcs(content:string): Promise<void> {
   });
 
   await options.load();
-  OPTS.events = events;
+  OPTS.agendas[i].events = events;
   options.write();
 }
 

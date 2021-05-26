@@ -124,12 +124,15 @@ function commandReceived(command:string) {
 
 export async function updateAgendaBackground(): Promise<void> {
   await options.load();
-  if (!OPTS.agendaUrl || OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
-  try {
-    const response = await fetch(OPTS.agendaUrl);
-    const text = await response.text();
-    await parseIcs(text);
-  } catch (e) {}
+  for (let index = 0; index < OPTS.agendas.length; index++) {
+    const agenda = OPTS.agendas[index];
+    if (!agenda.agendaUrl) return;
+    try {
+      const response = await fetch(agenda.agendaUrl);
+      const text = await response.text();
+      await parseIcs(text, index);
+    } catch (e) {}
+  }
   await options.write();
 }
 

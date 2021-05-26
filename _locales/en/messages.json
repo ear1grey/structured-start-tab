@@ -308,5 +308,14 @@
   },
   "presentation_mode": {
     "message": "Toggle presentation mode"
+  },
+  "edit_agenda_panel": {
+    "message": "Editing Agenda Panel"
+  },
+  "placeholder_panel_url_agenda": {
+    "message": "Agenda URL"
+  },
+  "url_agenda": {
+    "message": "Agenda URL"
   }
 }

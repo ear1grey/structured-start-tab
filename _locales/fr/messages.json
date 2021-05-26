@@ -311,5 +311,14 @@
   },
   "presentation_mode": {
     "message": "Activer le mode présentation"
+  },
+  "edit_agenda_panel": {
+    "message": "Editier le panneau de l'agenda"
+  },
+  "placeholder_panel_url_agenda": {
+    "message": "URL de l'agenda"
+  },
+  "url_agenda": {
+    "message": "URL de l'agend"
   }
 }
