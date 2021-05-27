@@ -274,13 +274,13 @@
     "message": "www.example.org/mycalendar.ics"
   },
   "no_agenda_link": {
-    "message": "<h1>Pas de lien</h1><p>Il faut renseigner une URL d'agenda dans les options avant d'activer la panneau Agenda<p>"
+    "message": "<h1>Pas de lien</h1><p>Il faut renseigner une URL d'agenda dans le menu d'édition du panneau.<p>"
   },
-  "toggleagenda": {
-    "message": "Afficher l'agenda"
+  "addAgenda": {
+    "message": "Ajouter un agenda"
   },
   "bad_agenda_link": {
-    "message": "<h1>Mauvais lien</h1><p>Vérifiez l'URL de l'agenda dans les options</p>"
+    "message": "<h1>Mauvais lien</h1><p>Vérifiez l'URL de l'agenda en éditant le panneau</p>"
   },
   "agenda_nb": {
     "message": "Entrez le nombre d'événements de votre calendrier que vous souhaitez voir apparaître."
@@ -311,5 +311,14 @@
   },
   "presentation_mode": {
     "message": "Activer le mode présentation"
+  },
+  "edit_agenda_panel": {
+    "message": "Editier le panneau de l'agenda"
+  },
+  "placeholder_panel_url_agenda": {
+    "message": "URL de l'agenda"
+  },
+  "url_agenda": {
+    "message": "URL de l'agend"
   }
 }

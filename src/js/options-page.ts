@@ -28,16 +28,6 @@ function getValue(what: keyof types.NumberOpts) {
   OPTS[what] = elem.valueAsNumber;
 }
 
-function setText(prefs:types.Options, what: keyof types.StringOpts, defaultValue = '') {
-  const elem = document.getElementById(what) as HTMLInputElement;
-  elem.value = prefs[what] || defaultValue;
-}
-
-function getText(what: keyof types.StringOpts) {
-  const elem = document.getElementById(what) as HTMLInputElement;
-  OPTS[what] = elem.value!;
-}
-
 export function loadOptionsWithPromise() :Promise<void> {
   return new Promise((resolve) => {
     const dataAsString = localStorage.getItem('structured-start-tab');
@@ -67,7 +57,6 @@ function updatePrefsWithPage() {
   getValue('showBookmarksLimit');
   getValue('space');
   getValue('fontsize');
-  getText('agendaUrl');
   getValue('agendaNb');
   getValue('titleAgendaNb');
 }
@@ -88,7 +77,6 @@ function updatePageWithPrefs(prefs:types.Options) {
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
   setValue(prefs, 'fontsize');
-  setText(prefs, 'agendaUrl');
   setValue(prefs, 'agendaNb');
   setValue(prefs, 'titleAgendaNb');
 }
@@ -157,7 +145,6 @@ function createPageWithPrefs(prefs:types.Options) {
     create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, chrome.i18n.getMessage('fontsize'));
     create(layout, 'checkbox', { id: 'useCustomScrollbar' }, chrome.i18n.getMessage('useCustomScrollbar'));
     create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
-    create(agenda, 'text', { id: 'agendaUrl' }, chrome.i18n.getMessage('agenda_url'));
     create(agenda, 'number', { id: 'agendaNb' }, chrome.i18n.getMessage('agenda_nb'));
     create(agenda, 'number', { id: 'titleAgendaNb' }, chrome.i18n.getMessage('title_agenda_nb'));
     create(agenda, 'checkbox', { id: 'showLocationAgenda' }, chrome.i18n.getMessage('showLocationAgenda'));

@@ -271,13 +271,13 @@
     "message": "www.example.org/mycalendar.ics"
   },
   "no_agenda_link": {
-    "message": "<h1>No link</h1><p>You need to setup a URL in the option page before toggle the Agenda Panel</p>"
+    "message": "<h1>No link</h1><p>You need to setup a URL in the edit page</p>"
   },
-  "toggleagenda": {
-    "message": "Show agenda"
+  "addAgenda": {
+    "message": "Add agenda"
   },
   "bad_agenda_link": {
-    "message": "<h1>Bad link</h1><p>Verify the agenda URL in the options</p>"
+    "message": "<h1>Bad link</h1><p>Verify the agenda URL in the pannel</p>"
   },
   "agenda_nb": {
     "message": "Enter the number of events in your calendar that you want to appear."
@@ -308,5 +308,14 @@
   },
   "presentation_mode": {
     "message": "Toggle presentation mode"
+  },
+  "edit_agenda_panel": {
+    "message": "Editing Agenda Panel"
+  },
+  "placeholder_panel_url_agenda": {
+    "message": "Agenda URL"
+  },
+  "url_agenda": {
+    "message": "Agenda URL"
   }
 }
