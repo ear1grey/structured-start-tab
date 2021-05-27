@@ -104,7 +104,15 @@ function editStart(elem:HTMLElement) {
     (document.querySelector('#editname') as HTMLInputElement).select();
   } else {
     if (elem.tagName === 'SECTION') {
-      cloneToDialog('#template_edit_panel');
+      if (elem.id.includes('agenda')) {
+        cloneToDialog('#template_edit_panel_agenda');
+        const index = parseInt(elem.id.split('-')[1]);
+        console.log(index);
+        console.log(OPTS.agendas[index]);
+        setValue('#urlInput', OPTS.agendas[index].agendaUrl);
+      } else {
+        cloneToDialog('#template_edit_panel');
+      }
       setValue('#editname', elem.firstElementChild!.textContent);
       if (elem.classList.contains('vertical')) {
         (document.querySelector('#radioVertical') as HTMLInputElement).checked = true;
@@ -180,6 +188,18 @@ function removeFavicons(root:Document) {
 const createStyleString = (n:string, v:string) => v[0] === '!' ? '' : `${n}:${v};`;
 
 
+function addRemoveClassList(toCheck:string, toAdd:string[], toRemove:string[]) {
+  if ((document.querySelector(toCheck) as HTMLInputElement).checked) {
+    for (const s of toAdd) {
+      els.editing.classList.add(s);
+    }
+  } else {
+    for (const s of toRemove) {
+      els.editing.classList.remove(s);
+    }
+  }
+}
+
 // store the updated version
 function editOk() {
   if (els.editing instanceof HTMLAnchorElement) {
@@ -189,21 +209,18 @@ function editOk() {
   } else {
     if (els.editing.tagName === 'SECTION') {
       els.editing.firstElementChild!.textContent = getValue('#editname');
-      if ((document.querySelector('#radioVertical') as HTMLInputElement).checked) {
-        els.editing.classList.add('vertical');
-      } else {
-        els.editing.classList.remove('vertical');
-      }
       if ((document.querySelector('#flexInput') as HTMLInputElement).checked) {
         els.editing.classList.add('flex-disabled');
       } else {
         els.editing.classList.remove('flex-disabled');
       }
-      if ((document.querySelector('#privateInput') as HTMLInputElement).checked) {
-        els.editing.classList.add('private');
-      } else {
-        els.editing.classList.remove('private');
-        els.editing.classList.remove('blur');
+      addRemoveClassList('#radioVertical', ['vertical'], ['vertical']);
+      addRemoveClassList('#privateInput', ['private'], ['private', 'blur']);
+      if (els.editing.id.includes('agenda')) {
+        const index = parseInt(els.editing.id.split('-')[1]);
+        console.log(index);
+        console.log(OPTS.agendas[index]);
+        OPTS.agendas[index].agendaUrl = getValue('#urlInput');
       }
     } else {
       return;
@@ -467,41 +484,39 @@ function inDepthBookmarkTree(toTreat: chrome.bookmarks.BookmarkTreeNode, parentP
   }
 }
 
-function toggleAgenda() {
-  if (!OPTS.agendaUrl || OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) {
-    toast.html('agenda', chrome.i18n.getMessage('no_agenda_link'));
-    return;
-  }
-  let panel = els.main.querySelector('#agendaPanel');
-  if (!panel) {
-    panel = createPanel(els.main, false);
-    panel.id = 'agendaPanel';
-    panel.firstElementChild!.textContent = chrome.i18n.getMessage('agenda');
-  }
+function addAgenda() {
+  const panel = createPanel(els.main, false);
+  panel.id = 'agenda-' + String(OPTS.agendas.length);
+  panel.firstElementChild!.textContent = chrome.i18n.getMessage('agenda');
+  OPTS.agendas.push(
+    {
+      agendaUrl: chrome.i18n.getMessage('default_agenda_link'),
+      events: [],
+    },
+  );
+  console.log(OPTS.agendas);
+  options.write();
   updateAgenda();
-  if (panel.classList.contains('folded')) panel.classList.toggle('folded');
-  let e = panel.parentElement;
-  while (e && e !== els.main) {
-    if (e.classList.contains('folded')) e.classList.toggle('folded');
-    e = e.parentElement;
-  }
 }
 
 async function updateAgenda() {
-  if (!OPTS.agendaUrl || OPTS.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
-  if (OPTS.events.length === 0) {
-    await updateAgendaBackground();
+  for (let index = 0; index < OPTS.agendas.length; index++) {
+    const agenda = OPTS.agendas[index];
+    if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) return;
+    if (agenda.events.length === 0) {
+      await updateAgendaBackground();
+    }
+    displayNewAgenda(index, agenda);
   }
-  displayNewAgenda();
 }
 
-function displayNewAgenda() {
-  const rootPanel = els.main.querySelector('#agendaPanel') as HTMLElement;
+function displayNewAgenda(index:number, agenda:types.Agenda) {
+  const rootPanel = els.main.querySelector('#agenda-' + String(index)) as HTMLElement;
   if (!rootPanel) return;
   while (rootPanel.lastElementChild!.firstChild) {
     rootPanel.lastElementChild!.removeChild(rootPanel.lastElementChild!.lastChild!);
   }
-  for (const event of OPTS.events.slice(0, OPTS.agendaNb)) {
+  for (const event of agenda.events.slice(0, OPTS.agendaNb)) {
     const panel = createPanel(rootPanel.lastElementChild as HTMLElement);
     panel.firstElementChild!.textContent = (event.location) ? event.title + ' - ' + event.location : event.title;
     const p = document.createElement('p');
@@ -1140,7 +1155,7 @@ function receiveBackgroundMessages(m:{item:string}) {
   switch (m.item) {
     case 'emptytrash': emptyTrash(); break;
     case 'togglebookmarks': toggleBookmarks(); break;
-    case 'toggleAgenda': toggleAgenda(); break;
+    case 'addAgenda': addAgenda(); break;
     case 'toggle-sidebar': toggleBookmarks(); break;
     case 'toggle-heatmap': toggleHeatMap(); break;
     case 'toggle-presentation': togglePresentation(); break;

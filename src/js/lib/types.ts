@@ -10,6 +10,11 @@ export interface IcalEvent {
   utcDate: number,
 }
 
+export interface Agenda {
+  agendaUrl: string,
+  events: IcalEvent[],
+}
+
 export interface NumberOpts {
   showToast: number,
   showBookmarksLimit: number,
@@ -36,12 +41,11 @@ export interface BooleanOpts {
 export interface StringOpts {
   html: string,
   backup: string,
-  agendaUrl: string,
 }
 
 export interface ObjectOpts {
   linkStats: LinkStats,
-  events: IcalEvent[],
+  agendas: Agenda[],
 }
 
 export interface Options extends NumberOpts, BooleanOpts, StringOpts, ObjectOpts {}

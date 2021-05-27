@@ -109,6 +109,43 @@
   </div>
 </template>
 
+<template id=template_edit_panel_agenda>
+  <h1 data-locale="edit_agenda_panel" id=editpanel>Editing Agenda Panel</h1>
+  <label>
+    <h2 data-locale="name">Name</h2>
+    <input data-locale="placeholder_panel_name" id=editname type=string placeholder='Panel Name'>
+  </label>
+  <label>
+    <h2 data-locale="url_agenda">Agenda URL</h2>
+    <input data-locale="placeholder_panel_url_agenda" id=urlInput type=string placeholder='Agenda URL'>
+  </label>
+  <label>
+    <h2 data-locale="background">Background</h2>
+    <color-switch id=bgcol auto="Automatic" manual="Manual" value='#000000'></color-switch>
+  </label>
+  <label>
+    <h2 data-locale="text">Text</h2>
+    <color-switch id=fgcol auto="Automatic" manual="Manual" value='#000000'></color-switch>
+  </label>
+  <label>
+    <h2 data-locale="direction">Direction</h2>
+    <div class="switch">
+      <input type="radio" id="radioHorizontal" name="direction" checked/>
+      <label for="radioHorizontal" data-locale="horizontal">Horizontal</label>
+      <input type="radio" id="radioVertical" name="direction"/>
+      <label for="radioVertical" data-locale="vertical">Vertical</label>
+    </div>
+  </label>
+  <label>
+    <h2 data-locale="private">Private</h2>
+    <input type="checkbox" id="privateInput"></input>
+  </label>
+  <div id=okcancel>
+    <button id=editok value="ok">OK</button>
+    <button data-locale="cancel" id=editcancel value="cancel">Cancel</button>
+  </div>
+</template>
+
 
 <template id=template_edit_link_orig>
   <h1 data-locale="edit_link" id=editheading>Editing Link</h1>
