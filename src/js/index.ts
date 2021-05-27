@@ -845,6 +845,16 @@ function dragDrop(e: DragEvent) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
+
+  let target:HTMLElement|null = e.target as HTMLElement;
+  while (target && target !== els.main) {
+    if (target.id.includes('agenda') || target.id.includes('topsites') || target.id.includes('bookmarksPanel')) {
+      toast.html('impossible', chrome.i18n.getMessage('impossible_drop'));
+      return;
+    }
+    target = target.parentElement;
+  }
+
   e.preventDefault();
   dragging.el.classList.remove('dragging');
   dragging.el.classList.remove('fresh');

@@ -320,5 +320,8 @@
   },
   "url_agenda": {
     "message": "Agenda URL"
+  },
+  "impossible_drop": {
+    "message": "<h1>Drop impossible</h1><p>It is impossible to drop a link/panel in this panel</p>"
   }
 }
