@@ -260,10 +260,10 @@
   },
   "vertical": {
     "message": "Vertical"
-  }, 
+  },
   "agenda": {
     "message": "Agenda"
-  }, 
+  },
   "agenda_url": {
     "message": "Put a <code>.ics</code> link here :"
   },
@@ -308,6 +308,9 @@
   },
   "presentation_mode": {
     "message": "Toggle presentation mode"
+  },
+  "flex": {
+    "message": "Force single line display"
   },
   "edit_agenda_panel": {
     "message": "Editing Agenda Panel"

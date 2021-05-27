@@ -120,6 +120,9 @@ function editStart(elem:HTMLElement) {
       if (elem.classList.contains('private')) {
         (document.querySelector('#privateInput') as HTMLInputElement).checked = true;
       }
+      if (elem.classList.contains('flex-disabled')) {
+        (document.querySelector('#flexInput') as HTMLInputElement).checked = true;
+      }
     } else {
       return;
     }
@@ -206,6 +209,11 @@ function editOk() {
   } else {
     if (els.editing.tagName === 'SECTION') {
       els.editing.firstElementChild!.textContent = getValue('#editname');
+      if ((document.querySelector('#flexInput') as HTMLInputElement).checked) {
+        els.editing.classList.add('flex-disabled');
+      } else {
+        els.editing.classList.remove('flex-disabled');
+      }
       addRemoveClassList('#radioVertical', ['vertical'], ['vertical']);
       addRemoveClassList('#privateInput', ['private'], ['private', 'blur']);
       if (els.editing.id.includes('agenda')) {

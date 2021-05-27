@@ -263,10 +263,10 @@
   },
   "vertical": {
     "message": "Vertical"
-  }, 
+  },
   "agenda": {
     "message": "Agenda"
-  }, 
+  },
   "agenda_url": {
     "message": "Mettez un lien <code>.ics</code> ici :"
   },
@@ -311,6 +311,9 @@
   },
   "presentation_mode": {
     "message": "Activer le mode présentation"
+  },
+  "flex": {
+    "message": "Forcer l'affichage sur une seule ligne"
   },
   "edit_agenda_panel": {
     "message": "Editier le panneau de l'agenda"
