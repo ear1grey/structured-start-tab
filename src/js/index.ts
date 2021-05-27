@@ -107,8 +107,6 @@ function editStart(elem:HTMLElement) {
       if (elem.id.includes('agenda')) {
         cloneToDialog('#template_edit_panel_agenda');
         const index = parseInt(elem.id.split('-')[1]);
-        console.log(index);
-        console.log(OPTS.agendas[index]);
         setValue('#urlInput', OPTS.agendas[index].agendaUrl);
       } else {
         cloneToDialog('#template_edit_panel');
@@ -210,8 +208,6 @@ function editOk() {
       addRemoveClassList('#privateInput', ['private'], ['private', 'blur']);
       if (els.editing.id.includes('agenda')) {
         const index = parseInt(els.editing.id.split('-')[1]);
-        console.log(index);
-        console.log(OPTS.agendas[index]);
         OPTS.agendas[index].agendaUrl = getValue('#urlInput');
       }
     } else {
@@ -486,7 +482,6 @@ function addAgenda() {
       events: [],
     },
   );
-  console.log(OPTS.agendas);
   options.write();
   updateAgenda();
 }
