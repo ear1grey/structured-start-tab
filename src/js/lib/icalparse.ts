@@ -4,7 +4,7 @@ import { OPTS } from './options.js';
 import { IcalEvent } from './types';
 
 
-export async function parseIcs(content:string, i:number): Promise<void> {
+export async function parseIcs(content:string, i:number, email:string): Promise<void> {
   const lines = content.split('\r\n');
   const index = [];
   const indexEnd = [];
@@ -32,7 +32,7 @@ export async function parseIcs(content:string, i:number): Promise<void> {
   const events:IcalEvent[] = [];
 
   for (const strEvent of strEvents) {
-    const event = getEventInfo(strEvent, timeZone);
+    const event = getEventInfo(strEvent, timeZone, email);
     if (event) {
       events.push(event);
     }
@@ -48,13 +48,14 @@ export async function parseIcs(content:string, i:number): Promise<void> {
 }
 
 
-function getEventInfo(strEvent: string[], timeZone: string): IcalEvent | null {
+function getEventInfo(strEvent: string[], timeZone: string, email: string): IcalEvent | null {
   const result:IcalEvent = {
     title: '',
     startDate: '',
     endDate: '',
     location: '',
     utcDate: 0,
+    url: '',
   };
 
   let dtSTART = '';
@@ -65,6 +66,10 @@ function getEventInfo(strEvent: string[], timeZone: string): IcalEvent | null {
     if (line.includes('DTSTART')) dtSTART = line.split(':')[1];
     if (line.includes('DTEND')) dtEnd = line.split(':')[1];
     if (line.includes('LOCATION')) result.location = line.split(':')[1];
+    if (line.includes('UID') && email !== '') {
+      const uid = line.split(':')[1];
+      result.url = 'https://calendar.google.com/calendar/eventedit/' + btoa(`${uid} ${email}`);
+    }
   }
 
   let year = parseInt(dtSTART.substr(0, 4));

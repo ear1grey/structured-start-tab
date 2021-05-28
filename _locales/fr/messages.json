@@ -323,5 +323,11 @@
   },
   "url_agenda": {
     "message": "URL de l'agend"
+  },
+  "email_agenda": {
+    "message": "L'email de l'agenda"
+  },
+  "placeholder_panel_email_agenda": {
+    "message": "L'email de l'agenda"
   }
 }

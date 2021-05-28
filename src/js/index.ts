@@ -110,6 +110,7 @@ function editStart(elem:HTMLElement) {
         console.log(index);
         console.log(OPTS.agendas[index]);
         setValue('#urlInput', OPTS.agendas[index].agendaUrl);
+        setValue('#emailInput', OPTS.agendas[index].email);
       } else {
         cloneToDialog('#template_edit_panel');
       }
@@ -221,6 +222,8 @@ function editOk() {
         console.log(index);
         console.log(OPTS.agendas[index]);
         OPTS.agendas[index].agendaUrl = getValue('#urlInput');
+        OPTS.agendas[index].email = getValue('#emailInput');
+        updateAgendaBackground().then(updateAgenda);
       }
     } else {
       return;
@@ -492,6 +495,7 @@ function addAgenda() {
     {
       agendaUrl: chrome.i18n.getMessage('default_agenda_link'),
       events: [],
+      email: '',
     },
   );
   console.log(OPTS.agendas);

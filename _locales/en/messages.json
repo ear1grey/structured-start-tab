@@ -320,5 +320,11 @@
   },
   "url_agenda": {
     "message": "Agenda URL"
+  },
+  "email_agenda": {
+    "message": "Agenda email"
+  },
+  "placeholder_panel_email_agenda": {
+    "message": "Agenda email"
   }
 }

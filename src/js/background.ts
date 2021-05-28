@@ -130,7 +130,7 @@ export async function updateAgendaBackground(): Promise<void> {
     try {
       const response = await fetch(agenda.agendaUrl);
       const text = await response.text();
-      await parseIcs(text, index);
+      await parseIcs(text, index, agenda.email);
     } catch (e) {}
   }
   await options.write();
