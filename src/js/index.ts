@@ -223,6 +223,7 @@ function editOk() {
         console.log(OPTS.agendas[index]);
         OPTS.agendas[index].agendaUrl = getValue('#urlInput');
         OPTS.agendas[index].email = getValue('#emailInput');
+        options.write();
         updateAgendaBackground().then(updateAgenda);
       }
     } else {
@@ -523,13 +524,17 @@ function displayNewAgenda(index:number, agenda:types.Agenda) {
   for (const event of agenda.events.slice(0, OPTS.agendaNb)) {
     const panel = createPanel(rootPanel.lastElementChild as HTMLElement);
     panel.firstElementChild!.textContent = (event.location) ? event.title + ' - ' + event.location : event.title;
-    const p = document.createElement('p');
+    const a = document.createElement('a');
     if (event.startDate.includes('Invalid') || event.endDate.includes('Invalid')) console.error('Invalid Date : ' + event.title);
     else {
-      p.textContent = chrome.i18n.getMessage('start') + ': ' + event.startDate;
-      if (OPTS.showEndDateAgenda) p.textContent += ' | ' + chrome.i18n.getMessage('end') + ': ' + event.endDate;
+      a.textContent = chrome.i18n.getMessage('start') + ': ' + event.startDate;
+      if (OPTS.showEndDateAgenda) a.textContent += ' | ' + chrome.i18n.getMessage('end') + ': ' + event.endDate;
     }
-    panel.lastElementChild?.append(p);
+    if (event.url) {
+      console.log(event.title, event.url);
+      a.href = event.url;
+    }
+    panel.lastElementChild?.append(a);
   }
 }
 

@@ -67,8 +67,9 @@ function getEventInfo(strEvent: string[], timeZone: string, email: string): Ical
     if (line.includes('DTEND')) dtEnd = line.split(':')[1];
     if (line.includes('LOCATION')) result.location = line.split(':')[1];
     if (line.includes('UID') && email !== '') {
-      const uid = line.split(':')[1];
-      result.url = 'https://calendar.google.com/calendar/eventedit/' + btoa(`${uid} ${email}`);
+      const uid = (line.split(':')[1]).split('@')[0];
+      const emailFormatted = email.split('@')[0] + '@m';
+      result.url = 'https://calendar.google.com/calendar/u/1/r/eventedit/' + btoa(`${uid} ${emailFormatted}`);
     }
   }
 
