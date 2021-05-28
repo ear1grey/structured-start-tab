@@ -323,5 +323,8 @@
   },
   "impossible_drop": {
     "message": "<h1>Drop impossible</h1><p>It is impossible to drop a link/panel in this panel</p>"
+  },
+   "agenda_help_msg": {
+    "message": "Before using the panel, please fill in your <code>.ics</code> link and email by editing the panel via Shift+Click. <br>The email must be the one linked to the agenda. <br>It will only be used to create links for editing events."
   }
 }

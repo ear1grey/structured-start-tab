@@ -484,6 +484,9 @@ function addAgenda() {
   const panel = createPanel(els.main, false);
   panel.id = 'agenda-' + String(OPTS.agendas.length);
   panel.firstElementChild!.textContent = chrome.i18n.getMessage('agenda');
+  const p = document.createElement('p');
+  p.innerHTML = chrome.i18n.getMessage('agenda_help_msg');
+  panel.lastElementChild?.append(p);
   OPTS.agendas.push(
     {
       agendaUrl: chrome.i18n.getMessage('default_agenda_link'),
