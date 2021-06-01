@@ -44,6 +44,9 @@ export function cloneTemplate(selector:string):NonEmptyDocumentFragment {
 
 export function cloneTemplateToTarget(selector:string, where:HTMLElement) :HTMLElement {
   const clone = cloneTemplate(selector);
+  if (where.tagName === 'SECTION') {
+    where = where.lastElementChild! as HTMLElement;
+  }
   where.append(clone);
   return where.lastElementChild! as HTMLElement;
 }
