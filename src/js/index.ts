@@ -388,8 +388,8 @@ function addLink(target? : HTMLElement) {
   flash(a, 'highlight');
 }
 
-function createPanel(target : HTMLElement, animation = true) {
-  const div = util.cloneTemplateToTarget('#template_panel', target);
+function createPanel(target : HTMLElement, animation = true, after = true) {
+  const div = util.cloneTemplateToTarget('#template_panel', target, after);
   div.firstElementChild!.textContent = chrome.i18n.getMessage('panel');
   if (animation) {
     div.scrollIntoView({ behavior: 'smooth' });
@@ -1173,7 +1173,7 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'topsitespanel': addTopSitesPanel(); break;
     case 'bookmarkspanel': toogleBookmarksPanel(); break;
     case 'addLink' : addLink(els.contextClicked); break;
-    case 'addPanel' : createPanel(els.contextClicked); break;
+    case 'addPanel' : createPanel(els.contextClicked, true, false); break;
     case 'lock' : lock(); break;
     case 'option' : util.simulateClick('#options'); break;
     default: break;
