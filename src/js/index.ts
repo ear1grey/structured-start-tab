@@ -107,8 +107,6 @@ function editStart(elem:HTMLElement) {
       if (elem.id.includes('agenda')) {
         cloneToDialog('#template_edit_panel_agenda');
         const index = parseInt(elem.id.split('-')[1]);
-        console.log(index);
-        console.log(OPTS.agendas[index]);
         setValue('#urlInput', OPTS.agendas[index].agendaUrl);
         setValue('#emailInput', OPTS.agendas[index].email);
       } else {
@@ -219,8 +217,6 @@ function editOk() {
       addRemoveClassList('#privateInput', ['private'], ['private', 'blur']);
       if (els.editing.id.includes('agenda')) {
         const index = parseInt(els.editing.id.split('-')[1]);
-        console.log(index);
-        console.log(OPTS.agendas[index]);
         OPTS.agendas[index].agendaUrl = getValue('#urlInput');
         OPTS.agendas[index].email = getValue('#emailInput');
         options.write();
@@ -499,7 +495,6 @@ function addAgenda() {
       email: '',
     },
   );
-  console.log(OPTS.agendas);
   options.write();
   updateAgenda();
 }
@@ -531,7 +526,6 @@ function displayNewAgenda(index:number, agenda:types.Agenda) {
       if (OPTS.showEndDateAgenda) a.textContent += ' | ' + chrome.i18n.getMessage('end') + ': ' + event.endDate;
     }
     if (event.url) {
-      console.log(event.title, event.url);
       a.href = event.url;
     }
     panel.lastElementChild?.append(a);
