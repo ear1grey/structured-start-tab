@@ -82,6 +82,7 @@ main {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  visibility: hidden;
 }
 
 main>section, #sidebar {
