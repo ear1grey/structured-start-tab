@@ -42,8 +42,16 @@ export function cloneTemplate(selector:string):NonEmptyDocumentFragment {
   throw new Error('Template not found: ' + selector);
 }
 
-export function cloneTemplateToTarget(selector:string, where:HTMLElement) :HTMLElement {
+export function cloneTemplateToTarget(selector:string, where:HTMLElement, after = true) :HTMLElement {
   const clone = cloneTemplate(selector);
-  where.append(clone);
-  return where.lastElementChild! as HTMLElement;
+  if (where.tagName === 'SECTION') {
+    where = where.lastElementChild! as HTMLElement;
+  }
+  if (after) {
+    where.append(clone);
+    return where.lastElementChild! as HTMLElement;
+  } else {
+    where.prepend(clone);
+    return where.firstElementChild! as HTMLElement;
+  }
 }

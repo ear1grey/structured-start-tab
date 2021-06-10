@@ -379,7 +379,11 @@ function addLink(target? : HTMLElement) {
   }
   const a = createExampleLink();
   if (target) {
-    target.append(a);
+    if (target.tagName === 'SECTION') {
+      target.lastElementChild?.append(a);
+    } else {
+      target.append(a);
+    }
   } else {
     els.main.append(a);
   }
@@ -388,8 +392,8 @@ function addLink(target? : HTMLElement) {
   flash(a, 'highlight');
 }
 
-function createPanel(target : HTMLElement, animation = true) {
-  const div = util.cloneTemplateToTarget('#template_panel', target);
+function createPanel(target : HTMLElement, animation = true, after = true) {
+  const div = util.cloneTemplateToTarget('#template_panel', target, after);
   div.firstElementChild!.textContent = chrome.i18n.getMessage('panel');
   if (animation) {
     div.scrollIntoView({ behavior: 'smooth' });
@@ -539,7 +543,7 @@ function duplicatePanel(keepLinks: boolean) {
     return;
   }
   const section = els.contextClicked;
-  if (!section) return;
+  if (!section || section === els.main) return;
   const dupe = section.cloneNode(true) as HTMLElement;
   if (!keepLinks) {
     const elements = dupe.querySelectorAll('a');
@@ -1178,7 +1182,7 @@ function receiveBackgroundMessages(m:{item:string}) {
     case 'topsitespanel': addTopSitesPanel(); break;
     case 'bookmarkspanel': toogleBookmarksPanel(); break;
     case 'addLink' : addLink(els.contextClicked); break;
-    case 'addPanel' : createPanel(els.contextClicked); break;
+    case 'addPanel' : createPanel(els.contextClicked, true, false); break;
     case 'lock' : lock(); break;
     case 'option' : util.simulateClick('#options'); break;
     default: break;
@@ -1190,6 +1194,8 @@ function saveElmContextClicked(e: Event) {
   const target = findParentSection(e.target! as HTMLElement);
   if (target !== null && target.tagName === 'SECTION') {
     els.contextClicked = target as HTMLElement;
+  } else {
+    els.contextClicked = els.main;
   }
 }
 
@@ -1210,6 +1216,7 @@ function prepareContextPanelEventListener() {
   for (const s of sections) {
     s.addEventListener('contextmenu', saveElmContextClicked);
   }
+  els.main.addEventListener('contextmenu', saveElmContextClicked);
 }
 
 /** Migration **/
