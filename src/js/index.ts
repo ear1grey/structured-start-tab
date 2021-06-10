@@ -924,6 +924,7 @@ export async function prepareBookmarks(OPTS:types.Options, target:HTMLElement) :
     buildBookmarks(OPTS, await bp, target, count);
   }
   showBookmarks(OPTS.showBookmarksSidebar);
+  (document.querySelector('#sidebar') as HTMLElement).style.setProperty('visibility', 'visible');
 }
 
 function toggleBookmarks() {
