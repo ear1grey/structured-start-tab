@@ -329,5 +329,11 @@
   },
   "agenda_help_msg": {
     "message": "Avant d'utiliser le panneau veuillez renseigner votre lien <code>.ics</code> ainsi que votre email en éditant le panneau via Shift+Click. <br>L'email doit être celui liée à l'agenda. <br>Il servira uniquement à la création des liens d'édition d'évènements."
+  },
+  "email_agenda": {
+    "message": "L'email de l'agenda"
+  },
+  "placeholder_panel_email_agenda": {
+    "message": "L'email de l'agenda"
   }
 }
