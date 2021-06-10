@@ -8,11 +8,13 @@ export interface IcalEvent {
   endDate: string,
   location: string,
   utcDate: number,
+  url: string,
 }
 
 export interface Agenda {
   agendaUrl: string,
   events: IcalEvent[],
+  email: string,
 }
 
 export interface NumberOpts {

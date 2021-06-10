@@ -108,6 +108,7 @@ function editStart(elem:HTMLElement) {
         cloneToDialog('#template_edit_panel_agenda');
         const index = parseInt(elem.id.split('-')[1]);
         setValue('#urlInput', OPTS.agendas[index].agendaUrl);
+        setValue('#emailInput', OPTS.agendas[index].email);
       } else {
         cloneToDialog('#template_edit_panel');
       }
@@ -217,6 +218,9 @@ function editOk() {
       if (els.editing.id.includes('agenda')) {
         const index = parseInt(els.editing.id.split('-')[1]);
         OPTS.agendas[index].agendaUrl = getValue('#urlInput');
+        OPTS.agendas[index].email = getValue('#emailInput');
+        options.write();
+        updateAgendaBackground().then(updateAgenda);
       }
     } else {
       return;
@@ -488,6 +492,7 @@ function addAgenda() {
     {
       agendaUrl: chrome.i18n.getMessage('default_agenda_link'),
       events: [],
+      email: '',
     },
   );
   options.write();
@@ -512,15 +517,19 @@ function displayNewAgenda(index:number, agenda:types.Agenda) {
     rootPanel.lastElementChild!.removeChild(rootPanel.lastElementChild!.lastChild!);
   }
   for (const event of agenda.events.slice(0, OPTS.agendaNb)) {
-    const panel = createPanel(rootPanel.lastElementChild as HTMLElement);
-    panel.firstElementChild!.textContent = (event.location) ? event.title + ' - ' + event.location : event.title;
-    const p = document.createElement('p');
-    if (event.startDate.includes('Invalid') || event.endDate.includes('Invalid')) console.error('Invalid Date : ' + event.title);
-    else {
-      p.textContent = chrome.i18n.getMessage('start') + ': ' + event.startDate;
-      if (OPTS.showEndDateAgenda) p.textContent += ' | ' + chrome.i18n.getMessage('end') + ': ' + event.endDate;
+    // panel.firstElementChild!.textContent = (event.location) ? event.title + ' - ' + event.location : event.title;
+    const a = document.createElement('a');
+    rootPanel.querySelector('nav')!.append(a);
+
+    if (event.startDate.includes('Invalid') ||
+        event.endDate.includes('Invalid')) {
+      continue;
+    } else {
+      a.textContent = event.title;
     }
-    panel.lastElementChild?.append(p);
+    if (event.url) {
+      a.href = event.url;
+    }
   }
 }
 
