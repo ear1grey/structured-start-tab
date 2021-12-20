@@ -97,6 +97,9 @@ function translateColor(rgba:string) {
 function editStart(elem:HTMLElement) {
   els.edit.textContent = ''; // reset
   const style = window.getComputedStyle(elem);
+  if (elem.parentElement?.id === 'toolbarnav') {
+    return;
+  }
   if (elem instanceof HTMLAnchorElement) {
     cloneToDialog('#template_edit_link');
     setValue('#editname', elem.textContent);
