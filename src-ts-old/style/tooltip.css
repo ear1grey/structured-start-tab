@@ -1,0 +1,13 @@
+#tinytooltip {
+  position: absolute;
+  top: 0;
+  left:0;
+  margin: 0;
+  padding: 1vmin;
+  transform: translateX( calc(1vmin + var(--tool-tip-left))) translateY( calc(1vmin + var(--tool-tip-top)) );
+  border-radius: var(--small);
+  background: var(--bg-mid);
+  color: var(--fg-light);
+  border: var(--fg-light) solid thin;
+  max-width: var(--toast-width); 
+}
