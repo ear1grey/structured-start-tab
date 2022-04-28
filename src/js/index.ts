@@ -5,6 +5,7 @@ import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import { ColorSwitch } from './components/color-switch/index.js';
+import { AgendaItem } from './components/agenda-item/index.js';
 import { updateAgendaBackground } from './background.js';
 
 export interface Elems {
@@ -515,25 +516,35 @@ async function updateAgenda() {
 }
 
 function displayNewAgenda(index:number, agenda:types.Agenda) {
+  console.log('DNA', index);
   const rootPanel = els.main.querySelector('#agenda-' + String(index)) as HTMLElement;
+  console.log('rootPanel', rootPanel);
   if (!rootPanel) return;
   while (rootPanel.lastElementChild!.firstChild) {
     rootPanel.lastElementChild!.removeChild(rootPanel.lastElementChild!.lastChild!);
   }
   for (const event of agenda.events.slice(0, OPTS.agendaNb)) {
     // panel.firstElementChild!.textContent = (event.location) ? event.title + ' - ' + event.location : event.title;
-    const a = document.createElement('a');
-    rootPanel.querySelector('nav')!.append(a);
+    // const a = document.createElement('a');
+    // rootPanel.querySelector('nav')!.append(a);
 
-    if (event.startDate.includes('Invalid') ||
-        event.endDate.includes('Invalid')) {
-      continue;
-    } else {
-      a.textContent = event.title;
-    }
-    if (event.url) {
-      a.href = event.url;
-    }
+    // if (event.startDate.includes('Invalid') ||
+    //     event.endDate.includes('Invalid')) {
+    //   continue;
+    // } else {
+    //   a.textContent = event.title;
+    // }
+    // if (event.url) {
+    //   a.href = event.url;
+    // }
+
+    const agendaItem = document.createElement('agenda-item');
+    agendaItem.setAttribute('time', event.startDate);
+    agendaItem.setAttribute('title', event.title);
+    agendaItem.setAttribute('href', event.url);
+    rootPanel.querySelector('nav')!.append(agendaItem);
+
+    console.log('Adding', agendaItem);
   }
 }
 
@@ -1248,6 +1259,7 @@ function migrateLinks() {
 
 async function prepareAll() {
   await options.load();
+  console.log("Agendas", OPTS.agendas);
   els = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
   prepareBookmarks(OPTS, els.bookmarksnav);
   util.prepareCSSVariables(OPTS);
