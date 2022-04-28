@@ -1,3 +1,5 @@
+import { attachStyleSheet } from '../comp-utils.js';
+
 interface ElAttrs {
   [key:string]:string
 }
@@ -15,15 +17,6 @@ function create(where:HTMLElement|DocumentFragment, what:string, attrs:ElAttrs =
   if (text) x.textContent = text;
   return x;
 }
-
-function attachStyleSheet(shadow:ShadowRoot) {
-  const e = document.createElement('link');
-  e.setAttribute('rel', 'stylesheet');
-  e.setAttribute('type', 'text/css');
-  e.setAttribute('href', 'js/components/better-range/index.css');
-  shadow.append(e);
-}
-
 
 interface Elements {
   intrans:HTMLInputElement,
@@ -58,7 +51,7 @@ export class BetterRange extends HTMLElement {
     super();
 
     const shadow = this.attachShadow({ mode: 'open' });
-    attachStyleSheet(shadow);
+    attachStyleSheet(shadow, 'js/components/better-range/index.css');
 
     const div = create(shadow, 'div', { id: 'better_range' });
 

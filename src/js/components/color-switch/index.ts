@@ -1,12 +1,5 @@
 import { BetterRange } from '../better-range/index.js';
-
-function attachStyleSheet(shadow:ShadowRoot) {
-  const e = document.createElement('link');
-  e.setAttribute('rel', 'stylesheet');
-  e.setAttribute('type', 'text/css');
-  e.setAttribute('href', 'js/components/color-switch/index.css');
-  shadow.append(e);
-}
+import { attachStyleSheet } from '../comp-utils.js';
 
 interface ElAttrs {
   [key:string]:string
@@ -99,7 +92,7 @@ export class ColorSwitch extends HTMLElement {
   constructor() {
     super();
     const shadow = this.attachShadow({ mode: 'open' });
-    attachStyleSheet(shadow);
+    attachStyleSheet(shadow, 'js/components/color-switch/index.css');
 
     const div = create(shadow, 'div', { id: 'top' });
 
