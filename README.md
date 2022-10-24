@@ -5,6 +5,7 @@ A browser extension that replaces the default tab content with a page of organis
 ## Install
 
 * [Chrome Web Store](https://chrome.google.com/webstore/detail/structured-start-tab/pldheaomfiegamcicehmijhaijcocidb)
+* [Firefox addons](https://addons.mozilla.org/en-GB/firefox/addon/structured-start-tab/)
 
 ## Contribute
 
