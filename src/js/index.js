@@ -3,7 +3,9 @@ import { OPTS } from './lib/options.js';
 import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
-import { updateAgendaBackground } from './background.js';
+import { updateAgendasBackground, updateAgendaBackground } from './background.js';
+import './components/agenda-item/index.js';
+
 const oneDay = 1000 * 60 * 60 * 24;
 const fourDays = oneDay * 4;
 const twoWeeks = oneDay * 14;
@@ -191,7 +193,7 @@ function editOk() {
                 OPTS.agendas[index].agendaUrl = getValue('#urlInput');
                 OPTS.agendas[index].email = getValue('#emailInput');
                 options.write();
-                updateAgendaBackground().then(updateAgenda);
+                updateAgendasBackground().then(updateAgenda);
             }
         }
         else {
@@ -460,17 +462,15 @@ async function updateAgenda() {
     for (let index = 0; index < OPTS.agendas.length; index++) {
         const agenda = OPTS.agendas[index];
         if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link'))
-            return;
+            continue;
         if (agenda.events.length === 0) {
-            await updateAgendaBackground();
+            await updateAgendaBackground(agenda);
         }
         displayNewAgenda(index, agenda);
     }
 }
 function displayNewAgenda(index, agenda) {
-    console.log('DNA', index);
     const rootPanel = els.main.querySelector('#agenda-' + String(index));
-    console.log('rootPanel', rootPanel);
     if (!rootPanel)
         return;
     while (rootPanel.lastElementChild.firstChild) {
@@ -494,7 +494,6 @@ function displayNewAgenda(index, agenda) {
         agendaItem.setAttribute('title', event.title);
         agendaItem.setAttribute('href', event.url);
         rootPanel.querySelector('nav').append(agendaItem);
-        console.log('Adding', agendaItem);
     }
 }
 function duplicatePanel(keepLinks) {

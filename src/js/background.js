@@ -117,12 +117,14 @@ function commandReceived(command) {
         });
     });
 }
-export async function updateAgendaBackground() {
+
+/** Update all agendas */
+export async function updateAgendasBackground() {
     await options.load();
     for (let index = 0; index < OPTS.agendas.length; index++) {
         const agenda = OPTS.agendas[index];
         if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link'))
-            return;
+            continue;
         console.log('Updating agenda:', index, agenda.agendaUrl);
         try {
             const response = await fetch(agenda.agendaUrl);
@@ -133,7 +135,22 @@ export async function updateAgendaBackground() {
     }
     await options.write();
 }
+
+/** Update specific agenda */
+export async function updateAgendaBackground(agenda) {
+    if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link'))
+        return
+    console.log('Updating agenda:', index, agenda.agendaUrl);
+    try {
+        const response = await fetch(agenda.agendaUrl);
+        const text = await response.text();
+        await parseIcs(text, index, agenda.email);
+    }
+    catch (e) { }
+    await options.write();
+}
+
 chrome.runtime.onInstalled.addListener(menuInstaller);
 chrome.contextMenus.onClicked.addListener(menuClicked);
-chrome.alarms.onAlarm.addListener(updateAgendaBackground);
+chrome.alarms.onAlarm.addListener(updateAgendasBackground);
 chrome.commands.onCommand.addListener(commandReceived);
