@@ -16,7 +16,6 @@
     "build": "rm -rf app && mkdir app && cp -R src/* app",
     "zip": "rm sst.zip;rm sst.xpi;find . -name '.DS_Store' -type f -delete;zip -u -8 -v -r sst.zip app _locales manifest.json release.md;cp sst.zip sst.xpi;echo 'bump versions in releases.md, manifest.json and package.json...'",
     "all": "npm run build;npm run zip;",
-    "test-moz": "web-ext --firefox=firefoxdeveloperedition run ",
     "preversion": "npm run lint",
     "version": "node update-manifest-version.js; git add manifest.json;",
     "postversion": "npm run all"
@@ -29,10 +28,7 @@
   "devDependencies": {
     "eslint": "^7.18.0",
     "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-portsoc": "^0.8.1",
-    "eslint-plugin-import": "^2.19.1",
-    "parcel": "^2.0.0-beta.1",
-    "web-ext": "^5.5.0"
+    "eslint-config-portsoc": "^0.8.1"
   },
   "eslintConfig": {
     "env": {
