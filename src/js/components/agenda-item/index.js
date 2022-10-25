@@ -33,54 +33,87 @@ export class AgendaItem extends HTMLElement {
     this._a = document.createElement('a');
     const time = document.createElement('time');
     const p = document.createElement('p');
-    // time
-    const t = this.getAttribute('time');
-    const tNum = Number(t);
-    const midnightTonight = new Date().setHours(24, 0, 0, 0);
-    let dateOfEvent;
-    if (isNaN(tNum)) {
-      dateOfEvent = new Date();
-      dateOfEvent.setHours(0, 0, 0, 0); // midnight just gone
-      time.textContent = 'today';
-    } else {
-      dateOfEvent = new Date(Number(t));
-      if (dateOfEvent.getTime() < midnightTonight) {
-        time.textContent = `${dateOfEvent.getHours()}:${dateOfEvent.getMinutes()}`;
-      } else {
-        time.textContent = daysBetween(new Date(midnightTonight), dateOfEvent);
-      }
-    }
-    console.log({ dateOfEvent });
-    time.id = 'time';
-    time.dateTime = dateOfEvent.toISOString();
-    // text
-    p.textContent = this.getAttribute('title') || 'None';
-    // link
-    const href = this.getAttribute('href');
-    if (href) {
-      this.href = href;
-    }
-    const shadow = this.attachShadow({ mode: 'closed' });
-    attachStyleSheet(shadow, 'js/components/agenda-item/index.css');
+
+    this.shadow = this.attachShadow({ mode: 'closed' });
+    attachStyleSheet(this.shadow, 'js/components/agenda-item/index.css');
     this._a.append(time, p);
-    shadow.append(this._a);
+    this.shadow.append(this._a);
   }
 
-  set time(num) {
-    this._time = num;
-  }
+  // COMPONENT ELEMENTS
+  get timeElem() { return this.shadow.querySelector('time'); }
+  get titleElem() { return this.shadow.querySelector('p'); }
+  get hrefElem() { return this.shadow.querySelector('a'); }
+
+  // GETTERS AND SETTERS
 
   get time() {
-    if (isNaN(this._time)) { return 0; }
-    return this._time;
+    const timeAttr = this.hasAttribute('time') ? Number(this.getAttribute('time')) : 0;
+    return isNaN(timeAttr) ? 0 : timeAttr;
   }
 
-  set href(href) {
-    this._a.setAttribute('href', href);
+  set time(newTime) { this.setAttribute('time', newTime); }
+
+  get href() { return this.getAttribute('href') }
+  set href(newHref) { this.setAttribute('href', newHref); }
+
+  get title(){
+    return this.hasAttribute('title') ? this.getAttribute('title') : 'None';
   }
 
-  get href() {
-    return this._a.href;
+  set title(newTitle){ this.setAttribute('title', newTitle); }
+
+  // LIFECYCLE METHODS
+  onLetterChange() {
+    this.titleElem.textContent = this.title;
+  }
+
+  onTimeChange(){
+    const midnightTonight = new Date().setHours(24, 0, 0, 0);
+    let dateOfEvent;
+    if (this.time === 0) {
+      dateOfEvent = new Date();
+      dateOfEvent.setHours(0, 0, 0, 0); // midnight just gone
+      this.timeElem.textContent = 'today';
+    } else {
+      dateOfEvent = new Date(this.time);
+      if (dateOfEvent.getTime() < midnightTonight) {
+        this.timeElem.textContent = `${dateOfEvent.getHours()}:${dateOfEvent.getMinutes()}`;
+      } else {
+        this.timeElem.textContent = daysBetween(new Date(midnightTonight), dateOfEvent);
+      }
+    }
+    this.timeElem.id = 'time';
+    this.timeElem.dateTime = dateOfEvent.toISOString();
+  }
+
+  onHrefChange() {
+    this.hrefElem.href = this.href;
+  }
+
+
+  // OBSERVABLE METHODS
+
+  static get observedAttributes() {
+    return ['time', 'title', 'href'];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (!oldValue && !newValue) { return; }
+
+    switch (name) {
+      case 'time':
+        this.onTimeChange();
+        break;
+      case 'title':
+        this.onLetterChange();
+        break;
+      case 'href':
+        this.onHrefChange();
+        break;
+      default:
+        break;
+    }
   }
 }
 customElements.define('agenda-item', AgendaItem);
