@@ -8,5 +8,5 @@ const pkgData = JSON.parse(pkgRaw);
 
 const manRaw = readFileSync(manPath, 'utf8');
 const manData = JSON.parse(manRaw);
-manData['version'] = pkgData.version;
+manData.version = pkgData.version;
 writeFileSync(manPath, JSON.stringify(manData, null, 2));

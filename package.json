@@ -1,13 +1,14 @@
 {
   "name": "structured-start-tab",
-  "version": "1.8.3",
+  "version": "1.9.0",
   "description": "Structured Start Tab",
   "author": "Rich Boakes <rich@boakes.org>",
   "contributors": [
     "Rich Boakes <rich@boakes.org>",
     "Jacek Kopecký <jacek@jacek.cz>",
     "Thomas PIENNE <https://github.com/toto101230>",
-    "Yassine SMARA <yassine.smara@laposte.net>"
+    "Yassine SMARA <yassine.smara@laposte.net>",
+    "Adriano Boccardo Pochettino <https://github.com/adrianoBP>"
   ],
   "license": "MPL-2.0",
   "main": "index.js",
