@@ -54,21 +54,21 @@ export class AgendaItem extends HTMLElement {
 
   set time(newTime) { this.setAttribute('time', newTime); }
 
-  get href() { return this.getAttribute('href') }
+  get href() { return this.getAttribute('href'); }
   set href(newHref) { this.setAttribute('href', newHref); }
 
-  get title(){
+  get title() {
     return this.hasAttribute('title') ? this.getAttribute('title') : 'None';
   }
 
-  set title(newTitle){ this.setAttribute('title', newTitle); }
+  set title(newTitle) { this.setAttribute('title', newTitle); }
 
   // LIFECYCLE METHODS
   onLetterChange() {
     this.titleElem.textContent = this.title;
   }
 
-  onTimeChange(){
+  onTimeChange() {
     const midnightTonight = new Date().setHours(24, 0, 0, 0);
     let dateOfEvent;
     if (this.time === 0) {
