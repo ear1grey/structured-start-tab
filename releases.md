@@ -3,6 +3,8 @@
 Every release for the foreseeable future will be an alpha level release.  This means you can expect an evolving and improving feature set, and also bugs.
 
 ## Alpha Releases
+
+* 1.9.0 New calendar panel
 * 1.8.3 Quick fix for not-editing bug (hangover from i18n conversion)
 * 1.8.2 Quick fix for component URL bug
 * 1.8.1 Internal test
@@ -29,4 +31,3 @@ Every release for the foreseeable future will be an alpha level release.  This m
 * 1.1.2 Drag and drop panel creation and nesting
 * 1.1.1 Better default page, better page flow for narrow pages
 * 1.1.0 Initial early-alpha
-
