@@ -57,6 +57,11 @@ function getEventInfo(strEvent, timeZone, email) {
       result.url = 'https://calendar.google.com/calendar/u/1/r/eventedit/' + btoa(`${eventUnique}`);
     }
   }
+
+  // add time for all day events
+  if (dtSTART.length === 8) { dtSTART += 'T000000Z'; }
+  if (dtEnd.length === 8) { dtEnd += 'T235959Z'; }
+
   let year = parseInt(dtSTART.substr(0, 4));
   let month = parseInt(dtSTART.substr(4, 2)) - 1;
   let day = parseInt(dtSTART.substr(6, 2));
