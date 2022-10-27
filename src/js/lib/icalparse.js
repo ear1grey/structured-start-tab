@@ -54,7 +54,7 @@ function getEventInfo(strEvent, timeZone, email) {
     if (line.includes('UID') && email !== '') {
       const uid = (line.split(':')[1]).split('@')[0];
       const eventUnique = `${uid} ${email.trim()}`;
-      result.url = 'https://calendar.google.com/calendar/u/1/r/eventedit/' + btoa(`${eventUnique}`);
+      result.url = email != null ? `https://calendar.google.com/calendar/u/${email}/r/eventedit/` + btoa(`${eventUnique}`) : '';
     }
   }
 
