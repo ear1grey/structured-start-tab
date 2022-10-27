@@ -4,7 +4,6 @@ function daysBetween(d1, d2, add = 'd') {
   const diffMillis = d2.getTime() - d1.getTime();
   const diffDays = diffMillis / ONE_DAY;
   const diff = Math.abs(Math.ceil(diffDays));
-  console.log(diffMillis, diffDays, diff);
   return `+${diff}${add}`;
 }
 /**

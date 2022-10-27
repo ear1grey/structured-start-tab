@@ -1130,7 +1130,6 @@ function migrateLinks() {
 }
 async function prepareAll() {
   await options.load();
-  console.log('Agendas', OPTS.agendas);
   els = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
   prepareBookmarks(OPTS, els.bookmarksnav);
   util.prepareCSSVariables(OPTS);
