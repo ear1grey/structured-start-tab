@@ -157,7 +157,6 @@ function upload(file) {
     const reader = new FileReader();
     reader.addEventListener('load', importLoadedFile);
     reader.readAsText(file);
-    console.log('loading');
   }
 }
 function uploadFile(e) {
@@ -202,7 +201,6 @@ export async function loadOptions() {
   toast.prepare();
 }
 export function saveOptions() {
-  console.log('saving');
   updatePrefsWithPage();
   updatePageWithPrefs(OPTS);
   util.prepareCSSVariables(OPTS);

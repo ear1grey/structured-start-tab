@@ -121,7 +121,6 @@ export async function updateAgendasBackground() {
   for (let index = 0; index < OPTS.agendas.length; index++) {
     const agenda = OPTS.agendas[index];
     if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { continue; }
-    console.log('Updating agenda:', index, agenda.agendaUrl);
     try {
       const response = await fetch(agenda.agendaUrl);
       const text = await response.text();
@@ -134,7 +133,6 @@ export async function updateAgendasBackground() {
 /** Update specific agenda */
 export async function updateAgendaBackground(agenda, index) {
   if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { return; }
-  console.log('Updating agenda:', agenda.agendaUrl);
   try {
     const response = await fetch(agenda.agendaUrl);
     const text = await response.text();
