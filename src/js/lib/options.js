@@ -39,6 +39,7 @@ export function load() {
       // Migrate data from localStorage to chrome.storage.local
       if (migratedData == null && currentData != null) {
         migratedData = JSON.parse(currentData);
+        Object.assign(OPTS, migratedData);
         write();
       }
 
