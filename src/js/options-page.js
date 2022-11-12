@@ -21,16 +21,6 @@ function getValue(what) {
   const elem = document.getElementById(what);
   OPTS[what] = elem.valueAsNumber;
 }
-export function loadOptionsWithPromise() {
-  return new Promise((resolve) => {
-    const dataAsString = localStorage.getItem('structured-start-tab');
-    if (dataAsString) {
-      const data = JSON.parse(dataAsString);
-      Object.assign(OPTS, data);
-    }
-    resolve();
-  });
-}
 // incorporate the latest values of the page into
 // the OPTS object that gets stored.
 function updatePrefsWithPage() {

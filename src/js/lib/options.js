@@ -27,15 +27,30 @@ export const OPTS = {
   linkStats: {},
   agendas: [],
 };
+
+const settingKey = 'structured-start-tab';
+
 export function load() {
-  const dataAsString = localStorage.getItem('structured-start-tab');
-  if (dataAsString) {
-    const data = JSON.parse(dataAsString);
-    Object.assign(OPTS, data);
-  }
-  return Promise.resolve();
+  return new Promise(resolve => {
+    const currentData = localStorage.getItem(settingKey);
+    chrome.storage.local.get([settingKey], function (result) {
+      let migratedData = result[settingKey];
+
+      // Migrate data from localStorage to chrome.storage.local
+      if (migratedData == null && currentData != null) {
+        migratedData = JSON.parse(currentData);
+        write();
+      }
+
+      Object.assign(OPTS, migratedData);
+      resolve();
+    });
+  });
 }
 export function write() {
-  localStorage.setItem('structured-start-tab', JSON.stringify(OPTS));
-  return Promise.resolve();
+  return new Promise(resolve => {
+    chrome.storage.local.set({ [settingKey]: OPTS }, function (result) {
+      resolve(result[settingKey]);
+    });
+  });
 }
