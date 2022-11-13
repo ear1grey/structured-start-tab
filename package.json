@@ -29,7 +29,7 @@
   "type": "module",
   "devDependencies": {
     "eslint": "^8.27.0",
-    "eslint-config-portsoc": "^1.0.0"
+    "eslint-config-portsoc": "^1.0.1"
   },
   "eslintConfig": {
     "env": {
