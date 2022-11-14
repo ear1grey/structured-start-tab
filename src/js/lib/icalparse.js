@@ -94,7 +94,7 @@ function getEventInfo(strEvent, timeZone, email) {
   result.utcDate = utcDate;
   const startDateNumber = new Date(utcDate);
   if (startDateNumber < new Date(Date.now())) { return null; }
-  result.startDate = startDateNumber.toLocaleString('en-GB', { timeZone: timeZone });
+  result.startDate = startDateNumber.toLocaleString('en-GB', { timeZone });
   result.title = getDateString(startDateNumber) + result.title;
   year = parseInt(dtEnd.substr(0, 4));
   month = parseInt(dtEnd.substr(4, 2)) - 1;
@@ -102,7 +102,7 @@ function getEventInfo(strEvent, timeZone, email) {
   hour = parseInt(dtEnd.substr(9, 2));
   min = parseInt(dtEnd.substr(11, 2));
   sec = parseInt(dtEnd.substr(13, 2));
-  result.endDate = new Date(Date.UTC(year, month, day, hour, min, sec)).toLocaleString('en-GB', { timeZone: timeZone });
+  result.endDate = new Date(Date.UTC(year, month, day, hour, min, sec)).toLocaleString('en-GB', { timeZone });
 
   // Don't return events that have been declined
   if (result.declined) { return null; }
