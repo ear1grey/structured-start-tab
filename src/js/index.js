@@ -596,7 +596,14 @@ function moveElement(e) {
   const nav = findNav(tgt);
   const position = tgt === dragging.el.nextElementSibling ? 'afterend' : 'beforebegin';
   if (dragging.el.tagName === 'A') {
-    if (tgt.tagName === 'H1') { return nav.prepend(dragging.el); }
+    if (tgt.tagName === 'H1') {
+      // Don't allow dropping inside agenda panel
+      if (tgt.parentElement.id.includes('agenda')) {
+        if (dragging.dummy) { dragging.dummy.remove(); }
+        return;
+      }
+      return nav.prepend(dragging.el);
+    }
     if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
     if (nav.children.length === 0) { return nav.prepend(dragging.el); }
   }
@@ -795,8 +802,10 @@ function dragEnd() {
   // event must have been cancelled because `dragging` should be reset on drop
   if (dragging.el.classList.contains('new')) {
     const elem = document.querySelector('.new');
-    if (OPTS.editOnNewDrop) { editStart(elem); }
-    elem.classList.remove('new');
+    if (elem.parentElement.id !== 'toolbarnav') {
+      if (OPTS.editOnNewDrop) { editStart(elem); }
+      elem.classList.remove('new');
+    }
   }
   if (dragging.dummy) {
     dragging.dummy.remove();
@@ -864,14 +873,15 @@ function toggleFold(e) {
   if (foldMe === els.trash) {
     toast.html('locked', chrome.i18n.getMessage('locked_trash_hidden'));
     toggleTrash();
-    saveChanges();
+
     return;
   }
   if (foldMe?.tagName === 'SECTION') {
     foldMe.classList.toggle('folded');
-    if (OPTS.savePanelStatusLocked) { saveChanges(); }
   }
   prepareDynamicFlex(els.main);
+
+  saveChanges();
 }
 function editSection(e) {
   const target = e.target;
@@ -971,6 +981,13 @@ export function prepareDrag() {
   document.addEventListener('drop', dragDrop);
   document.addEventListener('dragend', dragEnd);
   document.addEventListener('dragenter', dragEnter);
+
+  // clear all pending new elements that could have been left in the trash or incorrect drag
+  for (const element of document.querySelectorAll('.new')) {
+    // skip elements in the nav bar
+    if (element.parentElement.id === 'toolbarnav') continue;
+    element.remove();
+  }
 }
 function prepareDynamicFlex(where) {
   if (OPTS.proportionalSections) {

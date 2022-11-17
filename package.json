@@ -1,6 +1,6 @@
 {
   "name": "structured-start-tab",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Structured Start Tab",
   "author": "Rich Boakes <rich@boakes.org>",
   "contributors": [
@@ -28,9 +28,8 @@
   },
   "type": "module",
   "devDependencies": {
-    "eslint": "^7.18.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-portsoc": "^0.8.1"
+    "eslint": "^8.27.0",
+    "eslint-config-portsoc": "^1.0.1"
   },
   "eslintConfig": {
     "env": {

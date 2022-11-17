@@ -77,27 +77,12 @@ function menuClicked(info, tab) {
     chrome.tabs.sendMessage(tab.id, { item: info.menuItemId });
   }
 }
-function menuInstaller(details) {
+function menuInstaller() {
   const indexURL = chrome.runtime.getURL('app/index.html');
   for (const menuItem of menuItems) {
     menuItem.documentUrlPatterns = [indexURL];
     menuItem.contexts = ['page', 'link'];
     chrome.contextMenus.create(menuItem);
-  }
-  if (details.reason === 'update') {
-    chrome.storage.local.get(null, items => {
-      if (chrome.runtime.lastError) {
-        console.error('cannot get the data');
-      } else {
-        if (Object.keys(items).length !== 0) {
-          const importLastConfig = confirm(chrome.i18n.getMessage('import_config'));
-          if (importLastConfig) {
-            localStorage.setItem('structured-start-tab', JSON.stringify(items));
-          }
-        }
-      }
-    });
-    chrome.storage.local.clear();
   }
   chrome.alarms.create('agendaUpdate', {
     periodInMinutes: 15,
