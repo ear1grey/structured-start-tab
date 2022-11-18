@@ -983,11 +983,14 @@ export function prepareDrag() {
   document.addEventListener('dragend', dragEnd);
   document.addEventListener('dragenter', dragEnter);
 
-  // clear all pending new elements that could have been left in the trash or incorrect drag
-  for (const element of document.querySelectorAll('.new')) {
+  /* Clear all pending new elements that could have been left in the trash or incorrect drag.
+  Only clear when the user is not dragging as panels/links need the .new class whilst being dragged. */
+  if (!dragging) {
+    for (const element of document.querySelectorAll('.new')) {
     // skip elements in the nav bar
-    if (element.parentElement.id === 'toolbarnav') continue;
-    element.remove();
+      if (element.parentElement.id === 'toolbarnav') continue;
+      element.remove();
+    }
   }
 }
 function prepareDynamicFlex(where) {
