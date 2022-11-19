@@ -4,7 +4,10 @@ import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import { updateAgendaBackground } from './background.js';
+
+// TODO: import all components from a common file?
 import './components/agenda-item/index.js';
+import './components/panel/index.js';
 
 const oneDay = 1000 * 60 * 60 * 24;
 const fourDays = oneDay * 4;
@@ -528,6 +531,9 @@ function addAnchorListeners(a) {
 function findNav(elem) {
   let result;
   switch (elem.tagName) {
+    case 'SST-PANEL':
+      result = elem.shadowRoot.querySelector('nav');
+      break;
     case 'SECTION':
       result = elem.children[1];
       break;
@@ -607,7 +613,7 @@ function moveElement(e) {
     if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
     if (nav.children.length === 0) { return nav.prepend(dragging.el); }
   }
-  if (dragging.el.tagName === 'SECTION') {
+  if (dragging.el.tagName === 'SECTION' || dragging.el.tagName === 'SST-PANEL') {
     if (dragging.el.contains(tgt)) { return; } // can't drop *inside* self
     // if (nav.parentElement === dragging) return; // can't drop *inside* self
     // dropping on a heading inserted before that heading's parent
@@ -703,6 +709,7 @@ function dragOver(e) {
     return;
   }
   const target = e.target;
+
   if (!dragging.dummy && target === els.bin) {
     els.bin.classList.add('over');
   } else {
@@ -858,9 +865,11 @@ function prepareElements(selectors = '[id]') {
   });
   return el;
 }
-function findParentSection(elem) {
+function findSection(elem) {
   if (!elem) { return null; }
-  return elem.tagName === 'SECTION' ? elem : elem.parentElement;
+  if (elem.tagName === 'SECTION') return elem; // TODO: remove once fully converted panels to components
+  if (elem.tagName === 'SST-PANEL') return elem.shadowRoot.children[0];
+  return elem.parentElement;
 }
 function toggleFold(e) {
   if (!OPTS.allowCollapsingLocked) {
@@ -869,7 +878,7 @@ function toggleFold(e) {
   }
   if (!(e.target instanceof HTMLElement)) { return; }
   if (els.body.classList.contains('editing')) { return; }
-  const foldMe = findParentSection(e.target);
+  const foldMe = findSection(e.target);
   if (foldMe === els.trash) {
     toast.html('locked', chrome.i18n.getMessage('locked_trash_hidden'));
     toggleTrash();
@@ -878,6 +887,7 @@ function toggleFold(e) {
   }
   if (foldMe?.tagName === 'SECTION') {
     foldMe.classList.toggle('folded');
+    e.target?.toggleFold?.();
   }
   prepareDynamicFlex(els.main);
 
@@ -887,7 +897,7 @@ function editSection(e) {
   const target = e.target;
   if (target.tagName === 'A') { return; }
   if (els.body.classList.contains('editing')) { return; }
-  const foldMe = findParentSection(target);
+  const foldMe = findSection(target);
   if (foldMe === els.trash) { return; }
   if (e.shiftKey && foldMe instanceof HTMLElement && foldMe?.tagName === 'SECTION') {
     editStart(foldMe);
@@ -1101,7 +1111,7 @@ function receiveBackgroundMessages(m) {
 }
 function saveElmContextClicked(e) {
   e.stopPropagation();
-  const target = findParentSection(e.target);
+  const target = findSection(e.target);
   if (target !== null && target.tagName === 'SECTION') {
     els.contextClicked = target;
   } else {
@@ -1165,5 +1175,10 @@ async function prepareAll() {
   updateBookmarksPanel();
   updateAgenda();
   util.localizeHtml(document);
+
+  //! TODO: remove after test
+  const sstPanel = document.createElement('sst-panel');
+  sstPanel.setAttribute('draggable', 'true');
+  document.querySelector('main').append(sstPanel);
 }
 window.addEventListener('DOMContentLoaded', prepareAll);
