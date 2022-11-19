@@ -14,9 +14,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "npx eslint src --ext .js,.jsx",
-    "build": "rm -rf app && mkdir app && cp -R src/* app",
-    "zip": "rm sst.zip;rm sst.xpi;find . -name '.DS_Store' -type f -delete;zip -u -8 -v -r sst.zip app _locales manifest.json release.md;cp sst.zip sst.xpi;echo 'bump versions in releases.md, manifest.json and package.json...'",
-    "all": "npm run validatelogs;npm run build;npm run zip;",
+    "zip": "rm sst.zip;rm sst.xpi;find . -name '.DS_Store' -type f -delete;zip -u -8 -v -r sst.zip src _locales manifest.json release.md;cp sst.zip sst.xpi;echo 'bump versions in releases.md, manifest.json and package.json...'",
+    "all": "npm run validatelogs;npm run zip;",
     "preversion": "npm run lint",
     "version": "node update-manifest-version.js; git add manifest.json;",
     "postversion": "npm run all",
