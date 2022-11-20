@@ -17,6 +17,7 @@ const htmlToJson = (parentElement) => {
             header: child.firstElementChild.textContent, // First element is the h1 element
             content: htmlToJson(child.childNodes[1]), // Second element is the nav element
             folded: !!child.classList.contains('folded'),
+            grow: child.style.flexGrow,
           });
         break;
       case 'A':
@@ -69,6 +70,7 @@ const jsonToHtml = (parentElement, content) => {
         section.id = element.id;
         section.style.backgroundColor = element.backgroundColor;
         section.style.color = element.textColour;
+        section.style.flexGrow = element.grow;
         if (element.direction === 'vertical') { section.classList.add('vertical'); }
         if (element.singleLineDisplay) { section.classList.add('flex-disabled'); }
         if (element.private) { section.classList.add('private'); }
