@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   font-size: 1rem;
+  color: inherit;
 }
 
 section>h1 {
@@ -69,4 +70,30 @@ section.vertical nav {
 
 section.vertical section {
   width: auto;
+}
+
+a {
+  display: flex;
+  align-items: center;
+  background: var(--overlay-mid);
+  border: solid transparent thin;
+  border-radius: var(--tiny);
+  justify-content: center;
+  margin: var(--tiny);
+  padding: var(--medium);
+  min-height: 1.5rem;
+  text-align: center;
+  text-decoration: none;
+  overflow: hidden;
+  flex-grow: 1;
+  cursor: pointer;
+}
+
+
+.dragging {
+  transition: all 1s linear;
+  background: var(--bg-drop);
+  color: var(--fg-drop);
+  border-color: var(--fg-drop);
+  border-style: solid;
 }
