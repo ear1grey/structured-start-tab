@@ -895,7 +895,8 @@ function prepareContent() {
     els.main.firstElementChild.remove();
   }
 
-  if (OPTS.json == null || OPTS.json.length === 0) {
+  // If we don't have a JSON backup yet, it means that we are transitioning from the old version of storing
+  if (OPTS.jsonBackup == null) {
     const parser = new DOMParser();
     const tempdoc = parser.parseFromString(OPTS.html, 'text/html');
     const topLevel = tempdoc.querySelectorAll('body>*');
