@@ -547,6 +547,9 @@ function findNav(elem) {
     case 'IMG':
       result = elem.parentElement?.parentElement;
       break;
+    case 'AGENDA-ITEM':
+      result = elem.parentElement;
+      break;
   }
   if (result) {
     return result;
@@ -768,7 +771,7 @@ function dragDrop(e) {
   }
   let target = e.target;
   while (target && target !== els.main) {
-    if (target.id.includes('agenda') || target.id.includes('topsites') || target.id.includes('bookmarksPanel')) {
+    if (target.id.includes('topsites') || target.id.includes('bookmarksPanel')) {
       toast.html('impossible', chrome.i18n.getMessage('impossible_drop'));
       return;
     }
