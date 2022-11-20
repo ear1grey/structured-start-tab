@@ -127,20 +127,37 @@ function createPageWithPrefs(prefs) {
   }
   updatePageWithPrefs(prefs);
 }
-function exportHTML() {
+function exportStartTab() {
   const now = (new Date()).toISOString().slice(0, 10).replace(/-/g, '_');
-  const el = document.createElement('a');
-  el.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(OPTS.html));
-  el.setAttribute('download', `sst_backup_${now}.html`);
-  el.click();
+
+  const json = JSON.stringify(OPTS.json);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sst_backup_${now}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
-function importHTML() {
+function importStartTab() {
   util.simulateClick('#fileupload');
 }
 function importLoadedFile(file) {
   if (file.target && typeof file.target.result === 'string') {
-    OPTS.backup = OPTS.html;
-    OPTS.html = file.target.result;
+    OPTS.jsonBackup = [...OPTS.json];
+
+    // Keep support for old backups in HTML format
+    if (file.target.result.includes('<section')) {
+      OPTS.json = htmlStringToJson(file.target.result);
+    } else {
+      try {
+        OPTS.json = JSON.parse(file.target.result);
+      } catch (e) {
+        alert('Invalid file');
+        return;
+      }
+    }
+
     saveOptions();
   }
 }
@@ -164,10 +181,10 @@ function uploadFiles(e) {
   const file = target.files && target.files[0];
   upload(file);
 }
-function resetHTML() {
+function resetStartTab() {
   const backup = confirm(chrome.i18n.getMessage('suggest_backup'));
   if (backup) {
-    exportHTML();
+    exportStartTab();
   }
 
   OPTS.json = htmlStringToJson(chrome.i18n.getMessage('default_message'));
@@ -175,9 +192,9 @@ function resetHTML() {
 }
 function prepareListeners() {
   // ! ensures that if any of these elems don't exist a NPE is thrown.
-  document.getElementById('export').addEventListener('click', exportHTML);
-  document.getElementById('import').addEventListener('click', importHTML);
-  document.getElementById('reset').addEventListener('click', resetHTML);
+  document.getElementById('export').addEventListener('click', exportStartTab);
+  document.getElementById('import').addEventListener('click', importStartTab);
+  document.getElementById('reset').addEventListener('click', resetStartTab);
   const importDropZone = document.getElementById('importdropzone');
   importDropZone.addEventListener('dragover', e => e.preventDefault());
   importDropZone.addEventListener('drop', uploadFile);

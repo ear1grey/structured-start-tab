@@ -222,7 +222,9 @@ function detectKeydown(e) {
   }
   if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey)) {
     if (OPTS.backup) {
+      const copy = [...OPTS.json];
       OPTS.json = [...OPTS.jsonBackup];
+      OPTS.jsonBackup = copy;
     }
     options.write();
     prepareContent();
