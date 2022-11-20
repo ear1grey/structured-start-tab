@@ -5,6 +5,8 @@ import * as toast from './lib/toast.js';
 import * as util from './lib/util.js';
 import { OPTS } from './lib/options.js';
 import * as options from './lib/options.js';
+import { htmlStringToJson } from './services/parser.service.js';
+
 function setCheckBox(prefs, what) {
   const elem = document.getElementById(what);
   elem.checked = prefs[what];
@@ -167,7 +169,8 @@ function resetHTML() {
   if (backup) {
     exportHTML();
   }
-  OPTS.html = chrome.i18n.getMessage('default_message');
+
+  OPTS.json = htmlStringToJson(chrome.i18n.getMessage('default_message'));
   options.write();
 }
 function prepareListeners() {
