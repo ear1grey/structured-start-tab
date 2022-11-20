@@ -18,8 +18,8 @@
     "https://calendar.google.com/calendar/*"
   ],
   "background": {
-    "persistent": false,
-    "page": "src/background.html"
+    "service_worker": "src/js/background.js",
+    "type": "module"
   },
   "icons": {
     "16": "src/style/i/16.png",
@@ -28,7 +28,7 @@
     "128": "src/style/i/128.png",
     "580": "src/style/i/580.png"
   },
-  "browser_action": {
+  "action": {
     "default_icon": "src/style/i/48.png"
   },
   "chrome_url_overrides": {
