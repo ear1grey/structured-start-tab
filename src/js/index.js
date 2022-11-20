@@ -135,7 +135,8 @@ function setFavicon(elem, url) {
     favicon.className = 'favicon';
     elem.prepend(favicon);
   }
-  favicon.src = 'chrome://favicon/' + url;
+
+  if (url) { favicon.src = `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`; }
 }
 function prepareFavicons() {
   const links = els.main.querySelectorAll('a');
