@@ -465,7 +465,7 @@ function displayNewAgenda(index, agenda) {
     //   a.href = event.url;
     // }
     const agendaItem = document.createElement('agenda-item');
-    agendaItem.setAttribute('time', event.startDate);
+    agendaItem.setAttribute('time', event.utcDate);
     agendaItem.setAttribute('title', event.title);
     agendaItem.setAttribute('href', event.url);
     rootPanel.querySelector('nav').append(agendaItem);
