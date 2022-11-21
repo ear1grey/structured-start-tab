@@ -95,7 +95,7 @@ function getEventInfo(strEvent, timeZone, email) {
   const startDateNumber = new Date(utcDate);
   if (startDateNumber < new Date(Date.now())) { return null; }
   result.startDate = startDateNumber.toLocaleString('en-GB', { timeZone });
-  result.title = getDateString(startDateNumber) + result.title;
+//  result.title = getDateString(startDateNumber) + result.title;
   year = parseInt(dtEnd.substr(0, 4));
   month = parseInt(dtEnd.substr(4, 2)) - 1;
   day = parseInt(dtEnd.substr(6, 2));
