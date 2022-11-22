@@ -95,7 +95,6 @@ function getEventInfo(strEvent, timeZone, email) {
   const startDateNumber = new Date(utcDate);
   if (startDateNumber < new Date(Date.now())) { return null; }
   result.startDate = startDateNumber.toLocaleString('en-GB', { timeZone });
-//  result.title = getDateString(startDateNumber) + result.title;
   year = parseInt(dtEnd.substr(0, 4));
   month = parseInt(dtEnd.substr(4, 2)) - 1;
   day = parseInt(dtEnd.substr(6, 2));
@@ -108,15 +107,4 @@ function getEventInfo(strEvent, timeZone, email) {
   if (result.declined) { return null; }
 
   return result;
-}
-function getDateString(date) {
-  const today = new Date();
-  const a = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
-  const b = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
-  const diff = Math.floor((b - a) / (1000 * 60 * 60 * 24));
-  if (diff >= 1) {
-    return '+' + diff.toString() + ' ';
-  }
-  if (isNaN(date.getHours())) { return ''; }
-  return String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0') + ' ';
 }
