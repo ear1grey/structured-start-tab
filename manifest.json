@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "1.9.1",
+  "version": "1.10.0",
   "name": "Structured Start Tab",
   "description": "Show a structured page when a new tab is opened.",
   "author": "Rich Boakes",
