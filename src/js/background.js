@@ -65,8 +65,8 @@ const menuItems = [
   },
 ];
 const urls = [
-  chrome.runtime.getURL('app/index.html'),
-  chrome.runtime.getURL('app/options-page.html'),
+  chrome.runtime.getURL('src/index.html'),
+  chrome.runtime.getURL('src/options-page.html'),
   'chrome://newtab/',
 ];
 // message sender used whenever any of our
@@ -78,7 +78,7 @@ function menuClicked(info, tab) {
   }
 }
 function menuInstaller() {
-  const indexURL = chrome.runtime.getURL('app/index.html');
+  const indexURL = chrome.runtime.getURL('src/index.html');
   for (const menuItem of menuItems) {
     menuItem.documentUrlPatterns = [indexURL];
     menuItem.contexts = ['page', 'link'];

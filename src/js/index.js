@@ -135,7 +135,8 @@ function setFavicon(elem, url) {
     favicon.className = 'favicon';
     elem.prepend(favicon);
   }
-  favicon.src = 'chrome://favicon/' + url;
+
+  if (url) { favicon.src = `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`; }
 }
 function prepareFavicons() {
   const links = els.main.querySelectorAll('a');
@@ -464,7 +465,7 @@ function displayNewAgenda(index, agenda) {
     //   a.href = event.url;
     // }
     const agendaItem = document.createElement('agenda-item');
-    agendaItem.setAttribute('time', event.startDate);
+    agendaItem.setAttribute('time', event.utcDate);
     agendaItem.setAttribute('title', event.title);
     agendaItem.setAttribute('href', event.url);
     rootPanel.querySelector('nav').append(agendaItem);
@@ -545,6 +546,9 @@ function findNav(elem) {
       break;
     case 'IMG':
       result = elem.parentElement?.parentElement;
+      break;
+    case 'AGENDA-ITEM':
+      result = elem.parentElement;
       break;
   }
   if (result) {
@@ -767,7 +771,7 @@ function dragDrop(e) {
   }
   let target = e.target;
   while (target && target !== els.main) {
-    if (target.id.includes('agenda') || target.id.includes('topsites') || target.id.includes('bookmarksPanel')) {
+    if (target.id.includes('topsites') || target.id.includes('bookmarksPanel')) {
       toast.html('impossible', chrome.i18n.getMessage('impossible_drop'));
       return;
     }
@@ -982,11 +986,14 @@ export function prepareDrag() {
   document.addEventListener('dragend', dragEnd);
   document.addEventListener('dragenter', dragEnter);
 
-  // clear all pending new elements that could have been left in the trash or incorrect drag
-  for (const element of document.querySelectorAll('.new')) {
+  /* Clear all pending new elements that could have been left in the trash or incorrect drag.
+  Only clear when the user is not dragging as panels/links need the .new class whilst being dragged. */
+  if (!dragging) {
+    for (const element of document.querySelectorAll('.new')) {
     // skip elements in the nav bar
-    if (element.parentElement.id === 'toolbarnav') continue;
-    element.remove();
+      if (element.parentElement.id === 'toolbarnav') continue;
+      element.remove();
+    }
   }
 }
 function prepareDynamicFlex(where) {

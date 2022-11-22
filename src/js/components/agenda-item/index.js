@@ -77,7 +77,7 @@ export class AgendaItem extends HTMLElement {
     } else {
       dateOfEvent = new Date(this.time);
       if (dateOfEvent.getTime() < midnightTonight) {
-        this.timeElem.textContent = `${dateOfEvent.getHours()}:${dateOfEvent.getMinutes()}`;
+        this.timeElem.textContent = `${dateOfEvent.getHours()}:${('' + dateOfEvent.getMinutes()).padStart(2, '0')}`;
       } else {
         this.timeElem.textContent = daysBetween(new Date(midnightTonight), dateOfEvent);
       }
