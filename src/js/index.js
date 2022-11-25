@@ -97,7 +97,7 @@ function editStart(elem) {
         cloneToDialog('#template_edit_panel');
       }
 
-      if (elem.tagName === 'SECTION') {
+      if (elem.tagName === 'SECTION') { // Legacy support
         setValue('#editname', elem.firstElementChild.textContent);
         if (elem.classList.contains('vertical')) {
           document.querySelector('#radioVertical').checked = true;
@@ -110,7 +110,7 @@ function editStart(elem) {
         }
       } else {
         setValue('#editname', elem.header);
-        document.querySelector('#radioVertical').checked = elem.vertical;
+        document.querySelector('#radioVertical').checked = elem.direction === 'vertical';
         document.querySelector('#privateInput').checked = elem.private;
         document.querySelector('#flexInput').checked = elem.singleLineDisplay;
 
@@ -183,7 +183,7 @@ function editOk() {
     els.editing.href = getValue('#editurl');
     setFavicon(els.editing, getValue('#editurl'));
   } else {
-    if (els.editing.tagName === 'SECTION') {
+    if (els.editing.tagName === 'SECTION') { // Legacy support
       els.editing.firstElementChild.textContent = getValue('#editname');
       if (document.querySelector('#flexInput').checked) {
         els.editing.classList.add('flex-disabled');
@@ -202,8 +202,8 @@ function editOk() {
       }
     } else if (els.editing.tagName === 'SST-PANEL') {
       els.editing.header = getValue('#editname');
-      els.singleLineDisplay = document.querySelector('#flexInput').checked;
-      els.editing.vertical = document.querySelector('#radioVertical').checked;
+      els.editing.singleLineDisplay = document.querySelector('#flexInput').checked;
+      els.editing.direction = document.querySelector('#radioVertical').checked ? 'vertical' : 'horizontal';
       els.editing.private = document.querySelector('#privateInput').checked;
 
       els.editing.backgroundColour = getColorValue('#bgcol');
@@ -630,7 +630,7 @@ function calculatePositionWithinTarget(e) {
  * current thing would be dropped
  */
 function moveElement(e) {
-  const tgt = e.target;
+  const tgt = e.path[0];
   if (!dragging || dragging.el === tgt) { return; } // can't drop on self
   const nav = findNav(tgt);
   const position = tgt === dragging.el.nextElementSibling ? 'afterend' : 'beforebegin';
@@ -644,7 +644,7 @@ function moveElement(e) {
       return nav.prepend(dragging.el);
     }
     if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
-    if (nav.children.length === 0) { return nav.prepend(dragging.el); }
+    return nav.prepend(dragging.el);
   }
   if (dragging.el.tagName === 'SECTION' || dragging.el.tagName === 'SST-PANEL') {
     if (dragging.el.contains(tgt)) { return; } // can't drop *inside* self
@@ -742,7 +742,7 @@ function dragOver(e) {
     return;
   }
   const target = e.target;
-
+  console.log(target.tagName);
   if (!dragging.dummy && target === els.bin) {
     els.bin.classList.add('over');
   } else {
@@ -900,7 +900,7 @@ function prepareElements(selectors = '[id]') {
 }
 function findSection(elem) {
   if (!elem) { return null; }
-  if (elem.tagName === 'SECTION') return elem; // TODO: remove once fully converted panels to components
+  if (elem.tagName === 'SECTION') return elem; // Legacy support
   if (elem.tagName === 'SST-PANEL') return elem.shadowRoot.children[0];
   return elem.parentElement;
 }
@@ -934,12 +934,14 @@ function editSection(e) {
   if (!e.shiftKey) return;
 
   const target = findTarget(e);
-  if (target.tagName === 'A') { return; }
+  if (target.tagName === 'A') {
+    return;
+  }
   if (target.tagName === 'SST-PANEL') { editStart(target); } else {
     if (els.body.classList.contains('editing')) { return; }
     const foldMe = findSection(target);
     if (foldMe === els.trash) { return; }
-    if (foldMe instanceof HTMLElement && foldMe?.tagName === 'SECTION') {
+    if (foldMe instanceof HTMLElement && foldMe?.tagName === 'SECTION') { // Legacy support
       editStart(foldMe);
     }
   }

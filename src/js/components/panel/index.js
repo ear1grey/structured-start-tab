@@ -28,7 +28,7 @@ class PanelComponent extends HTMLElement {
   get content() { return this._content; }
 
   get backgroundColour() { return this.getAttribute('background-color') || '#00000019'; }
-  set backgroundColour(color) { this.setAttribute('background-color', color); }
+  set backgroundColour(color) { this.setAttribute('background-color', color.replace('!', '')); }
 
   get textColour() { return this.getAttribute('text-color') || '#ddddddaN'; }
   set textColour(color) { this.setAttribute('text-color', color); }
