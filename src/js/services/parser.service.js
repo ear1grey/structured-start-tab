@@ -1,5 +1,5 @@
 // Ids of elements that we don't want parsed
-const htmlToJson = (parentElement) => {
+const domToJson = (parentElement) => {
   const jsonContent = [];
 
   for (const child of parentElement.children) {
@@ -15,7 +15,7 @@ const htmlToJson = (parentElement) => {
             singleLineDisplay: !!child.classList.contains('flex-disabled'),
             private: !!child.classList.contains('private'),
             header: child.firstElementChild.textContent, // First element is the h1 element
-            content: htmlToJson(child.childNodes[1]), // Second element is the nav element
+            content: domToJson(child.childNodes[1]), // Second element is the nav element
             folded: !!child.classList.contains('folded'),
             grow: child.style.flexGrow,
           });
@@ -42,7 +42,7 @@ const htmlToJson = (parentElement) => {
         jsonContent.push(
           {
             type: 'list',
-            content: htmlToJson(child),
+            content: domToJson(child),
           });
         break;
       case 'LI':
@@ -134,9 +134,10 @@ const jsonToHtml = (parentElement, content) => {
 };
 
 const htmlStringToJson = (htmlString) => {
+  // NOTE: DOMParser does not work in service workers!
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlString, 'text/html');
-  return htmlToJson(doc.body);
+  return domToJson(doc.body);
 };
 
 const appendItemWithDefaults = (parent, item) => {
@@ -145,7 +146,7 @@ const appendItemWithDefaults = (parent, item) => {
 };
 
 export {
-  htmlToJson,
+  domToJson,
   htmlStringToJson,
 
   jsonToHtml,

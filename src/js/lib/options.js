@@ -25,7 +25,7 @@ export const OPTS = {
   showEndDateAgenda: true,
   // StringOpts
   backup: '',
-  json: htmlStringToJson(chrome.i18n.getMessage('default_message')),
+  json: {},
   linkStats: {},
   agendas: [],
 };
@@ -36,6 +36,13 @@ export function load() {
   return new Promise(resolve => {
     chrome.storage.local.get([settingKey], (result) => {
       Object.assign(OPTS, result[settingKey]);
+
+      // if the json obj is empty, it means that is the first time the extension is installed or it is migrated from <1.10.0
+      if (!OPTS.json || Object.keys(OPTS.json).length === 0) {
+        OPTS.json = htmlStringToJson(chrome.i18n.getMessage('default_message'));
+        write();
+      }
+
       resolve();
     });
   });

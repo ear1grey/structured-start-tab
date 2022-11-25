@@ -4,7 +4,7 @@ import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import { updateAgendaBackground } from './background.js';
-import { htmlToJson, jsonToHtml } from './services/parser.service.js';
+import { domToJson, jsonToHtml } from './services/parser.service.js';
 
 import './components/agenda-item/index.js';
 
@@ -207,7 +207,7 @@ function saveChanges(makeBackup = true) {
     OPTS.jsonBackup = [...OPTS.json];
   }
 
-  OPTS.json = htmlToJson(els.main);
+  OPTS.json = domToJson(els.main);
   options.write();
 
   prepareMain();
@@ -901,8 +901,8 @@ function prepareContent() {
     els.main.firstElementChild.remove();
   }
 
-  // If we don't have a JSON backup yet, it means that we are transitioning from the old version of storing
-  if (OPTS.jsonBackup == null) {
+  // If we don't have a JSON backup yet but we have an html property, it means that we are transitioning from the old version of storing
+  if (OPTS.jsonBackup == null && OPTS.html != null) {
     const parser = new DOMParser();
     const tempdoc = parser.parseFromString(OPTS.html, 'text/html');
     const topLevel = tempdoc.querySelectorAll('body>*');
