@@ -267,6 +267,14 @@ main>section {
   margin: var(--medium);
 }
 
+section>nav>ul {
+  padding: 1em;
+  margin-left: 2em;
+}
+
+section>nav>p {
+  padding: 1em;
+}
 
 section {
   display: flex;
@@ -394,6 +402,7 @@ main section.folded>h1 {
   text-align: unset;
   flex-direction: row-reverse;
 }
+
 
 h1,
 h2,
