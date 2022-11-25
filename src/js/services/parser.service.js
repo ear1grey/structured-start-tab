@@ -4,7 +4,7 @@ const domToJson = (parentElement) => {
 
   for (const child of parentElement.children) {
     switch (child.tagName) {
-      case 'SECTION':
+      case 'SECTION': // Legacy
         jsonContent.push(
           {
             id: child.id,
@@ -18,6 +18,22 @@ const domToJson = (parentElement) => {
             content: domToJson(child.childNodes[1]), // Second element is the nav element
             folded: !!child.classList.contains('folded'),
             grow: child.style.flexGrow,
+          });
+        break;
+      case 'SST-PANEL':
+        jsonContent.push(
+          {
+            id: child.id,
+            type: 'sst-panel',
+            backgroundColour: child.backgroundColour,
+            textColour: child.textColour,
+            direction: child.direction,
+            singleLineDisplay: child.singleLineDisplay,
+            private: child.private,
+            header: child.header,
+            content: domToJson(child.content),
+            folded: child.folded,
+            grow: child.grow,
           });
         break;
       case 'A':
@@ -88,6 +104,27 @@ const jsonToDom = (parentElement, content) => {
         section.appendChild(nav);
 
         appendItemWithDefaults(parentElement, section);
+        break;
+      }
+      case 'sst-panel':{
+        const panel = document.createElement('sst-panel');
+
+        // Add properties
+        panel.id = element.id;
+        panel.backgroundColour = element.backgroundColour;
+        panel.textColour = element.textColour;
+        panel.direction = element.direction;
+        panel.singleLineDisplay = element.singleLineDisplay;
+        panel.private = element.private;
+        panel.header = element.header;
+        panel.folded = element.folded;
+        panel.grow = element.grow;
+        if (element.invisible) { panel.classList.add('invisible'); }
+
+        // Set content
+        jsonToDom(panel.content, element.content);
+
+        appendItemWithDefaults(parentElement, panel);
         break;
       }
       case 'link':{

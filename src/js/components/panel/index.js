@@ -21,8 +21,41 @@ class PanelComponent extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['folded'];
+    return ['background-color', 'text-color', 'direction', 'single-line-display', 'private', 'header', 'folded', 'grow'];
   }
+
+  // Getters & setters
+  get content() { return this._content; }
+
+  get backgroundColour() { return this.getAttribute('background-color') || '#00000019'; }
+  set backgroundColour(color) { this.setAttribute('background-color', color); }
+
+  get textColour() { return this.getAttribute('text-color') || '#ddddddaN'; }
+  set textColour(color) { this.setAttribute('text-color', color); }
+
+  get direction() { return this.getAttribute('direction') || 'horizontal'; }
+  set direction(direction) { this.setAttribute('direction', direction); }
+
+  get singleLineDisplay() { return this.hasAttribute('single-line-display'); }
+  set singleLineDisplay(isSingleLine) {
+    if (isSingleLine) {
+      this.setAttribute('single-line-display', '');
+    } else {
+      this.removeAttribute('single-line-display');
+    }
+  }
+
+  get private() { return this.hasAttribute('private'); }
+  set private(isPrivate) {
+    if (isPrivate) {
+      this.setAttribute('private', '');
+    } else {
+      this.removeAttribute('private');
+    }
+  }
+
+  get header() { return this.getAttribute('header') || this._panel.firstChild.textContent; }
+  set header(header) { this.setAttribute('header', header); }
 
   get folded() { return this.hasAttribute('folded'); }
   set folded(isFolded) {
@@ -33,8 +66,48 @@ class PanelComponent extends HTMLElement {
     }
   }
 
+  get grow() { return this.getAttribute('grow') || ''; }
+  set grow(grow) { this.setAttribute('grow', grow); }
+
   toggleFold() {
     this.folded = !this.folded;
+  }
+
+  // Event handlers
+  onBackgroundColourChange() {
+    this._panel.style.backgroundColor = this.backgroundColour;
+  }
+
+  onTextColourChange() {
+    this._panel.style.color = this.textColour;
+  }
+
+  onDirectionChange() {
+    if (this.direction === 'vertical') {
+      this._panel.classList.add('vertical');
+    } else {
+      this._panel.classList.remove('vertical');
+    }
+  }
+
+  onSingleLineDisplayChange() {
+    if (this.singleLineDisplay) {
+      this._panel.classList.add('single-line-display');
+    } else {
+      this._panel.classList.remove('single-line-display');
+    }
+  }
+
+  onPrivateChange() {
+    if (this.private) {
+      this._panel.classList.add('private');
+    } else {
+      this._panel.classList.remove('private');
+    }
+  }
+
+  onHeaderChange() {
+    this._header.textContent = this.header;
   }
 
   onFoldChange() {
@@ -45,8 +118,37 @@ class PanelComponent extends HTMLElement {
     }
   }
 
+  onGrowChange() {
+    this._panel.style.flexGrow = this.grow;
+  }
+
   attributeChangedCallback(name) {
-    if (name === 'folded') { this.onFoldChange(); }
+    switch (name) {
+      case 'background-color':
+        this.onBackgroundColourChange();
+        break;
+      case 'text-color':
+        this.onTextColourChange();
+        break;
+      case 'direction':
+        this.onDirectionChange();
+        break;
+      case 'single-line-display':
+        this.onSingleLineDisplayChange();
+        break;
+      case 'private':
+        this.onPrivateChange();
+        break;
+      case 'header':
+        this.onHeaderChange();
+        break;
+      case 'folded':
+        this.onFoldChange();
+        break;
+      case 'grow':
+        this.onGrowChange();
+        break;
+    }
   }
 }
 

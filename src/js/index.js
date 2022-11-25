@@ -6,7 +6,6 @@ import * as tooltip from './lib/tooltip.js';
 import { updateAgendaBackground } from './background.js';
 import { domToJson, jsonToDom } from './services/parser.service.js';
 
-
 // TODO: import all components from a common file?
 import './components/agenda-item/index.js';
 import './components/panel/index.js';
@@ -78,13 +77,17 @@ function translateColor(rgba) {
 function editStart(elem) {
   els.edit.textContent = ''; // reset
   const style = window.getComputedStyle(elem);
+
+  let bgcol = elem.dataset.bg ? elem.dataset.bg : '!' + translateColor(style.backgroundColor);
+  let fgcol = elem.dataset.fg ? elem.dataset.fg : '!' + translateColor(style.color);
+
   if (elem instanceof HTMLAnchorElement) {
     cloneToDialog('#template_edit_link');
     setValue('#editname', elem.textContent);
     setValue('#editurl', elem.href);
     document.querySelector('#editname').select();
   } else {
-    if (elem.tagName === 'SECTION') {
+    if (elem.tagName === 'SECTION' || elem.tagName === 'SST-PANEL') {
       if (elem.id.includes('agenda')) {
         cloneToDialog('#template_edit_panel_agenda');
         const index = parseInt(elem.id.split('-')[1]);
@@ -93,24 +96,35 @@ function editStart(elem) {
       } else {
         cloneToDialog('#template_edit_panel');
       }
-      setValue('#editname', elem.firstElementChild.textContent);
-      if (elem.classList.contains('vertical')) {
-        document.querySelector('#radioVertical').checked = true;
-      }
-      if (elem.classList.contains('private')) {
-        document.querySelector('#privateInput').checked = true;
-      }
-      if (elem.classList.contains('flex-disabled')) {
-        document.querySelector('#flexInput').checked = true;
+
+      if (elem.tagName === 'SECTION') {
+        setValue('#editname', elem.firstElementChild.textContent);
+        if (elem.classList.contains('vertical')) {
+          document.querySelector('#radioVertical').checked = true;
+        }
+        if (elem.classList.contains('private')) {
+          document.querySelector('#privateInput').checked = true;
+        }
+        if (elem.classList.contains('flex-disabled')) {
+          document.querySelector('#flexInput').checked = true;
+        }
+      } else {
+        setValue('#editname', elem.header);
+        document.querySelector('#radioVertical').checked = elem.vertical;
+        document.querySelector('#privateInput').checked = elem.private;
+        document.querySelector('#flexInput').checked = elem.singleLineDisplay;
+
+        bgcol = '!' + elem.backgroundColour;
+        fgcol = '!' + elem.textColour;
       }
     } else {
       return;
     }
   }
-  const bgcol = elem.dataset.bg ? elem.dataset.bg : '!' + translateColor(style.backgroundColor);
-  const fgcol = elem.dataset.fg ? elem.dataset.fg : '!' + translateColor(style.color);
+
   setColorValue('#bgcol', bgcol);
   setColorValue('#fgcol', fgcol);
+
   dialog.addEventListener('close', closeDialog);
   dialog.addEventListener('cancel', editCancel);
   dialog.showModal();
@@ -186,6 +200,30 @@ function editOk() {
         updateAgendaBackground(OPTS.agendas[index], index)
           .then(() => displayNewAgenda(index, OPTS.agendas[index]));
       }
+    } else if (els.editing.tagName === 'SST-PANEL') {
+      els.editing.header = getValue('#editname');
+      els.singleLineDisplay = document.querySelector('#flexInput').checked;
+      els.editing.vertical = document.querySelector('#radioVertical').checked;
+      els.editing.private = document.querySelector('#privateInput').checked;
+
+      els.editing.backgroundColour = getColorValue('#bgcol');
+      els.editing.textColour = getColorValue('#fgcol');
+
+      if (els.editing.id.includes('agenda')) {
+        const index = parseInt(els.editing.id.split('-')[1]);
+        OPTS.agendas[index].agendaUrl = getValue('#urlInput');
+        OPTS.agendas[index].email = getValue('#emailInput');
+        options.write();
+        updateAgendaBackground(OPTS.agendas[index], index)
+          .then(() => displayNewAgenda(index, OPTS.agendas[index]));
+      }
+
+      dialog.close();
+      saveChanges();
+      flash(els.editing);
+      els.editing.classList.remove('edited');
+      // delete els.editing;
+      return;
     } else {
       return;
     }
@@ -196,6 +234,7 @@ function editOk() {
   styleString += createStyleString('background', els.editing.dataset.bg);
   styleString += createStyleString('color', els.editing.dataset.fg);
   els.editing.setAttribute('style', styleString);
+
   dialog.close();
   saveChanges();
   flash(els.editing);
@@ -557,6 +596,11 @@ function findParentWithFlex(elem) {
   const display = style.getPropertyValue('display');
   return (display === 'flex') ? elem : findParentWithFlex(elem.parentElement);
 }
+
+function findTarget(e) {
+  return e.target.tagName === 'SST-PANEL' ? e.path.find(x => x.tagName === 'SST-PANEL') : e.target;
+}
+
 /**
  * When called, and passed an event this function will find the
  * first parent that has a flex direction (row or column) and
@@ -648,7 +692,7 @@ function dragStart(e) {
   }
   els.body.classList.add('dragOngoing');
   if (els.body.classList.contains('editing')) { return; }
-  const target = e.target;
+  const target = e.target.tagName === 'SST-PANEL' ? e.path[0] : e.target;
   let el, dummy;
   if (target.classList.contains('new')) {
     if (target.id === 'addlink') {
@@ -865,9 +909,13 @@ function toggleFold(e) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
-  if (!(e.target instanceof HTMLElement)) { return; }
+
+  // This is why shadow root needs to be open
+  const target = findTarget(e);
+
+  if (!(target instanceof HTMLElement)) { return; }
   if (els.body.classList.contains('editing')) { return; }
-  const foldMe = findSection(e.target);
+  const foldMe = findSection(target);
   if (foldMe === els.trash) {
     toast.html('locked', chrome.i18n.getMessage('locked_trash_hidden'));
     toggleTrash();
@@ -876,20 +924,24 @@ function toggleFold(e) {
   }
   if (foldMe?.tagName === 'SECTION') {
     foldMe.classList.toggle('folded');
-    e.target?.toggleFold?.();
+    target?.toggleFold?.();
   }
   prepareDynamicFlex(els.main);
 
   saveChanges();
 }
 function editSection(e) {
-  const target = e.target;
+  if (!e.shiftKey) return;
+
+  const target = findTarget(e);
   if (target.tagName === 'A') { return; }
-  if (els.body.classList.contains('editing')) { return; }
-  const foldMe = findSection(target);
-  if (foldMe === els.trash) { return; }
-  if (e.shiftKey && foldMe instanceof HTMLElement && foldMe?.tagName === 'SECTION') {
-    editStart(foldMe);
+  if (target.tagName === 'SST-PANEL') { editStart(target); } else {
+    if (els.body.classList.contains('editing')) { return; }
+    const foldMe = findSection(target);
+    if (foldMe === els.trash) { return; }
+    if (foldMe instanceof HTMLElement && foldMe?.tagName === 'SECTION') {
+      editStart(foldMe);
+    }
   }
 }
 /** add a fold button to the page if necessary */
