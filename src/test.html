@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <title>Structured Start Tab</title>
 <link rel="stylesheet" href="style/index.css">
-<script src=/app/js/components/agenda-item/index.js type=module></script>
+<script src=/src/js/components/agenda-item/index.js type=module></script>
 
 <style>
   nav {
@@ -22,7 +22,7 @@
 
 <script>
   const data = [
-    { time: 0, title: "This is the first example", href:"http://example.org/one" },
+    { time: 0, title: "This is the first example", href: "http://example.org/one" },
     { time: 3601000, title: "One hour from now" },
     { time: 7201000, title: "Two hours from now" },
     { time: 36010000, title: "10 hours from now" },
@@ -32,8 +32,8 @@
     { time: 864000000, title: "10 from now" },
     { time: 8640000000, title: "100 from now" },
     { title: "No Time", href: "http://example.org/two" },
-    { time: 86400000*365, title: "1yr exactly from now" },
-    { time: 86401000*365, title: "1yr exactly from now" },
+    { time: 86400000 * 365, title: "1yr exactly from now" },
+    { time: 86401000 * 365, title: "1yr exactly from now" },
   ];
 
   for (const d of data) {
@@ -45,4 +45,3 @@
     document.querySelector('nav').append(agendaItem);
   }
 </script>
-

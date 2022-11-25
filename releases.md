@@ -4,6 +4,7 @@ Every release for the foreseeable future will be an alpha level release.  This m
 
 ## Alpha Releases
 
+* 1.10.0 [Migration to MV3](https://github.com/ear1grey/structured-start-tab/milestone/20?closed=1)
 * 1.9.1 [Preparation for manifest V3](https://github.com/ear1grey/structured-start-tab/milestone/21?closed=1)
 * 1.9.0 New calendar panel
 * 1.8.3 Quick fix for not-editing bug (hangover from i18n conversion)
