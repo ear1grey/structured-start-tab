@@ -4,7 +4,7 @@ import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import { updateAgendaBackground } from './background.js';
-import { domToJson, jsonToHtml } from './services/parser.service.js';
+import { domToJson, jsonToDom } from './services/parser.service.js';
 
 import './components/agenda-item/index.js';
 
@@ -418,16 +418,18 @@ function addAgenda() {
   options.write();
   updateAgenda();
 }
-async function updateAgenda() {
+
+async function updateAgenda(updateAgendas = true) {
   for (let index = 0; index < OPTS.agendas.length; index++) {
     const agenda = OPTS.agendas[index];
     if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { continue; }
-    if (agenda.events.length === 0) {
+    if (agenda.events.length === 0 && updateAgendas) {
       await updateAgendaBackground(agenda, index);
     }
     displayNewAgenda(index, agenda);
   }
 }
+
 function displayNewAgenda(index, agenda) {
   const rootPanel = els.main.querySelector('#agenda-' + String(index));
   if (!rootPanel) { return; }
@@ -913,8 +915,10 @@ function prepareContent() {
     }
     prepareFavicons();
   } else {
-    jsonToHtml(els.main, OPTS.json);
+    jsonToDom(els.main, OPTS.json);
+    updateAgenda(false);
   }
+
   prepareListeners();
 }
 function toggleTrash() {

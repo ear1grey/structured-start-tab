@@ -60,7 +60,7 @@ const domToJson = (parentElement) => {
   return jsonContent;
 };
 
-const jsonToHtml = (parentElement, content) => {
+const jsonToDom = (parentElement, content) => {
   for (const element of content) {
     switch (element.type) {
       case 'section':{
@@ -84,7 +84,7 @@ const jsonToHtml = (parentElement, content) => {
 
         // Set content
         const nav = document.createElement('nav');
-        jsonToHtml(nav, element.content);
+        jsonToDom(nav, element.content);
         section.appendChild(nav);
 
         appendItemWithDefaults(parentElement, section);
@@ -103,7 +103,7 @@ const jsonToHtml = (parentElement, content) => {
         const icon = document.createElement('img');
         icon.classList.add('favicon');
         icon.setAttribute('src', element.icon);
-        link.appendChild(icon);
+        link.prepend(icon);
 
         appendItemWithDefaults(parentElement, link);
         break;
@@ -117,7 +117,7 @@ const jsonToHtml = (parentElement, content) => {
       }
       case 'list':{
         const list = document.createElement('ul');
-        jsonToHtml(list, element.content);
+        jsonToDom(list, element.content);
 
         parentElement.appendChild(list);
         break;
@@ -149,5 +149,5 @@ export {
   domToJson,
   htmlStringToJson,
 
-  jsonToHtml,
+  jsonToDom,
 };
