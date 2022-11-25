@@ -9,7 +9,7 @@ const domToJson = (parentElement) => {
           {
             id: child.id,
             type: 'section',
-            backgroundColor: child.style.backgroundColor,
+            backgroundColour: child.style.backgroundColor,
             textColour: child.style.color,
             direction: child.classList.contains('vertical') ? 'vertical' : 'horizontal',
             singleLineDisplay: !!child.classList.contains('flex-disabled'),
@@ -24,7 +24,7 @@ const domToJson = (parentElement) => {
         jsonContent.push(
           {
             type: 'link',
-            backgroundColor: child.style.backgroundColor,
+            backgroundColour: child.style.backgroundColor,
             textColour: child.style.color,
             name: child.textContent,
             url: child.href,
@@ -68,7 +68,7 @@ const jsonToDom = (parentElement, content) => {
 
         // Add properties
         section.id = element.id;
-        section.style.backgroundColor = element.backgroundColor;
+        section.style.backgroundColor = element.backgroundColour;
         section.style.color = element.textColour;
         section.style.flexGrow = element.grow;
         if (element.direction === 'vertical') { section.classList.add('vertical'); }
@@ -94,7 +94,7 @@ const jsonToDom = (parentElement, content) => {
         const link = document.createElement('a');
 
         // Add properties
-        link.style.backgroundColor = element.backgroundColor;
+        link.style.backgroundColor = element.backgroundColour;
         link.style.color = element.textColour;
         link.setAttribute('href', element.url);
         link.textContent = element.name;
