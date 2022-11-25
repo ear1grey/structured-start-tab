@@ -1,6 +1,6 @@
 {
-  "manifest_version": 2,
-  "version": "1.9.1",
+  "manifest_version": 3,
+  "version": "1.10.0",
   "name": "Structured Start Tab",
   "description": "Show a structured page when a new tab is opened.",
   "author": "Rich Boakes",
@@ -9,35 +9,44 @@
     "tabs",
     "storage",
     "bookmarks",
-    "chrome://favicon/",
+    "favicon",
     "contextMenus",
     "topSites",
-    "https://calendar.google.com/calendar/*",
     "alarms"
   ],
+  "host_permissions": [
+    "https://calendar.google.com/calendar/*"
+  ],
   "background": {
-    "persistent": false,
-    "page": "app/background.html"
+    "service_worker": "src/js/background.js",
+    "type": "module"
   },
   "icons": {
-    "16": "app/style/i/16.png",
-    "48": "app/style/i/48.png",
-    "96": "app/style/i/96.png",
-    "128": "app/style/i/128.png",
-    "580": "app/style/i/580.png"
+    "16": "src/style/i/16.png",
+    "48": "src/style/i/48.png",
+    "96": "src/style/i/96.png",
+    "128": "src/style/i/128.png",
+    "580": "src/style/i/580.png"
   },
-  "browser_action": {
-    "default_icon": "app/style/i/48.png"
+  "action": {
+    "default_icon": "src/style/i/48.png"
   },
   "chrome_url_overrides": {
-    "newtab": "app/index.html"
+    "newtab": "src/index.html"
   },
   "options_ui": {
-    "page": "app/options-page.html"
+    "page": "src/options-page.html"
   },
   "web_accessible_resources": [
-    "data/*",
-    "chrome://settings/strings.js"
+    {
+      "resources": [
+        "data/*",
+        "chrome://settings/strings.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
   ],
   "commands": {
     "toggle-sidebar": {

@@ -32,18 +32,8 @@ const settingKey = 'structured-start-tab';
 
 export function load() {
   return new Promise(resolve => {
-    const currentData = localStorage.getItem(settingKey);
     chrome.storage.local.get([settingKey], (result) => {
-      let migratedData = result[settingKey];
-
-      // Migrate data from localStorage to chrome.storage.local
-      if (migratedData == null && currentData != null) {
-        migratedData = JSON.parse(currentData);
-        Object.assign(OPTS, migratedData);
-        write();
-      }
-
-      Object.assign(OPTS, migratedData);
+      Object.assign(OPTS, result[settingKey]);
       resolve();
     });
   });
