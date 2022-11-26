@@ -56,3 +56,18 @@ export function setFavicon(elem, url) {
 
   if (url) { favicon.src = `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`; }
 }
+
+export function rgbaToHex(rgba) {
+  const rgbaData = rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+),\s*((\d+).(\d+))/);
+
+  const red = rgbaData[1];
+  const green = rgbaData[2];
+  const blue = rgbaData[3];
+  const alpha = rgbaData[4];
+
+  return `#${hex(red)}${hex(green)}${hex(blue)}${hex(alpha * 255)}`;
+}
+
+function hex(x) {
+  return ('0' + parseInt(x).toString(16)).slice(-2);
+}

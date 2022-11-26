@@ -124,7 +124,6 @@ main>section,
   background-color: var(--overlay-dark);
   border-radius: var(--tiny);
   min-height: var(--button-min-height);
-  padding: var(--large);
   text-decoration: none;
 }
 
@@ -289,11 +288,6 @@ section {
   border-radius: var(--medium);
 }
 
-sst-panel {
-  display: flex;
-  flex: 1 1 auto;
-}
-
 section section {
   flex-direction: column;
   border-radius: var(--small);
@@ -306,12 +300,6 @@ section sst-panel::part(panel) {
 }
 
 section sst-panel[folded]::part(panel) {
-  width: min-content;
-}
-
-sst-panel::part(panel) sst-panel::part(panel) {
-  flex-direction: column;
-  border-radius: var(--small);
   width: min-content;
 }
 
@@ -328,14 +316,6 @@ section.vertical section {
 }
 
 section section nav {
-  flex-wrap: wrap;
-}
-
-section sst-panel::part(content) {
-  flex-wrap: wrap;
-}
-
-sst-panel::part(content) sst-panel::part(content) {
   flex-wrap: wrap;
 }
 
@@ -428,7 +408,6 @@ main a {
   text-decoration: none;
   overflow: hidden;
   flex-grow: 1;
-  min-height: 1.5em;
   cursor: pointer;
 }
 

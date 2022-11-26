@@ -117,3 +117,40 @@ section sst-panel::part(panel) {
 section sst-panel[folded]::part(panel) {
   width: min-content;
 }
+
+sst-panel {
+  display: flex;
+  flex: 1 1 auto;
+
+  flex-direction: column;
+  border-radius: var(--small);
+  width: min-content;
+}
+
+sst-panel[folded] {
+  display: flex;
+  flex: unset;
+}
+
+sst-panel::part(panel) sst-panel::part(panel) {
+  flex-direction: column;
+  border-radius: var(--small);
+  width: min-content;
+}
+
+section sst-panel::part(content) {
+  flex-wrap: wrap;
+}
+
+sst-panel::part(content) sst-panel::part(content) {
+  flex-wrap: wrap;
+}
+
+p {
+  padding: 1em;
+}
+
+ul {
+  padding: 1em;
+  margin-left: 2em;
+}

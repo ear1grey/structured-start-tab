@@ -1,4 +1,4 @@
-import { setFavicon } from '../lib/util.js';
+import { setFavicon, rgbaToHex } from '../lib/util.js';
 
 // Ids of elements that we don't want parsed
 const domToJson = (parentElement) => {
@@ -7,11 +7,15 @@ const domToJson = (parentElement) => {
   for (const child of parentElement.children) {
     switch (child.tagName) {
       case 'SECTION': // Legacy
+
+        // Keep agendas and trash as normal sections until migrated to their own component
+        // Migrate normal panels to sst-panel
+
         jsonContent.push(
           {
             id: child.id,
-            type: 'section',
-            backgroundColour: child.style.backgroundColor,
+            type: (child.id.includes('agenda') || child.id.includes('trash')) ? 'section' : 'sst-panel',
+            backgroundColour: child.style.backgroundColor?.includes('rgba') ? rgbaToHex(child.style.backgroundColor) : child.style.backgroundColor,
             textColour: child.style.color,
             direction: child.classList.contains('vertical') ? 'vertical' : 'horizontal',
             singleLineDisplay: !!child.classList.contains('flex-disabled'),
@@ -21,6 +25,7 @@ const domToJson = (parentElement) => {
             folded: !!child.classList.contains('folded'),
             grow: child.style.flexGrow,
           });
+
         break;
       case 'SST-PANEL':
         jsonContent.push(
@@ -86,7 +91,7 @@ const jsonToDom = (parentElement, content) => {
 
         // Add properties
         section.id = element.id;
-        section.style.backgroundColor = element.backgroundColour;
+        section.style.backgroundColor = element.backgroundColor?.includes('rgba') ? rgbaToHex(element.backgroundColor) : element.backgroundColor;
         section.style.color = element.textColour;
         section.style.flexGrow = element.grow;
         if (element.direction === 'vertical') { section.classList.add('vertical'); }

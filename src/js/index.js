@@ -37,11 +37,11 @@ function setColorValue(where, what) {
 function getColorValue(where) {
   const elem = document.querySelector(where);
   const color = elem.value;
-  const open = elem.dataset.open ? '' : '!';
+  const open = elem.open ? '' : '!';
   return open + color;
 }
 function linkClicked(e) {
-  if (e.target instanceof HTMLElement) {
+  if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
     if (e.shiftKey) {
       e.preventDefault();
       editStart(e.target);
@@ -114,8 +114,8 @@ function editStart(elem) {
         document.querySelector('#privateInput').checked = elem.private;
         document.querySelector('#flexInput').checked = elem.singleLineDisplay;
 
-        bgcol = '!' + elem.backgroundColour;
-        fgcol = '!' + elem.textColour;
+        bgcol = elem.backgroundColour;
+        fgcol = elem.textColour;
       }
     } else {
       return;
@@ -232,6 +232,7 @@ function editOk() {
   els.editing.classList.remove('edited');
   delete els.editing;
 }
+
 function saveChanges(makeBackup = true) {
   if (els.main.classList.contains('heatmap')) {
     toggleHeatMap();
@@ -243,7 +244,7 @@ function saveChanges(makeBackup = true) {
   OPTS.json = domToJson(els.main);
   options.write();
 
-  prepareMain();
+  // prepareMain();
 
   util.prepareCSSVariables(OPTS);
   prepareDynamicFlex(els.main);
@@ -351,15 +352,20 @@ function addLink(target) {
   flash(a, 'highlight');
 }
 function createPanel(target, animation = true, after = true) {
-  const div = util.cloneTemplateToTarget('#template_panel', target, after);
-  div.firstElementChild.textContent = chrome.i18n.getMessage('panel');
+  const panel = document.createElement('sst-panel');
+  panel.setAttribute('draggable', 'true');
+
+  if (after) target.append(panel);
+  else target.prepend(panel);
+
   if (animation) {
-    div.scrollIntoView({ behavior: 'smooth' });
+    panel.scrollIntoView({ behavior: 'smooth' });
     toast.html('addpanel', chrome.i18n.getMessage('add_panel_auto'));
-    div.classList.add('flash');
-    div.addEventListener('animationend', () => { div.classList.remove('flash'); });
+    panel.classList.add('flash');
+    panel.addEventListener('animationend', () => { panel.classList.remove('flash'); });
   }
-  return div;
+
+  return panel;
 }
 function addPanel() {
   if (OPTS.lock) {
@@ -463,25 +469,14 @@ async function updateAgenda(updateAgendas = true) {
   }
 }
 
+
 function displayNewAgenda(index, agenda) {
-  const rootPanel = els.main.querySelector('#agenda-' + String(index));
+  const rootPanel = getAllBySelector(document, '#agenda-' + String(index))[0];
   if (!rootPanel) { return; }
   while (rootPanel.lastElementChild.firstChild) {
     rootPanel.lastElementChild.removeChild(rootPanel.lastElementChild.lastChild);
   }
   for (const event of agenda.events.slice(0, OPTS.agendaNb)) {
-    // panel.firstElementChild!.textContent = (event.location) ? event.title + ' - ' + event.location : event.title;
-    // const a = document.createElement('a');
-    // rootPanel.querySelector('nav')!.append(a);
-    // if (event.startDate.includes('Invalid') ||
-    //     event.endDate.includes('Invalid')) {
-    //   continue;
-    // } else {
-    //   a.textContent = event.title;
-    // }
-    // if (event.url) {
-    //   a.href = event.url;
-    // }
     const agendaItem = document.createElement('agenda-item');
     agendaItem.setAttribute('time', event.utcDate);
     agendaItem.setAttribute('title', event.title);
@@ -589,6 +584,7 @@ function findParentWithFlex(elem) {
 }
 
 function findTarget(e) {
+  if (e.path[0].tagName === 'A') return e.path[0];
   return e.target.tagName === 'SST-PANEL' ? e.path.find(x => x.tagName === 'SST-PANEL') : e.target;
 }
 
@@ -616,6 +612,22 @@ function calculatePositionWithinTarget(e) {
   }
   return (position * 2 < width) ? 'beforebegin' : 'afterend';
 }
+
+function isElementContained(parentElement, childElement) {
+  if (parentElement.contains(childElement)) { return true; }
+  if (parentElement === childElement) { return true; }
+
+  // check the shadow dom recursively
+  if (parentElement.shadowRoot) {
+    const shadowChildren = parentElement.shadowRoot.querySelectorAll('*');
+    for (const child of shadowChildren) {
+      if (isElementContained(child, childElement)) { return true; }
+    }
+  }
+
+  return false;
+}
+
 /*
  * add a placeholder element to the position where the
  * current thing would be dropped
@@ -637,13 +649,31 @@ function moveElement(e) {
     if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
     return nav.prepend(dragging.el);
   }
-  if (dragging.el.tagName === 'SECTION' || dragging.el.tagName === 'SST-PANEL') {
-    if (dragging.el.contains(tgt)) { return; } // can't drop *inside* self
-    // if (nav.parentElement === dragging) return; // can't drop *inside* self
+  if (dragging.el.tagName === 'SECTION') {
+    // can't drop *inside* self
+    if (dragging.el.contains(tgt) || dragging.el.shadow?.contains(tgt)) { return; }
+
     // dropping on a heading inserted before that heading's parent
     if (tgt.tagName === 'H1') {
       const beforeOrAfter = calculatePositionWithinTarget(e);
       return tgt.parentElement.insertAdjacentElement(beforeOrAfter, dragging.el);
+    }
+    if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
+    if (tgt.tagName === 'MAIN') { return nav.append(dragging.el); }
+    if (nav.children.length === 0) { return nav.prepend(dragging.el); }
+  }
+  if (dragging.el.tagName === 'SST-PANEL') {
+    // can't drop *inside* self
+    if (isElementContained(dragging.el, tgt)) { return; }
+
+    // dropping on a heading inserted before that heading's parent
+    if (tgt.tagName === 'H1') {
+      const closestTarget = findTarget(e);
+
+      if (dragging.el.contains(closestTarget)) return;
+
+      const beforeOrAfter = calculatePositionWithinTarget(e);
+      return closestTarget.insertAdjacentElement(beforeOrAfter, dragging.el);
     }
     if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
     if (tgt.tagName === 'MAIN') { return nav.append(dragging.el); }
@@ -683,8 +713,18 @@ function dragStart(e) {
   }
   els.body.classList.add('dragOngoing');
   if (els.body.classList.contains('editing')) { return; }
-  const target = e.target.tagName === 'SST-PANEL' ? e.path[0] : e.target;
+  let target = e.target.tagName === 'SST-PANEL' ? e.path[0] : e.target;
+  if (target.tagName === 'IMG') {
+    target = target.parentElement;
+
+    // Alternatively, don't allow dragging of images at all
+    // e.stopPropagation();
+    // e.preventDefault();
+    // return;
+  }
+
   let el, dummy;
+  // Dummy used when dragging from the toolbar
   if (target.classList.contains('new')) {
     if (target.id === 'addlink') {
       dummy = createExampleLink();
@@ -693,7 +733,6 @@ function dragStart(e) {
       el = dummy;
       toast.html('addlink', chrome.i18n.getMessage('add_link'));
     } else {
-      // addpanel
       dummy = createPanel(els.main);
       dummy.classList.add('dragging');
       dummy.classList.add('new');
@@ -733,7 +772,6 @@ function dragOver(e) {
     return;
   }
   const target = e.target;
-  console.log(target.tagName);
   if (!dragging.dummy && target === els.bin) {
     els.bin.classList.add('over');
   } else {
@@ -804,6 +842,7 @@ function dragDrop(e) {
     }
     target = target.parentElement;
   }
+  e.stopPropagation();
   e.preventDefault();
   dragging.el.classList.remove('dragging');
   dragging.el.classList.remove('fresh');
@@ -821,14 +860,14 @@ function dragDrop(e) {
   }
 }
 function dragEnd() {
-  if (!dragging) { return; }
+  if (!dragging || !dragging.el.classList.contains('dragging')) { return; }
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
   els.body.classList.remove('dragOngoing');
   els.bin.classList.remove('over');
-  dragging.el.classList.remove('dragging');
+
   dragging.el.classList.remove('fresh');
   // event must have been cancelled because `dragging` should be reset on drop
   if (dragging.el.classList.contains('new')) {
@@ -843,6 +882,9 @@ function dragEnd() {
   } else {
     replaceElementInOriginalPosition();
   }
+
+  dragging.el.classList.remove('dragging');
+
   dragging = undefined;
   tooltip.hide();
   toast.html('cancel', chrome.i18n.getMessage('drag_cancel'));
@@ -889,12 +931,24 @@ function prepareElements(selectors = '[id]') {
   });
   return el;
 }
+
+function findEventFirstSection(e) {
+  for (let i = 0; i < e.path.length; i++) {
+    if (e.path[i].tagName === 'SECTION') {
+      return e.path[i];
+    }
+  }
+
+  return null;
+}
+
 function findSection(elem) {
   if (!elem) { return null; }
   if (elem.tagName === 'SECTION') return elem; // Legacy support
   if (elem.tagName === 'SST-PANEL') return elem.shadowRoot.children[0];
   return elem.parentElement;
 }
+
 function toggleFold(e) {
   if (!OPTS.allowCollapsingLocked) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
@@ -928,13 +982,17 @@ function editSection(e) {
   if (target.tagName === 'A') {
     return;
   }
-  if (target.tagName === 'SST-PANEL') { editStart(target); } else {
-    if (els.body.classList.contains('editing')) { return; }
-    const foldMe = findSection(target);
-    if (foldMe === els.trash) { return; }
-    if (foldMe instanceof HTMLElement && foldMe?.tagName === 'SECTION') { // Legacy support
-      editStart(foldMe);
-    }
+
+  if (els.body.classList.contains('editing')) { return; }
+
+  const elementToEdit = findEventFirstSection(e);
+
+  if (elementToEdit.id.includes('agenda')) {
+    editStart(elementToEdit);
+  } else if (target.tagName === 'SST-PANEL' && target.shadow?.contains(elementToEdit)) {
+    editStart(target);
+  } else if (elementToEdit instanceof HTMLElement && elementToEdit?.tagName === 'SECTION') { // Legacy support
+    editStart(elementToEdit);
   }
 }
 /** add a fold button to the page if necessary */
@@ -943,8 +1001,20 @@ function prepareFoldables(selectors = 'main') {
   elems.forEach(e => e.addEventListener('dblclick', toggleFold));
   elems.forEach(e => e.addEventListener('click', editSection));
 }
+
+function getAllBySelector(element, selector) {
+  const elements = [...element.querySelectorAll(selector)];
+  for (const child of element.children) {
+    elements.push(...getAllBySelector(child, selector));
+  }
+  if (element.shadowRoot) {
+    elements.push(...getAllBySelector(element.shadowRoot, selector));
+  }
+  return elements;
+}
+
 function prepareListeners() {
-  const anchors = document.querySelectorAll('a');
+  const anchors = getAllBySelector(document, 'a');
   for (const a of anchors) {
     addAnchorListeners(a);
   }
@@ -1217,10 +1287,5 @@ async function prepareAll() {
   updateBookmarksPanel();
   updateAgenda();
   util.localizeHtml(document);
-
-  //! TODO: remove after test
-  const sstPanel = document.createElement('sst-panel');
-  sstPanel.setAttribute('draggable', 'true');
-  document.querySelector('main').append(sstPanel);
 }
 window.addEventListener('DOMContentLoaded', prepareAll);

@@ -27,11 +27,16 @@ class PanelComponent extends HTMLElement {
   // Getters & setters
   get content() { return this._content; }
 
-  get backgroundColour() { return this.getAttribute('background-color') || '#00000019'; }
-  set backgroundColour(color) { this.setAttribute('background-color', color.replace('!', '')); }
+  // Exclamation mark used to identify if the value is default or not
+  get backgroundColour() { return this.getAttribute('background-color') || '!#00000019'; }
+  set backgroundColour(color) {
+    this.setAttribute('background-color', color.slice(0, 1) + color.slice(1).replace('!', ''));
+  }
 
-  get textColour() { return this.getAttribute('text-color') || '#ddddddaN'; }
-  set textColour(color) { this.setAttribute('text-color', color); }
+  get textColour() { return this.getAttribute('text-color') || '!#ddddddaN'; }
+  set textColour(color) {
+    this.setAttribute('text-color', color.slice(0, 1) + color.slice(1).replace('!', ''));
+  }
 
   get direction() { return this.getAttribute('direction') || 'horizontal'; }
   set direction(direction) { this.setAttribute('direction', direction); }
@@ -116,10 +121,16 @@ class PanelComponent extends HTMLElement {
     } else if (!this.folded && this._panel.classList.contains('folded')) {
       this._panel.classList.remove('folded');
     }
+
+    this.onGrowChange();
   }
 
   onGrowChange() {
-    this._panel.style.flexGrow = this.grow;
+    if (this.tagName === 'SST-PANEL') {
+      this.style.flexGrow = this.folded ? 'unset' : this.grow;
+    } else {
+      this.getRootNode().style.flexGrow = this.folded ? 'unset' : this.grow;
+    }
   }
 
   attributeChangedCallback(name) {
