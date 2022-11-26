@@ -147,20 +147,11 @@ function closeDialog() {
   }
   delete els.editing;
 }
-function setFavicon(elem, url) {
-  let favicon = elem.querySelector('img.favicon');
-  if (!favicon) {
-    favicon = document.createElement('img');
-    favicon.className = 'favicon';
-    elem.prepend(favicon);
-  }
 
-  if (url) { favicon.src = `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`; }
-}
 function prepareFavicons() {
   const links = els.main.querySelectorAll('a');
   for (const a of links) {
-    setFavicon(a, a.href);
+    util.setFavicon(a, a.href);
   }
 }
 
@@ -181,7 +172,7 @@ function editOk() {
   if (els.editing instanceof HTMLAnchorElement) {
     els.editing.textContent = getValue('#editname');
     els.editing.href = getValue('#editurl');
-    setFavicon(els.editing, getValue('#editurl'));
+    util.setFavicon(els.editing, getValue('#editurl'));
   } else {
     if (els.editing.tagName === 'SECTION') { // Legacy support
       els.editing.firstElementChild.textContent = getValue('#editname');
@@ -333,7 +324,7 @@ function createExampleLink(text = chrome.i18n.getMessage('example'), href = 'htt
   const a = document.createElement('a');
   a.href = href;
   a.textContent = text;
-  setFavicon(a, href);
+  util.setFavicon(a, href);
   addAnchorListeners(a);
   return a;
 }
@@ -793,7 +784,7 @@ function extractDataFromDrop(e) {
   }
   if (url) {
     dragging.el.href = url;
-    setFavicon(dragging.el, url);
+    util.setFavicon(dragging.el, url);
     dragging.el.textContent = text || '';
   } else {
     dragging.el.remove();

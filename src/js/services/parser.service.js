@@ -1,3 +1,5 @@
+import { setFavicon } from '../lib/util.js';
+
 // Ids of elements that we don't want parsed
 const domToJson = (parentElement) => {
   const jsonContent = [];
@@ -135,12 +137,7 @@ const jsonToDom = (parentElement, content) => {
         link.style.color = element.textColour;
         link.setAttribute('href', element.url);
         link.textContent = element.name;
-
-        // Set icon
-        const icon = document.createElement('img');
-        icon.classList.add('favicon');
-        icon.setAttribute('src', element.icon);
-        link.prepend(icon);
+        setFavicon(link, element.url);
 
         appendItemWithDefaults(parentElement, link);
         break;

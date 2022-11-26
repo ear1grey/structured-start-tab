@@ -45,3 +45,14 @@ export function cloneTemplateToTarget(selector, where, after = true) {
     return where.firstElementChild;
   }
 }
+
+export function setFavicon(elem, url) {
+  let favicon = elem.querySelector('img.favicon');
+  if (!favicon) {
+    favicon = document.createElement('img');
+    favicon.className = 'favicon';
+    elem.prepend(favicon);
+  }
+
+  if (url) { favicon.src = `chrome-extension://${chrome.runtime.id}/_favicon/?pageUrl=${encodeURIComponent(url)}&size=32`; }
+}
