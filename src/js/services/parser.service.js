@@ -14,14 +14,14 @@ const domToJson = (parentElement) => {
         jsonContent.push(
           {
             id: child.id,
-            type: (child.id.includes('agenda') || child.id.includes('trash')) ? 'section' : 'sst-panel',
+            type: (child.id.includes('trash')) ? 'section' : 'sst-panel',
             backgroundColour: child.style.backgroundColor?.includes('rgba') ? rgbaToHex(child.style.backgroundColor) : child.style.backgroundColor,
             textColour: child.style.color,
             direction: child.classList.contains('vertical') ? 'vertical' : 'horizontal',
             singleLineDisplay: !!child.classList.contains('flex-disabled'),
             private: !!child.classList.contains('private'),
             header: child.firstElementChild.textContent, // First element is the h1 element
-            content: domToJson(child.childNodes[1]), // Second element is the nav element
+            content: domToJson(child.children[1]), // Second element is the nav element
             folded: !!child.classList.contains('folded'),
             grow: child.style.flexGrow,
           });

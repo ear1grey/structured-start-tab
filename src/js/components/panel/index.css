@@ -16,7 +16,7 @@ section>nav {
   display: flex;
   flex: 1 1 auto;
   background: transparent;
-  margin: var(--small);
+  margin: var(--medium);
 }
 
 section>nav:empty {
@@ -140,10 +140,16 @@ sst-panel::part(panel) sst-panel::part(panel) {
 
 section sst-panel::part(content) {
   flex-wrap: wrap;
+  margin: var(--tiny);
+}
+
+.single-line-display nav {
+  flex-wrap: nowrap !important;
 }
 
 sst-panel::part(content) sst-panel::part(content) {
   flex-wrap: wrap;
+  margin: var(--tiny);
 }
 
 p {

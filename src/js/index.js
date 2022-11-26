@@ -91,8 +91,8 @@ function editStart(elem) {
       if (elem.id.includes('agenda')) {
         cloneToDialog('#template_edit_panel_agenda');
         const index = parseInt(elem.id.split('-')[1]);
-        setValue('#urlInput', OPTS.agendas[index].agendaUrl);
-        setValue('#emailInput', OPTS.agendas[index].email);
+        setValue('#urlInput', OPTS.agendas[index]?.agendaUrl);
+        setValue('#emailInput', OPTS.agendas[index]?.email);
       } else {
         cloneToDialog('#template_edit_panel');
       }
@@ -184,7 +184,13 @@ function editOk() {
       addRemoveClassList('#radioVertical', ['vertical'], ['vertical']);
       addRemoveClassList('#privateInput', ['private'], ['private', 'blur']);
       if (els.editing.id.includes('agenda')) {
-        const index = parseInt(els.editing.id.split('-')[1]);
+        let index = parseInt(els.editing.id.split('-')[1]);
+
+        if (OPTS.agendas.length === 0) {
+          OPTS.agendas = [{}];
+          index = 0;
+        }
+
         OPTS.agendas[index].agendaUrl = getValue('#urlInput');
         OPTS.agendas[index].email = getValue('#emailInput');
         options.write();
@@ -213,7 +219,6 @@ function editOk() {
       saveChanges();
       flash(els.editing);
       els.editing.classList.remove('edited');
-      // delete els.editing;
       return;
     } else {
       return;
@@ -244,7 +249,7 @@ function saveChanges(makeBackup = true) {
   OPTS.json = domToJson(els.main);
   options.write();
 
-  // prepareMain();
+  prepareListeners();
 
   util.prepareCSSVariables(OPTS);
   prepareDynamicFlex(els.main);
@@ -448,7 +453,8 @@ function inDepthBookmarkTree(toTreat, parentPanel) {
 function addAgenda() {
   const panel = createPanel(els.main, false);
   panel.id = 'agenda-' + String(OPTS.agendas.length);
-  panel.firstElementChild.textContent = chrome.i18n.getMessage('agenda');
+  panel.header = chrome.i18n.getMessage('agenda');
+  panel.direction = 'vertical';
   OPTS.agendas.push({
     agendaUrl: chrome.i18n.getMessage('default_agenda_link'),
     events: [],
@@ -471,7 +477,7 @@ async function updateAgenda(updateAgendas = true) {
 
 
 function displayNewAgenda(index, agenda) {
-  const rootPanel = getAllBySelector(document, '#agenda-' + String(index))[0];
+  const rootPanel = getAllBySelector(document, '#agenda-' + String(index))[0]?._panel;
   if (!rootPanel) { return; }
   while (rootPanel.lastElementChild.firstChild) {
     rootPanel.lastElementChild.removeChild(rootPanel.lastElementChild.lastChild);
@@ -633,22 +639,12 @@ function isElementContained(parentElement, childElement) {
  * current thing would be dropped
  */
 function moveElement(e) {
-  const tgt = e.path[0];
+  const tgt = findTarget(e);
   if (!dragging || dragging.el === tgt) { return; } // can't drop on self
+  if (tgt.id.includes('agenda')) { return; } // can't drop on agenda
   const nav = findNav(tgt);
   const position = tgt === dragging.el.nextElementSibling ? 'afterend' : 'beforebegin';
-  if (dragging.el.tagName === 'A') {
-    if (tgt.tagName === 'H1') {
-      // Don't allow dropping inside agenda panel
-      if (tgt.parentElement.id.includes('agenda')) {
-        if (dragging.dummy) { dragging.dummy.remove(); }
-        return;
-      }
-      return nav.prepend(dragging.el);
-    }
-    if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
-    return nav.prepend(dragging.el);
-  }
+
   if (dragging.el.tagName === 'SECTION') {
     // can't drop *inside* self
     if (dragging.el.contains(tgt) || dragging.el.shadow?.contains(tgt)) { return; }
@@ -691,7 +687,7 @@ function checkDragIsWithin(target, preferred) {
 }
 function replaceElementInOriginalPosition() {
   if (!dragging || !dragging.parent) { return; }
-  if (dragging.sibling) {
+  if (dragging.sibling && dragging.el !== dragging.sibling) {
     dragging.parent.insertBefore(dragging.el, dragging.sibling);
   } else {
     dragging.parent.append(dragging.el);
@@ -753,17 +749,12 @@ function dragStart(e) {
     sibling: target.nextElementSibling,
     startedOnThisPage: true,
   };
-  // setDragImage(e);  // <-- not sure I like disabling this or if I want it as an option
 }
 function flash(elem, cls = 'flash') {
   elem.classList.add(cls);
   elem.addEventListener('animationend', () => { elem.classList.remove(cls); });
 }
-// function setDragImage(e) {
-//   const img = new Image();
-//   img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-//   e.dataTransfer.setDragImage(img, 1, 1);
-// }
+
 /* respond if dropping here is ok */
 function dragOver(e) {
   if (!dragging) { return; }
@@ -772,8 +763,14 @@ function dragOver(e) {
     return;
   }
   const target = e.target;
-  if (!dragging.dummy && target === els.bin) {
+
+  console.log(target.id);
+
+  if (target === els.bin || target.id.includes('agenda')) {
     els.bin.classList.add('over');
+    e.preventDefault();
+    dragging.dummy?.remove();
+    return;
   } else {
     els.bin.classList.remove('over');
   }
@@ -828,6 +825,7 @@ function extractDataFromDrop(e) {
     dragging.el.remove();
   }
 }
+
 function dragDrop(e) {
   if (!dragging) { return; }
   if (OPTS.lock) {
@@ -846,11 +844,18 @@ function dragDrop(e) {
   e.preventDefault();
   dragging.el.classList.remove('dragging');
   dragging.el.classList.remove('fresh');
-  if (e.target === els.bin && !dragging.dummy) {
-    els.trash = els.main.querySelector('#trash') || util.cloneTemplateToTarget('#template_trash', els.main);
-    els.trash.lastElementChild?.append(dragging.el);
-    saveChanges();
-    toast.html('locked', chrome.i18n.getMessage('locked_moved_to_trash'));
+
+  if (e.target === els.bin) {
+    // when we drop into the bin from the toolbar, remove the element from the screen directly
+    if (dragging.dummy) {
+      dragging.dummy.remove();
+      dragging.dummy = null;
+    } else {
+      els.trash = els.main.querySelector('#trash') || util.cloneTemplateToTarget('#template_trash', els.main);
+      els.trash.lastElementChild?.append(dragging.el);
+      saveChanges();
+      toast.html('locked', chrome.i18n.getMessage('locked_moved_to_trash'));
+    }
   } else {
     if (!dragging.startedOnThisPage) {
       extractDataFromDrop(e);
@@ -859,35 +864,37 @@ function dragDrop(e) {
     saveChanges();
   }
 }
+
 function dragEnd() {
-  if (!dragging || !dragging.el.classList.contains('dragging')) { return; }
-  if (OPTS.lock) {
-    toast.html('locked', chrome.i18n.getMessage('locked'));
-    return;
-  }
-  els.body.classList.remove('dragOngoing');
-  els.bin.classList.remove('over');
-
-  dragging.el.classList.remove('fresh');
-  // event must have been cancelled because `dragging` should be reset on drop
-  if (dragging.el.classList.contains('new')) {
-    const elem = document.querySelector('.new');
-    if (elem.parentElement.id !== 'toolbarnav') {
-      if (OPTS.editOnNewDrop) { editStart(elem); }
-      elem.classList.remove('new');
+  try {
+    if (!dragging || !dragging.el.classList.contains('dragging')) {
+      if (OPTS.editOnNewDrop && dragging.el.classList.contains('new') && dragging.dummy) { editStart(dragging.el); }
+      return;
     }
-  }
-  if (dragging.dummy) {
-    dragging.dummy.remove();
-  } else {
-    replaceElementInOriginalPosition();
-  }
+    if (OPTS.lock) {
+      toast.html('locked', chrome.i18n.getMessage('locked'));
+      return;
+    }
 
-  dragging.el.classList.remove('dragging');
+    els.body.classList.remove('dragOngoing');
+    els.bin.classList.remove('over');
 
-  dragging = undefined;
-  tooltip.hide();
-  toast.html('cancel', chrome.i18n.getMessage('drag_cancel'));
+    dragging.el.classList.remove('fresh');
+
+    if (dragging.dummy) {
+      dragging.dummy.remove();
+    } else {
+      replaceElementInOriginalPosition();
+    }
+
+    dragging.el.classList.remove('dragging');
+
+    dragging = undefined;
+    tooltip.hide();
+    toast.html('cancel', chrome.i18n.getMessage('drag_cancel'));
+  } finally {
+    dragging?.el.classList.remove('new');
+  }
 }
 export async function prepareBookmarks(OPTS, target) {
   if (OPTS.showBookmarksSidebar) {
@@ -1092,10 +1099,6 @@ function prepareTrash() {
  * make all links within a doc draggable
  */
 export function prepareDrag() {
-  // const links = document.querySelectorAll('main a, .bookmarks a');
-  // for (const link of links) {
-  //   link.draggable = true;
-  // }
   document.addEventListener('dragstart', dragStart);
   document.addEventListener('dragover', dragOver);
   document.addEventListener('drop', dragDrop);
@@ -1114,7 +1117,7 @@ export function prepareDrag() {
 }
 function prepareDynamicFlex(where) {
   if (OPTS.proportionalSections) {
-    const topLevelSections = where.querySelectorAll(':scope > section');
+    const topLevelSections = where.querySelectorAll(':scope > sst-panel, :scope > section, :scope > a');
     for (const child of topLevelSections) {
       calculateDynamicFlex(child);
     }
@@ -1125,11 +1128,10 @@ function prepareDynamicFlex(where) {
 }
 function calculateDynamicFlex(where) {
   let total = 0;
-  const nav = where.querySelector('nav');
-  if (nav) {
-    for (const child of nav.children) {
-      if (child.tagName === 'SECTION') {
-        if (child.classList.contains('folded')) {
+  if (where._content) {
+    for (const child of where._content.children) {
+      if (child.tagName === 'SST-PANEL') {
+        if (child.folded) {
           total += 1;
         } else {
           total += Math.max(1, calculateDynamicFlex(child));
@@ -1140,8 +1142,8 @@ function calculateDynamicFlex(where) {
       }
     }
   }
-  if (where.tagName === 'SECTION') {
-    where.dataset.size = String(total);
+  if (where.tagName === 'SST-PANEL') {
+    where.grow = String(total > 0 ? total : 1);
   }
   return total;
 }
