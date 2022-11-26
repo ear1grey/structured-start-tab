@@ -644,7 +644,13 @@ function moveElement(e) {
   if (tgt.id.includes('agenda')) { return; } // can't drop on agenda
   const nav = findNav(tgt);
   const position = tgt === dragging.el.nextElementSibling ? 'afterend' : 'beforebegin';
-
+  if (dragging.el.tagName === 'A') {
+    if (tgt.tagName === 'H1') {
+      return nav.prepend(dragging.el);
+    }
+    if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
+    return nav.prepend(dragging.el);
+  }
   if (dragging.el.tagName === 'SECTION') {
     // can't drop *inside* self
     if (dragging.el.contains(tgt) || dragging.el.shadow?.contains(tgt)) { return; }
