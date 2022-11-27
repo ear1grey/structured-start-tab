@@ -770,8 +770,6 @@ function dragOver(e) {
   }
   const target = e.target;
 
-  console.log(target.id);
-
   if (target === els.bin || target.id.includes('agenda')) {
     els.bin.classList.add('over');
     e.preventDefault();

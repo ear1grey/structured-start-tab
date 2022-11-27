@@ -124,7 +124,6 @@ sst-panel {
 
   flex-direction: column;
   border-radius: var(--small);
-  width: min-content;
 }
 
 sst-panel[folded] {
