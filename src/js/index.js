@@ -1040,7 +1040,6 @@ function prepareContent() {
   }
 
   // If we don't have a JSON backup yet but we have an html property, it means that we are transitioning from the old version of storing
-  debugger;
   if (OPTS.jsonBackup == null && OPTS.html != null) {
     const parser = new DOMParser();
     const tempdoc = parser.parseFromString(OPTS.html, 'text/html');
