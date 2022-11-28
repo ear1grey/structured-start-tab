@@ -250,7 +250,7 @@ section>nav {
 }
 
 section>nav:empty {
-  border: white dashed thin;
+  border: #fff dashed thin;
   min-height: 2em;
 }
 
@@ -338,7 +338,7 @@ section section nav {
 }
 
 .switch input:checked+label {
-  background-color: lightgrey;
+  background-color: #d3d3d3;
   box-shadow: none;
 }
 
