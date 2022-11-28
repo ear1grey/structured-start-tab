@@ -4,6 +4,8 @@ import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import { updateAgendaBackground } from './background.js';
+import { domToJson, jsonToDom } from './services/parser.service.js';
+
 import './components/agenda-item/index.js';
 
 const oneDay = 1000 * 60 * 60 * 24;
@@ -144,12 +146,7 @@ function prepareFavicons() {
     setFavicon(a, a.href);
   }
 }
-function removeFavicons(root) {
-  const images = root.querySelectorAll('img.favicon');
-  for (const a of images) {
-    a.remove();
-  }
-}
+
 const createStyleString = (n, v) => v[0] === '!' ? '' : `${n}:${v};`;
 function addRemoveClassList(toCheck, toAdd, toRemove) {
   if (document.querySelector(toCheck).checked) {
@@ -207,45 +204,31 @@ function saveChanges(makeBackup = true) {
     toggleHeatMap();
   }
   if (makeBackup) {
-    OPTS.backup = OPTS.html;
+    OPTS.jsonBackup = [...OPTS.json];
   }
-  const html = els.main.innerHTML;
-  const tree = treeFromHTML(html);
-  removeFavicons(tree);
-  cleanTree(tree);
-  OPTS.html = tree.body.innerHTML;
+
+  OPTS.json = domToJson(els.main);
   options.write();
-  prepareMain(OPTS);
+
+  prepareMain();
+
   util.prepareCSSVariables(OPTS);
   prepareDynamicFlex(els.main);
   prepareBookmarks(OPTS, els.bookmarksnav);
 }
-function cleanTree(tree) {
-  const all = tree.querySelectorAll('section, a');
-  for (const e of all) {
-    if (e.classList.contains('flash')) { e.classList.remove('flash'); }
-    if (e.classList.contains('highlight')) { e.classList.remove('highlight'); }
-    if (e.classList.length === 0) {
-      e.removeAttribute('class');
-    }
-  }
-}
-function treeFromHTML(html) {
-  const parser = new DOMParser();
-  return parser.parseFromString(html, 'text/html');
-}
+
 function detectKeydown(e) {
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
     util.simulateClick('#editok');
   }
   if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey)) {
     if (OPTS.backup) {
-      const prev = OPTS.html;
-      OPTS.html = OPTS.backup;
-      OPTS.backup = prev;
+      const copy = [...OPTS.json];
+      OPTS.json = [...OPTS.jsonBackup];
+      OPTS.jsonBackup = copy;
     }
     options.write();
-    prepareContent(OPTS.html);
+    prepareContent();
     toast.html('undo', chrome.i18n.getMessage('undo'));
   }
   if (e.code === 'Escape') {
@@ -435,16 +418,18 @@ function addAgenda() {
   options.write();
   updateAgenda();
 }
-async function updateAgenda() {
+
+async function updateAgenda(updateAgendas = true) {
   for (let index = 0; index < OPTS.agendas.length; index++) {
     const agenda = OPTS.agendas[index];
     if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { continue; }
-    if (agenda.events.length === 0) {
+    if (agenda.events.length === 0 && updateAgendas) {
       await updateAgendaBackground(agenda, index);
     }
     displayNewAgenda(index, agenda);
   }
 }
+
 function displayNewAgenda(index, agenda) {
   const rootPanel = els.main.querySelector('#agenda-' + String(index));
   if (!rootPanel) { return; }
@@ -912,19 +897,28 @@ function prepareListeners() {
   els.addlink.addEventListener('click', addLinkListener);
   els.addpanel.addEventListener('click', addPanel);
 }
-function prepareContent(html) {
-  const parser = new DOMParser();
-  const tempdoc = parser.parseFromString(html, 'text/html');
-  const topLevel = tempdoc.querySelectorAll('body>*');
+function prepareContent() {
   // clean page
   while (els.main.firstElementChild) {
     els.main.firstElementChild.remove();
   }
-  // populate page
-  for (const elem of topLevel) {
-    els.main.append(elem);
+
+  // If we don't have a JSON backup yet but we have an html property, it means that we are transitioning from the old version of storing
+  if (OPTS.jsonBackup == null && OPTS.html != null) {
+    const parser = new DOMParser();
+    const tempdoc = parser.parseFromString(OPTS.html, 'text/html');
+    const topLevel = tempdoc.querySelectorAll('body>*');
+
+    // populate page
+    for (const elem of topLevel) {
+      els.main.append(elem);
+    }
+    prepareFavicons();
+  } else {
+    jsonToDom(els.main, OPTS.json);
+    updateAgenda(false);
   }
-  prepareFavicons();
+
   prepareListeners();
 }
 function toggleTrash() {
@@ -943,10 +937,7 @@ function clearDialog() {
     dialog.firstElementChild.remove();
   }
 }
-// interface PregnantHTMLElement extends HTMLDialogElement {
-//   lastElementChild:HTMLElement,
-//   firstElementChild:HTMLElement
-// }
+
 function cloneToDialog(selector) {
   dialog = document.createElement('dialog');
   dialog.id = 'dialog';
@@ -1115,13 +1106,15 @@ function saveElmContextClicked(e) {
 function prepareBackgroundListener() {
   chrome.runtime.onMessage.addListener(receiveBackgroundMessages);
 }
-function prepareMain(OPTS) {
-  prepareContent(OPTS.html);
+
+function prepareMain() {
+  prepareContent();
   prepareDrag();
   prepareFoldables();
   prepareDynamicFlex(els.main);
   prepareContextPanelEventListener();
 }
+
 function prepareContextPanelEventListener() {
   const sections = els.main.querySelectorAll('section');
   for (const s of sections) {
@@ -1157,7 +1150,7 @@ async function prepareAll() {
   els = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
   prepareBookmarks(OPTS, els.bookmarksnav);
   util.prepareCSSVariables(OPTS);
-  prepareMain(OPTS);
+  prepareMain();
   prepareTrash();
   prepareBackgroundListener();
   toast.prepare();
