@@ -159,3 +159,7 @@ ul {
   padding: 1em;
   margin-left: 2em;
 }
+
+.blur {
+  visibility: hidden;
+}

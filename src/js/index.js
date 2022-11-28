@@ -477,7 +477,7 @@ async function updateAgenda(updateAgendas = true) {
 
 
 function displayNewAgenda(index, agenda) {
-  const rootPanel = getAllBySelector(document, '#agenda-' + String(index))[0]?._panel;
+  const rootPanel = getAllBySelector(els.main, '#agenda-' + String(index))[0]?._panel;
   if (!rootPanel) { return; }
   while (rootPanel.lastElementChild.firstChild) {
     rootPanel.lastElementChild.removeChild(rootPanel.lastElementChild.lastChild);
@@ -1025,7 +1025,7 @@ function getAllBySelector(element, selector) {
 }
 
 function prepareListeners() {
-  const anchors = getAllBySelector(document, 'a');
+  const anchors = getAllBySelector(els.main, 'a');
   for (const a of anchors) {
     addAnchorListeners(a);
   }
@@ -1166,16 +1166,12 @@ function lock() {
   }
 }
 function togglePresentation() {
-  const panels = document.querySelectorAll('.private');
+  const panels = getAllBySelector(els.main, '[private]');
+
   els.main.classList.toggle('private-on');
-  if (els.main.classList.contains('private-on')) {
-    for (const p of panels) {
-      p.classList.add('blur');
-    }
-  } else {
-    for (const p of panels) {
-      p.classList.remove('blur');
-    }
+  const isPrivateOn = els.main.classList.contains('private-on');
+  for (const panel of panels) {
+    panel.blur = isPrivateOn;
   }
 }
 function receiveBackgroundMessages(m) {

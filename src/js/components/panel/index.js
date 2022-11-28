@@ -21,7 +21,7 @@ class PanelComponent extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['background-color', 'text-color', 'direction', 'single-line-display', 'private', 'header', 'folded', 'grow'];
+    return ['background-color', 'text-color', 'direction', 'single-line-display', 'private', 'header', 'folded', 'grow', 'blur'];
   }
 
   // Getters & setters
@@ -73,6 +73,15 @@ class PanelComponent extends HTMLElement {
 
   get grow() { return this.getAttribute('grow') || ''; }
   set grow(grow) { this.setAttribute('grow', grow); }
+
+  get blur() { return this.hasAttribute('blur'); }
+  set blur(isBlur) {
+    if (isBlur) {
+      this.setAttribute('blur', '');
+    } else {
+      this.removeAttribute('blur');
+    }
+  }
 
   toggleFold() {
     this.folded = !this.folded;
@@ -133,6 +142,14 @@ class PanelComponent extends HTMLElement {
     }
   }
 
+  onBlurChange() {
+    if (this.blur && this.private) {
+      this._panel.classList.add('blur');
+    } else {
+      this._panel.classList.remove('blur');
+    }
+  }
+
   attributeChangedCallback(name) {
     switch (name) {
       case 'background-color':
@@ -158,6 +175,9 @@ class PanelComponent extends HTMLElement {
         break;
       case 'grow':
         this.onGrowChange();
+        break;
+      case 'blur':
+        this.onBlurChange();
         break;
     }
   }
