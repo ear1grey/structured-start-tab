@@ -58,7 +58,7 @@ export function setFavicon(elem, url) {
 }
 
 export function rgbaToHex(rgba) {
-  const rgbaData = rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+),\s*((\d+).(\d+))/);
+  const rgbaData = rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+),\s*((\d+)(.(\d+))*)/);
 
   const red = rgbaData[1];
   const green = rgbaData[2];
