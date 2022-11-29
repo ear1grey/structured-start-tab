@@ -109,6 +109,10 @@ a:hover {
   margin-right: var(--small);
 }
 
+section sst-panel {
+  width: unset;
+}
+
 section sst-panel::part(panel) {
   flex-direction: column;
   border-radius: var(--small);
@@ -124,6 +128,7 @@ sst-panel {
 
   flex-direction: column;
   border-radius: var(--small);
+  width: min-content;
 }
 
 sst-panel[folded] {

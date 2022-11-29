@@ -91,7 +91,7 @@ const jsonToDom = (parentElement, content) => {
 
         // Add properties
         section.id = element.id;
-        section.style.backgroundColor = element.backgroundColor?.includes('rgba') ? rgbaToHex(element.backgroundColor) : element.backgroundColor;
+        section.style.backgroundColor = element.backgroundColour?.includes('rgba') ? rgbaToHex(element.backgroundColour) : element.backgroundColour;
         section.style.color = element.textColour;
         section.style.flexGrow = element.grow;
         if (element.direction === 'vertical') { section.classList.add('vertical'); }
