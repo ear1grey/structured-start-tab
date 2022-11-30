@@ -591,3 +591,15 @@ color-switch {
   padding: 0;
   flex-grow: 1;
 }
+
+section#feedback {
+  flex: unset;
+}
+
+section#feedback a {
+  margin: .5em;
+}
+
+section#feedback.hide {
+  display: none;
+}
