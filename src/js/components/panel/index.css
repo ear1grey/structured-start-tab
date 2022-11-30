@@ -1,0 +1,170 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-size: 1rem;
+  color: inherit;
+}
+
+section>h1 {
+  flex-grow: 0;
+
+  margin-top: var(--small);
+  border: 0.125rem solid transparent;
+}
+
+section>nav {
+  display: flex;
+  flex: 1 1 auto;
+  background: transparent;
+  margin: var(--medium);
+}
+
+section>nav:empty {
+  border: white dashed thin;
+  min-height: 2em;
+}
+
+section.folded nav {
+  display: none;
+}
+
+section.folded>h1 {
+  text-orientation: sideways-right;
+  writing-mode: vertical-lr;
+  transform: rotate(-180deg);
+  text-align: end;
+  flex-grow: 0 !important;
+}
+
+section>nav,
+section {
+  flex-wrap: nowrap;
+}
+
+section {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  align-content: flex-start;
+  background: var(--overlay-dark);
+  border: solid thin var(--fg-light-alpha);
+  flex-direction: row;
+  margin: var(--small);
+  padding: var(--small);
+  border-radius: var(--medium);
+}
+
+section section {
+  flex-direction: column;
+  border-radius: var(--small);
+  width: min-content;
+}
+
+section section nav {
+  flex-wrap: wrap;
+}
+
+section.vertical nav {
+  flex-direction: column;
+}
+
+section.vertical section {
+  width: auto;
+}
+
+a {
+  display: flex;
+  align-items: center;
+  background: var(--overlay-mid);
+  border: solid transparent thin;
+  border-radius: var(--tiny);
+  justify-content: center;
+  margin: var(--tiny);
+  padding: var(--medium);
+  min-height: 1.5rem;
+  text-align: center;
+  text-decoration: none;
+  overflow: hidden;
+  flex-grow: 1;
+  cursor: pointer;
+}
+
+
+a:hover {
+  border-color: var(--fg-light);
+}
+
+.dragging {
+  transition: all 1s linear;
+  background: var(--bg-drop);
+  color: var(--fg-drop);
+  border-color: var(--fg-drop);
+  border-style: solid;
+}
+
+.favicon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  margin-right: var(--small);
+}
+
+section sst-panel {
+  width: unset;
+}
+
+section sst-panel::part(panel) {
+  flex-direction: column;
+  border-radius: var(--small);
+}
+
+section sst-panel[folded]::part(panel) {
+  width: min-content;
+}
+
+sst-panel {
+  display: flex;
+  flex: 1 1 auto;
+
+  flex-direction: column;
+  border-radius: var(--small);
+  width: min-content;
+}
+
+sst-panel[folded] {
+  display: flex;
+  flex: unset;
+}
+
+sst-panel::part(panel) sst-panel::part(panel) {
+  flex-direction: column;
+  border-radius: var(--small);
+  width: min-content;
+}
+
+section sst-panel::part(content) {
+  flex-wrap: wrap;
+  margin: var(--tiny);
+}
+
+.single-line-display nav {
+  flex-wrap: nowrap !important;
+}
+
+sst-panel::part(content) sst-panel::part(content) {
+  flex-wrap: wrap;
+  margin: var(--tiny);
+}
+
+p {
+  padding: 1em;
+}
+
+ul {
+  padding: 1em;
+  margin-left: 2em;
+}
+
+.blur {
+  visibility: hidden;
+}

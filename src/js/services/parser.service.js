@@ -1,23 +1,46 @@
+import { setFavicon, rgbaToHex } from '../lib/util.js';
+
 // Ids of elements that we don't want parsed
 const domToJson = (parentElement) => {
   const jsonContent = [];
 
   for (const child of parentElement.children) {
     switch (child.tagName) {
-      case 'SECTION':
+      case 'SECTION': // Legacy
+
+        // Keep agendas and trash as normal sections until migrated to their own component
+        // Migrate normal panels to sst-panel
+
         jsonContent.push(
           {
             id: child.id,
-            type: 'section',
-            backgroundColour: child.style.backgroundColor,
+            type: (child.id.includes('trash')) ? 'section' : 'sst-panel',
+            backgroundColour: child.style.backgroundColor?.includes('rgba') ? rgbaToHex(child.style.backgroundColor) : child.style.backgroundColor,
             textColour: child.style.color,
             direction: child.classList.contains('vertical') ? 'vertical' : 'horizontal',
             singleLineDisplay: !!child.classList.contains('flex-disabled'),
             private: !!child.classList.contains('private'),
             header: child.firstElementChild.textContent, // First element is the h1 element
-            content: domToJson(child.childNodes[1]), // Second element is the nav element
+            content: domToJson(child.children[1]), // Second element is the nav element
             folded: !!child.classList.contains('folded'),
             grow: child.style.flexGrow,
+          });
+
+        break;
+      case 'SST-PANEL':
+        jsonContent.push(
+          {
+            id: child.id,
+            type: 'sst-panel',
+            backgroundColour: child.backgroundColour,
+            textColour: child.textColour,
+            direction: child.direction,
+            singleLineDisplay: child.singleLineDisplay,
+            private: child.private,
+            header: child.header,
+            content: domToJson(child.content),
+            folded: child.folded,
+            grow: child.grow,
           });
         break;
       case 'A':
@@ -68,7 +91,7 @@ const jsonToDom = (parentElement, content) => {
 
         // Add properties
         section.id = element.id;
-        section.style.backgroundColor = element.backgroundColour;
+        section.style.backgroundColor = element.backgroundColour?.includes('rgba') ? rgbaToHex(element.backgroundColour) : element.backgroundColour;
         section.style.color = element.textColour;
         section.style.flexGrow = element.grow;
         if (element.direction === 'vertical') { section.classList.add('vertical'); }
@@ -90,6 +113,27 @@ const jsonToDom = (parentElement, content) => {
         appendItemWithDefaults(parentElement, section);
         break;
       }
+      case 'sst-panel':{
+        const panel = document.createElement('sst-panel');
+
+        // Add properties
+        panel.id = element.id;
+        panel.backgroundColour = element.backgroundColour;
+        panel.textColour = element.textColour;
+        panel.direction = element.direction;
+        panel.singleLineDisplay = element.singleLineDisplay;
+        panel.private = element.private;
+        panel.header = element.header;
+        panel.folded = element.folded;
+        panel.grow = element.grow;
+        if (element.invisible) { panel.classList.add('invisible'); }
+
+        // Set content
+        jsonToDom(panel.content, element.content);
+
+        appendItemWithDefaults(parentElement, panel);
+        break;
+      }
       case 'link':{
         const link = document.createElement('a');
 
@@ -98,12 +142,7 @@ const jsonToDom = (parentElement, content) => {
         link.style.color = element.textColour;
         link.setAttribute('href', element.url);
         link.textContent = element.name;
-
-        // Set icon
-        const icon = document.createElement('img');
-        icon.classList.add('favicon');
-        icon.setAttribute('src', element.icon);
-        link.prepend(icon);
+        setFavicon(link, element.url);
 
         appendItemWithDefaults(parentElement, link);
         break;

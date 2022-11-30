@@ -124,9 +124,7 @@ main>section,
   background-color: var(--overlay-dark);
   border-radius: var(--tiny);
   min-height: var(--button-min-height);
-  padding: var(--large);
   text-decoration: none;
-  ;
 }
 
 #toolbar a#bin {
@@ -252,7 +250,7 @@ section>nav {
 }
 
 section>nav:empty {
-  border: white dashed thin;
+  border: #fff dashed thin;
   min-height: 2em;
 }
 
@@ -285,7 +283,7 @@ section {
   background: var(--overlay-dark);
   border: solid thin var(--fg-light-alpha);
   flex-direction: row;
-  margin: var(--small);
+  margin: var(--medium);
   padding: var(--small);
   border-radius: var(--medium);
 }
@@ -293,6 +291,15 @@ section {
 section section {
   flex-direction: column;
   border-radius: var(--small);
+  width: min-content;
+}
+
+section sst-panel::part(panel) {
+  flex-direction: column;
+  border-radius: var(--small);
+}
+
+section sst-panel[folded]::part(panel) {
   width: min-content;
 }
 
@@ -331,7 +338,7 @@ section section nav {
 }
 
 .switch input:checked+label {
-  background-color: lightgrey;
+  background-color: #d3d3d3;
   box-shadow: none;
 }
 
@@ -350,6 +357,22 @@ main>section>h1 {
   transform: rotate(-180deg);
   text-align: end;
   flex-grow: 0 !important;
+}
+
+main>sst-panel::part(header) {
+  text-orientation: sideways-right;
+  writing-mode: vertical-lr;
+  transform: rotate(-180deg);
+  text-align: end;
+  flex-grow: 0 !important;
+}
+
+main>sst-panel[folded]::part(header) {
+  text-orientation: unset;
+  writing-mode: unset;
+  transform: unset;
+  text-align: unset;
+  flex-direction: row-reverse;
 }
 
 main section.folded>h1 {
@@ -385,7 +408,6 @@ main a {
   text-decoration: none;
   overflow: hidden;
   flex-grow: 1;
-  min-height: 1.5em;
   cursor: pointer;
 }
 
@@ -419,8 +441,6 @@ a.metamouseover:not(.dragging),
 main.editing a:hover:not(.dragging) {
   cursor: move;
 }
-
-
 
 #statuswrapper {
   position: relative;
@@ -570,124 +590,4 @@ dialog {
 color-switch {
   padding: 0;
   flex-grow: 1;
-}
-
-[data-size="1"] {
-  flex-grow: 1;
-}
-
-[data-size="2"] {
-  flex-grow: 2;
-}
-
-[data-size="3"] {
-  flex-grow: 3;
-}
-
-[data-size="4"] {
-  flex-grow: 4;
-}
-
-[data-size="5"] {
-  flex-grow: 5;
-}
-
-[data-size="6"] {
-  flex-grow: 6;
-}
-
-[data-size="7"] {
-  flex-grow: 7;
-}
-
-[data-size="8"] {
-  flex-grow: 8;
-}
-
-[data-size="9"] {
-  flex-grow: 9;
-}
-
-[data-size="10"] {
-  flex-grow: 10;
-}
-
-[data-size="11"] {
-  flex-grow: 11;
-}
-
-[data-size="12"] {
-  flex-grow: 12;
-}
-
-[data-size="13"] {
-  flex-grow: 13;
-}
-
-[data-size="14"] {
-  flex-grow: 14;
-}
-
-[data-size="15"] {
-  flex-grow: 15;
-}
-
-[data-size="16"] {
-  flex-grow: 16;
-}
-
-[data-size="17"] {
-  flex-grow: 17;
-}
-
-[data-size="18"] {
-  flex-grow: 18;
-}
-
-[data-size="19"] {
-  flex-grow: 19;
-}
-
-[data-size="20"] {
-  flex-grow: 20;
-}
-
-[data-size="21"] {
-  flex-grow: 21;
-}
-
-[data-size="22"] {
-  flex-grow: 22;
-}
-
-[data-size="23"] {
-  flex-grow: 23;
-}
-
-[data-size="24"] {
-  flex-grow: 24;
-}
-
-[data-size="25"] {
-  flex-grow: 25;
-}
-
-[data-size="26"] {
-  flex-grow: 26;
-}
-
-[data-size="27"] {
-  flex-grow: 27;
-}
-
-[data-size="28"] {
-  flex-grow: 28;
-}
-
-[data-size="29"] {
-  flex-grow: 29;
-}
-
-[data-size="30"] {
-  flex-grow: 30;
 }
