@@ -131,9 +131,17 @@ sst-panel {
   width: min-content;
 }
 
+sst-panel[grow] {
+  width: min-content;
+}
+
 sst-panel[folded] {
   display: flex;
   flex: unset;
+}
+
+section.vertical sst-panel {
+  width: 100%;
 }
 
 sst-panel::part(panel) sst-panel::part(panel) {
