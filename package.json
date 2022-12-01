@@ -17,7 +17,7 @@
     "zip": "rm sst.zip;rm sst.xpi;find . -name '.DS_Store' -type f -delete;zip -u -8 -v -r sst.zip src _locales manifest.json release.md;cp sst.zip sst.xpi;echo 'bump versions in releases.md, manifest.json and package.json...'",
     "all": "npm run validatelogs;npm run zip;",
     "preversion": "npm run lint",
-    "version": "node update-manifest-version.js; git add manifest.json;",
+    "version": "node update-manifest-version.js; npm run i; git add manifest.json package.json package-lock.json;",
     "postversion": "npm run all",
     "validatelogs": "if grep -qr 'console.log' src/; then echo 'WARNING: console.log were left in the code!'; fi"
   },
