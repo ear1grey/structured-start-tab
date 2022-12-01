@@ -84,6 +84,10 @@ main {
   flex-direction: column;
 }
 
+#sidebar * {
+  user-select: none;
+}
+
 main>section,
 #sidebar {
   padding: var(--small);
@@ -598,8 +602,4 @@ section#feedback {
 
 section#feedback a {
   margin: .5em;
-}
-
-section#feedback.hide {
-  display: none;
 }
