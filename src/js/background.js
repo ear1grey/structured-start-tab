@@ -84,8 +84,15 @@ function menuInstaller() {
     menuItem.contexts = ['page', 'link'];
     chrome.contextMenus.create(menuItem);
   }
+
+  // Update agendas every 10 minutes
   chrome.alarms.create('agendaUpdate', {
     periodInMinutes: 15,
+  });
+
+  // Save page to the cloud every 10 minutes
+  chrome.alarms.create('savePage', {
+    periodInMinutes: 10,
   });
 }
 function commandReceived(command) {
@@ -126,7 +133,20 @@ export async function updateAgendaBackground(agenda, index) {
   await options.write();
 }
 
+const handleAlarm = (details) => {
+  switch (details.name) {
+    case 'agendaUpdate':
+      updateAgendasBackground();
+      break;
+    case 'savePage':
+      // TODO: needs implementation
+      break;
+    default:
+      break;
+  }
+};
+
 chrome.runtime.onInstalled.addListener(menuInstaller);
 chrome.contextMenus.onClicked.addListener(menuClicked);
-chrome.alarms.onAlarm.addListener(updateAgendasBackground);
+chrome.alarms.onAlarm.addListener(handleAlarm);
 chrome.commands.onCommand.addListener(commandReceived);

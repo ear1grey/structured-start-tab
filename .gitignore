@@ -6,3 +6,6 @@ app
 .eslintrc.reference.json
 sst.zip
 sst.xpi
+*.log
+.firebaserc
+firebase_data/*
