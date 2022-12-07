@@ -1289,5 +1289,10 @@ async function prepareAll() {
   updateBookmarksPanel();
   updateAgenda();
   util.localizeHtml(document);
+
+  // Feedback button should always be visible when in beta
+  if (!OPTS.showFeedback && !util.isBeta()) {
+    document.querySelector('#feedback').style.display = 'none';
+  }
 }
 window.addEventListener('DOMContentLoaded', prepareAll);

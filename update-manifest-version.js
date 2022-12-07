@@ -20,9 +20,12 @@ pkgData.description = 'Structured Start Tab';
 let pageTitle = 'Structured Start Tab';
 
 // Add beta definitions
-if (pkgData.version.includes('beta')) {
+if (pkgData.version.split('.').length > 3) { // beta version should be structured as X.Y.Z.B whilst release version is X.Y.Z
   pkgData.name += '-beta';
+  manData.name += ' (beta)';
   pkgData.description += ' (beta)';
+  manData.description += ' (beta)';
+
   pageTitle += ' (beta)';
 }
 
