@@ -71,3 +71,7 @@ export function rgbaToHex(rgba) {
 function hex(x) {
   return ('0' + parseInt(x).toString(16)).slice(-2);
 }
+
+export function isBeta() {
+  return chrome.runtime.getManifest().version.split('.').length > 3;
+}
