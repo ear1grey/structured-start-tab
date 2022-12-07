@@ -6,6 +6,7 @@ import * as tooltip from './lib/tooltip.js';
 import { updateAgendaBackground } from './background.js';
 import { domToJson, jsonToDom } from './services/parser.service.js';
 import { prepareDrag } from './services/drag.service.js';
+import { savePageCloud } from './services/cloud.service.js';
 
 // TODO: import all components from a common file?
 import './components/agenda-item/index.js';
@@ -217,7 +218,7 @@ function editOk() {
       }
 
       dialog.close();
-      saveChanges();
+      saveChanges({ cloudSave: true });
       flash(els.editing);
       els.editing.classList.remove('edited');
       return;
@@ -233,13 +234,13 @@ function editOk() {
   els.editing.setAttribute('style', styleString);
 
   dialog.close();
-  saveChanges();
+  saveChanges({ cloudSave: true });
   flash(els.editing);
   els.editing.classList.remove('edited');
   delete els.editing;
 }
 
-export function saveChanges(makeBackup = true) {
+export function saveChanges({ makeBackup = true, cloudSave = false } = {}) {
   if (els.main == null) return;
 
   if (els.main.classList.contains('heatmap')) {
@@ -251,6 +252,10 @@ export function saveChanges(makeBackup = true) {
 
   OPTS.json = domToJson(els.main);
   options.write();
+
+  if (cloudSave) {
+    savePageCloud(OPTS.json);
+  }
 
   prepareListeners();
 
@@ -726,7 +731,7 @@ function emptyTrash() {
   delete els.trash;
   document.querySelector('#trash')?.remove();
   prepareTrash();
-  saveChanges(false);
+  saveChanges({ makeBackup: false });
 }
 function lock() {
   OPTS.lock = !OPTS.lock;

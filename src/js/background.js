@@ -139,7 +139,8 @@ const handleAlarm = (details) => {
       updateAgendasBackground();
       break;
     case 'savePage':
-      // TODO: needs implementation
+      console.log('savePage (not implemented)');
+      // TODO: needs implementation: savePageCloud(OPTS.json)
       break;
     default:
       break;
