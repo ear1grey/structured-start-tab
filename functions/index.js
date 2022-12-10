@@ -30,7 +30,7 @@ export const saveSettings = functions.https.onRequest((req, res) => {
       });
     } else {
       admin.firestore().collection('settings').doc(id).update(settings).then(() => {
-        res.status(200).send('Settings updated');
+        res.status(204).send();
       }).catch(err => {
         res.status(500).send(err);
       });

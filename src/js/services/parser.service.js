@@ -1,4 +1,4 @@
-import { setFavicon, rgbaToHex } from '../lib/util.js';
+import { setFavicon, rgbaToHex, newUuid } from '../lib/util.js';
 
 // Ids of elements that we don't want parsed
 const domToJson = (parentElement) => {
@@ -13,6 +13,7 @@ const domToJson = (parentElement) => {
 
         jsonContent.push(
           {
+            ident: child.ident || newUuid(),
             id: child.id,
             type: (child.id.includes('trash')) ? 'section' : 'sst-panel',
             backgroundColour: child.style.backgroundColor?.includes('rgba') ? rgbaToHex(child.style.backgroundColor) : child.style.backgroundColor,
@@ -30,6 +31,7 @@ const domToJson = (parentElement) => {
       case 'SST-PANEL':
         jsonContent.push(
           {
+            ident: child.ident || newUuid(),
             id: child.id,
             type: 'sst-panel',
             backgroundColour: child.backgroundColour,
@@ -46,6 +48,7 @@ const domToJson = (parentElement) => {
       case 'A':
         jsonContent.push(
           {
+            ident: child.ident || newUuid(),
             type: 'link',
             backgroundColour: child.style.backgroundColor,
             textColour: child.style.color,
@@ -57,6 +60,7 @@ const domToJson = (parentElement) => {
       case 'P':
         jsonContent.push(
           {
+            ident: child.ident || newUuid(),
             type: 'text',
             content: child.innerHTML,
           });
@@ -64,6 +68,7 @@ const domToJson = (parentElement) => {
       case 'UL':
         jsonContent.push(
           {
+            ident: child.ident || newUuid(),
             type: 'list',
             content: domToJson(child),
           });
@@ -71,6 +76,7 @@ const domToJson = (parentElement) => {
       case 'LI':
         jsonContent.push(
           {
+            ident: child.ident || newUuid(),
             type: 'listItem',
             content: child.innerHTML,
           });

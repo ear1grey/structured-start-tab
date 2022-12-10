@@ -6,7 +6,7 @@ import * as tooltip from './lib/tooltip.js';
 import { updateAgendaBackground } from './background.js';
 import { domToJson, jsonToDom } from './services/parser.service.js';
 import { prepareDrag } from './services/drag.service.js';
-import { savePageCloud } from './services/cloud.service.js';
+import { getPageCloud, savePageCloud } from './services/cloud.service.js';
 
 // TODO: import all components from a common file?
 import './components/agenda-item/index.js';
@@ -869,9 +869,45 @@ async function prepareAll() {
   updateAgenda();
   util.localizeHtml(document);
 
-  document.querySelector('#test-btn').addEventListener('click', () => {
+  document.querySelector('#test-btn').addEventListener('click', async () => {
     console.log('test');
-    window.location.href = './pages/merge-resolver/index.html';
+    // window.location.href = './pages/merge-resolver/index.html';
+    const onlineSettings = await getPageCloud();
+    console.log('content equal?', isContentEqual(onlineSettings, OPTS.json));
   });
 }
+
+const isContentEqual = (a, b) => {
+  if ((a == null && b == null) || !Array.isArray(a)) return true;
+
+  // Each content is an array - if the length is different, they are not equal
+  if (a.length !== b.length) return false;
+
+  return a.every(elemA => {
+    const elemB = b.find(elemB => elemB.ident === elemA.ident);
+    if (!elemB) return false;
+
+    return elemA.backgroundColour === elemB.backgroundColour &&
+      elemA.textColour === elemB.textColour &&
+      elemA.type === elemB.type &&
+
+      // panel only properties
+      isContentEqual(elemA.content, elemB.content) &&
+      elemA.direction === elemB.direction &&
+      elemA.folded === elemB.folded &&
+      elemA.grow === elemB.grow &&
+      elemA.header === elemB.header &&
+      elemA.id === elemB.id &&
+      elemA.private === elemB.private &&
+      elemA.singleLineDisplay === elemB.singleLineDisplay &&
+      elemA.textColour === elemB.textColour &&
+      elemA.type === elemB.type &&
+
+      // link only properties
+      elemA.icon === elemB.icon &&
+      elemA.name === elemB.name &&
+      elemA.url === elemB.url;
+  });
+};
+
 window.addEventListener('DOMContentLoaded', prepareAll);

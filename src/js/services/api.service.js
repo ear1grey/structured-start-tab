@@ -4,11 +4,15 @@ const makeRequest = async (url, method = 'GET', body = null, headers = {}) => {
     'Content-Type': 'application/json',
   };
 
-  return (await fetch(url, {
+  const response = await fetch(url, {
     method,
     headers,
     body: body ? JSON.stringify(body) : null,
-  })).json();
+  });
+
+  if (response.status !== 204) {
+    return await response.json();
+  }
 };
 
 export {
