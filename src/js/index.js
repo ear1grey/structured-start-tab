@@ -871,9 +871,18 @@ async function prepareAll() {
 
   document.querySelector('#test-btn').addEventListener('click', async () => {
     console.log('test');
-    // window.location.href = './pages/merge-resolver/index.html';
     const onlineSettings = await getPageCloud();
-    console.log('content equal?', isContentEqual(onlineSettings, OPTS.json));
+
+    const isEqual = isContentEqual(onlineSettings, OPTS.json);
+    console.log('content equal?', isEqual);
+
+    if (!isEqual){
+      OPTS.onlineJson = onlineSettings;
+      saveChanges();
+      window.location.href = './pages/merge-resolver/index.html';
+    } else if (onlineSettings == null && OPTS.json != null){
+      await savePageCloud(OPTS.json);
+    }
   });
 }
 

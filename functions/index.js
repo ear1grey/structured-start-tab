@@ -3,39 +3,72 @@ import admin from 'firebase-admin';
 
 admin.initializeApp();
 
-export const getSettings = functions.https.onRequest((req, res) => {
-  const id = req.query.id;
+const getSettingsById = (id) => {
+  return new Promise(resolve => 
+    admin.firestore().collection('settings').doc(id).get().then(doc => {
+      if (!doc.exists) {
+        resolve({
+          status: 404,
+          content: {error: 'Settings not found'}
+        })
+      } else {
+        const data = doc.data();
+        resolve({
+          status: 200,
+          content: {
+            settings: data.settings,
+            version: data.version
+          }
+        })
+      }
+    }).catch(error => {
+      resolve({
+        status: 500,
+        content: {error}
+      })
+    })
+  );
+}
 
-  admin.firestore().collection('settings').doc(id).get().then(doc => {
-    if (!doc.exists) {
-      res.status(404).send('Settings not found');
-    } else {
-      res.status(200).send(doc.data());
-    }
-  }).catch(err => {
-    res.status(500).send(err);
-  });
+export const getSettings = functions.https.onRequest(async (req, res) => {
+  const id = req.query.id;
+  const {status, content} = await getSettingsById(id);
+  console.log();
+  res.status(status).send(content);
 });
 
-export const saveSettings = functions.https.onRequest((req, res) => {
+
+export const saveSettings = functions.https.onRequest(async (req, res) => {
   const id = req.body.id;
-  const settings = req.body.settings;
+  const content = req.body.content;
+
+  const {status, savedContent} = await getSettingsById(id);
+
+  if (status === 200) {
+    if (savedContent.version + 1 !== content.version) {
+      // TODO: handle possible merge conflict
+      console.log('!! Possible merge conflict');
+    } 
+  } else if(status >= 400 && status !== 404) { // 404 means that there's no config for the user - we want to create a new config
+    res.status(status).send(savedContent)
+  }
 
   admin.firestore().collection('settings').doc(id).get().then(doc => {
     if (!doc.exists) {
-      admin.firestore().collection('settings').doc(id).set(settings).then(() => {
+      admin.firestore().collection('settings').doc(id).set(content).then(() => {
         res.send('Settings saved');
-      }).catch(err => {
-        res.send(err);
+      }).catch(error => {
+        res.send({error});
       });
     } else {
-      admin.firestore().collection('settings').doc(id).update(settings).then(() => {
+      admin.firestore().collection('settings').doc(id).update(content).then(() => {
         res.status(204).send();
-      }).catch(err => {
-        res.status(500).send(err);
+      }).catch(error => {
+        res.status(500).send({error});
       });
     }
-  }).catch(err => {
-    res.status(500).send(err);
+  }).catch(error => {
+    res.status(500).send({error});
   });
+  
 });

@@ -10,9 +10,13 @@ const makeRequest = async (url, method = 'GET', body = null, headers = {}) => {
     body: body ? JSON.stringify(body) : null,
   });
 
-  if (response.status !== 204) {
-    return await response.json();
-  }
+  response.content = await response.text();
+  try{
+    response.content = JSON.parse(response.content);
+    response.isJSON = true;
+  }catch { }
+
+  return response;
 };
 
 export {

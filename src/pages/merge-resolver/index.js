@@ -34,7 +34,7 @@ const prepareElements = async () => {
   };
 
   jsonToDom(els.left, [...OPTS.json]);
-  jsonToDom(els.right, [...OPTS.json]);
+  jsonToDom(els.right, [...OPTS.onlineJson]);
 };
 
 const save = (pick) => {
@@ -43,6 +43,10 @@ const save = (pick) => {
   } else if (pick === 'right') {
     OPTS.json = domToJson(els.right);
   }
+  OPTS.onlineJson = null;
+
+  // TODO: after picking version we need to update the cloud version
+
   options.write();
 };
 

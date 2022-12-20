@@ -28,6 +28,7 @@ export const OPTS = {
   json: {},
   linkStats: {},
   agendas: [],
+  onlineVersion: 1,
 };
 
 const settingKey = 'structured-start-tab';

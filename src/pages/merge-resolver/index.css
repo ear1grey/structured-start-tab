@@ -25,6 +25,7 @@ body>section {
   background: none;
   border-radius: unset;
   max-height: 80vh;
+  justify-content: center;
 }
 
 body>section>div {
