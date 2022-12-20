@@ -5,6 +5,7 @@ import '../../js/components/panel/index.js';
 import { prepareCSSVariables } from '../../js/lib/util.js';
 import { prepareDrag } from '../../js/services/drag.service.js';
 import { prepareFoldables } from '../../js/index.js';
+import { savePageCloud } from '../../js/services/cloud.service.js';
 
 let els;
 
@@ -44,6 +45,8 @@ const save = (pick) => {
     OPTS.json = domToJson(els.right);
   }
   OPTS.onlineJson = null;
+
+  savePageCloud(OPTS.json)
 
   // TODO: after picking version we need to update the cloud version
 

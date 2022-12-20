@@ -9,3 +9,4 @@ sst.xpi
 *.log
 .firebaserc
 firebase_data/*
+firebase-export*/

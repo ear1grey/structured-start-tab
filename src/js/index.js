@@ -892,30 +892,32 @@ const isContentEqual = (a, b) => {
   // Each content is an array - if the length is different, they are not equal
   if (a.length !== b.length) return false;
 
-  return a.every(elemA => {
-    const elemB = b.find(elemB => elemB.ident === elemA.ident);
-    if (!elemB) return false;
+  return a
+    .filter(elem => elem.id !== 'trash') // Trash content does not need to be equal
+    .every(elemA => {
+      const elemB = b.find(elemB => elemB.ident === elemA.ident);
+      if (!elemB) return false;
 
-    return elemA.backgroundColour === elemB.backgroundColour &&
-      elemA.textColour === elemB.textColour &&
-      elemA.type === elemB.type &&
+      return elemA.backgroundColour === elemB.backgroundColour &&
+        elemA.textColour === elemB.textColour &&
+        elemA.type === elemB.type &&
 
-      // panel only properties
-      isContentEqual(elemA.content, elemB.content) &&
-      elemA.direction === elemB.direction &&
-      elemA.folded === elemB.folded &&
-      elemA.grow === elemB.grow &&
-      elemA.header === elemB.header &&
-      elemA.id === elemB.id &&
-      elemA.private === elemB.private &&
-      elemA.singleLineDisplay === elemB.singleLineDisplay &&
-      elemA.textColour === elemB.textColour &&
-      elemA.type === elemB.type &&
+        // panel only properties
+        isContentEqual(elemA.content, elemB.content) &&
+        elemA.direction === elemB.direction &&
+        elemA.folded === elemB.folded &&
+        elemA.grow === elemB.grow &&
+        elemA.header === elemB.header &&
+        elemA.id === elemB.id &&
+        elemA.private === elemB.private &&
+        elemA.singleLineDisplay === elemB.singleLineDisplay &&
+        elemA.textColour === elemB.textColour &&
+        elemA.type === elemB.type &&
 
-      // link only properties
-      elemA.icon === elemB.icon &&
-      elemA.name === elemB.name &&
-      elemA.url === elemB.url;
+        // link only properties
+        elemA.icon === elemB.icon &&
+        elemA.name === elemB.name &&
+        elemA.url === elemB.url;
   });
 };
 

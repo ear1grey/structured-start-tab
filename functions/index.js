@@ -40,28 +40,28 @@ export const getSettings = functions.https.onRequest(async (req, res) => {
 
 export const saveSettings = functions.https.onRequest(async (req, res) => {
   const id = req.body.id;
-  const content = req.body.content;
+  const incomingContent = req.body.content;
 
-  const {status, savedContent} = await getSettingsById(id);
+  const {status, content} = await getSettingsById(id);
 
   if (status === 200) {
-    if (savedContent.version + 1 !== content.version) {
+    if (content.version + 1 !== incomingContent.version) {
       // TODO: handle possible merge conflict
       console.log('!! Possible merge conflict');
     } 
   } else if(status >= 400 && status !== 404) { // 404 means that there's no config for the user - we want to create a new config
-    res.status(status).send(savedContent)
+    res.status(status).send(content)
   }
 
   admin.firestore().collection('settings').doc(id).get().then(doc => {
     if (!doc.exists) {
-      admin.firestore().collection('settings').doc(id).set(content).then(() => {
+      admin.firestore().collection('settings').doc(id).set(incomingContent).then(() => {
         res.send('Settings saved');
       }).catch(error => {
         res.send({error});
       });
     } else {
-      admin.firestore().collection('settings').doc(id).update(content).then(() => {
+      admin.firestore().collection('settings').doc(id).update(incomingContent).then(() => {
         res.status(204).send();
       }).catch(error => {
         res.status(500).send({error});
