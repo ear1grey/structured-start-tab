@@ -1,8 +1,8 @@
 import * as util from './lib/util.js';
-import { OPTS } from './lib/options.js';
 import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
+import { OPTS } from './lib/options.js';
 import { updateAgendaBackground } from './background.js';
 import { domToJson, jsonToDom } from './services/parser.service.js';
 import { prepareDrag } from './services/drag.service.js';
@@ -23,9 +23,11 @@ function setValue(where, what, open = false) {
   elem.value = what ?? '';
   if (open) { elem.dataset.open = 'true'; }
 }
+
 function getValue(where) {
   return document.querySelector(where).value;
 }
+
 function setColorValue(where, what) {
   const elem = document.querySelector(where);
   if (what[0] === '!') {
@@ -36,12 +38,14 @@ function setColorValue(where, what) {
     elem.open = true;
   }
 }
+
 function getColorValue(where) {
   const elem = document.querySelector(where);
   const color = elem.value;
   const open = elem.open ? '' : '!';
   return open + color;
 }
+
 function linkClicked(e) {
   if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
     if (e.shiftKey) {
@@ -52,6 +56,7 @@ function linkClicked(e) {
     }
   }
 }
+
 function updateClickCount(a) {
   const link = a.getAttribute('href');
   if (!link) { return; }
@@ -62,9 +67,11 @@ function updateClickCount(a) {
   }
   options.write();
 }
+
 function toHex(x, m = 1) {
   return ('0' + parseInt(String(m * x), 10).toString(16)).slice(-2);
 }
+
 function translateColor(rgba) {
   const parts = rgba.split('(')[1].split(')')[0].split(',');
   const converted = [
@@ -76,6 +83,7 @@ function translateColor(rgba) {
   const result = '#' + converted.join('');
   return result;
 }
+
 export function editStart(elem) {
   els.edit.textContent = ''; // reset
   const style = window.getComputedStyle(elem);
@@ -136,10 +144,12 @@ export function editStart(elem) {
   document.querySelector('#editcancel').addEventListener('click', editCancel);
   els.editname = document.querySelector('#editname');
 }
+
 function editCancel() {
   toast.html('editcancelled', chrome.i18n.getMessage('edit_cancelled'));
   closeDialog();
 }
+
 function closeDialog() {
   dialog.close();
   dialog.remove();
@@ -284,6 +294,7 @@ function detectKeydown(e) {
     }
   }
 }
+
 function toggleHeatMap() {
   const links = els.main.querySelectorAll('a');
   const numbers = [];
@@ -316,6 +327,7 @@ function toggleHeatMap() {
     changeBookmarksToHeatmap();
   }
 }
+
 function changeBookmarksToHeatmap() {
   els.bookmarksnav.classList.toggle('heatmapLegend');
   if (els.bookmarksnav.classList.contains('heatmapLegend')) {
@@ -330,15 +342,16 @@ function changeBookmarksToHeatmap() {
     prepareBookmarks(OPTS, els.bookmarksnav);
   }
 }
+
 function getColorHeatMap(value, max) {
   const h = (1.0 - (value / max)) * 240;
   return 'hsl(' + String(h) + ', 100%, 50%)';
 }
 
-
 function addLinkListener() {
   addLink();
 }
+
 function addLink(target) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
@@ -359,7 +372,6 @@ function addLink(target) {
   flash(a, 'highlight');
 }
 
-
 function addPanel() {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
@@ -367,6 +379,7 @@ function addPanel() {
   }
   return util.createPanel(els.main);
 }
+
 function addTopSitesPanel() {
   let panel = els.main.querySelector('#topsites');
   if (!panel) {
@@ -384,6 +397,7 @@ function addTopSitesPanel() {
   panel.scrollIntoView({ behavior: 'smooth' });
   flash(panel, 'highlight');
 }
+
 function updateTopSites() {
   const panel = els.main.querySelector('#topsites');
   if (!panel) { return; }
@@ -398,6 +412,7 @@ function updateTopSites() {
     }
   });
 }
+
 function toogleBookmarksPanel() {
   let panel = els.main.querySelector('#bookmarksPanel');
   if (!panel) {
@@ -418,6 +433,7 @@ function toogleBookmarksPanel() {
   panel.scrollIntoView({ behavior: 'smooth' });
   flash(panel, 'highlight');
 }
+
 async function updateBookmarksPanel() {
   const rootPanel = els.main.querySelector('#bookmarksPanel');
   if (!rootPanel) { return; }
@@ -426,6 +442,7 @@ async function updateBookmarksPanel() {
   });
   inDepthBookmarkTree(tree[0], rootPanel);
 }
+
 function inDepthBookmarkTree(toTreat, parentPanel) {
   if (toTreat.children) {
     const panel = util.createPanel(els.main);
@@ -438,6 +455,7 @@ function inDepthBookmarkTree(toTreat, parentPanel) {
     parentPanel.lastElementChild.append(util.createExampleLink(toTreat.title, toTreat.url));
   }
 }
+
 function addAgenda() {
   const panel = util.createPanel(els.main, false);
   panel.id = 'agenda-' + String(OPTS.agendas.length);
@@ -463,7 +481,6 @@ async function updateAgenda(updateAgendas = true) {
   }
 }
 
-
 function displayNewAgenda(index, agenda) {
   const rootPanel = getAllBySelector(els.main, '#agenda-' + String(index))[0]?._panel;
   if (!rootPanel) { return; }
@@ -478,6 +495,7 @@ function displayNewAgenda(index, agenda) {
     rootPanel.querySelector('nav').append(agendaItem);
   }
 }
+
 function duplicatePanel(keepLinks) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
@@ -499,6 +517,7 @@ function duplicatePanel(keepLinks) {
   dupe.addEventListener('contextmenu', saveElmContextClicked);
   toast.html('locked', chrome.i18n.getMessage('duplicate_panel'));
 }
+
 /**
  * Accept an array of things that are either containers or links
  * inject in the section template
@@ -546,11 +565,13 @@ export async function prepareBookmarks(OPTS, target) {
   showBookmarks(OPTS.showBookmarksSidebar);
   document.querySelector('#sidebar').style.setProperty('visibility', 'visible');
 }
+
 function toggleBookmarks() {
   OPTS.showBookmarksSidebar = !OPTS.showBookmarksSidebar;
   prepareBookmarks(OPTS, els.bookmarksnav);
   saveChanges();
 }
+
 function showBookmarks(visible = true) {
   if (visible) {
     document.documentElement.style.removeProperty('--bookmark-width');
@@ -564,7 +585,6 @@ function showBookmarks(visible = true) {
     document.documentElement.style.setProperty('--bookmark-border', '0em');
   }
 }
-
 
 function findEventFirstSection(e) {
   for (let i = 0; i < e.path.length; i++) {
@@ -610,6 +630,7 @@ function toggleFold(e) {
 
   saveChanges();
 }
+
 function editSection(e) {
   if (!e.shiftKey) return;
 
@@ -632,6 +653,7 @@ function editSection(e) {
     editStart(elementToEdit);
   }
 }
+
 /** add a fold button to the page if necessary */
 export function prepareFoldables(selectors = 'main') {
   const elems = [...document.querySelectorAll(selectors)];
@@ -659,6 +681,7 @@ function prepareListeners() {
   els.addlink.addEventListener('click', addLinkListener);
   els.addpanel.addEventListener('click', addPanel);
 }
+
 function prepareContent() {
   // clean page
   while (els.main.firstElementChild) {
@@ -683,6 +706,7 @@ function prepareContent() {
 
   prepareListeners();
 }
+
 function toggleTrash() {
   // ensure trash is the last thing on the screen
   els.trash = els.main.querySelector('#trash') || util.cloneTemplateToTarget('#template_trash', els.main);
@@ -694,6 +718,7 @@ function toggleTrash() {
     els.main.scrollIntoView({ behavior: 'smooth' });
   }
 }
+
 function clearDialog() {
   while (dialog?.firstElementChild) {
     dialog.firstElementChild.remove();
@@ -716,6 +741,7 @@ function cloneToDialog(selector) {
   clearDialog();
   dialog.append(clone);
 }
+
 function prepareTrash() {
   els.trash = els.trash || document.querySelector('#trash');
   if (!els.trash) {
@@ -726,13 +752,13 @@ function prepareTrash() {
   els.bin.addEventListener('click', toggleTrash);
 }
 
-
 function emptyTrash() {
   delete els.trash;
   document.querySelector('#trash')?.remove();
   prepareTrash();
   saveChanges({ makeBackup: false });
 }
+
 function lock() {
   OPTS.lock = !OPTS.lock;
   if (OPTS.lock) {
@@ -741,6 +767,7 @@ function lock() {
     toast.html('locked', chrome.i18n.getMessage('lock_off'));
   }
 }
+
 function togglePresentation() {
   const panels = getAllBySelector(els.main, '[private]');
 
@@ -750,6 +777,7 @@ function togglePresentation() {
     panel.blur = isPrivateOn;
   }
 }
+
 function receiveBackgroundMessages(m) {
   switch (m.item) {
     case 'emptytrash':
@@ -797,6 +825,7 @@ function receiveBackgroundMessages(m) {
     default: break;
   }
 }
+
 function saveElmContextClicked(e) {
   e.stopPropagation();
   const target = findSection(e.target);
@@ -806,6 +835,7 @@ function saveElmContextClicked(e) {
     els.contextClicked = els.main;
   }
 }
+
 function prepareBackgroundListener() {
   chrome.runtime.onMessage.addListener(receiveBackgroundMessages);
 }
@@ -848,6 +878,27 @@ function migrateLinks() {
     delete o.dataset.locale;
   }
 }
+
+async function loadPageCloud() {
+  const onlineSettings = await getPageCloud();
+
+  const isEqual = isContentEqual(onlineSettings, OPTS.json);
+  console.log('content equal?', isEqual);
+
+  if (!isEqual) {
+    OPTS.onlineJson = onlineSettings;
+    saveChanges();
+    window.location.href = './pages/merge-resolver/index.html';
+  } else if (onlineSettings == null && OPTS.json != null) {
+    await savePageCloud(OPTS.json);
+
+    // Feedback button should always be visible when in beta
+    if (!OPTS.showFeedback && !util.isBeta()) {
+      document.querySelector('#feedback').style.display = 'none';
+    }
+  }
+}
+
 async function prepareAll() {
   await options.load();
   els = util.prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
@@ -869,26 +920,10 @@ async function prepareAll() {
   updateAgenda();
   util.localizeHtml(document);
 
-  document.querySelector('#test-btn').addEventListener('click', async () => {
-    console.log('test');
-    const onlineSettings = await getPageCloud();
+  await loadPageCloud();
 
-    const isEqual = isContentEqual(onlineSettings, OPTS.json);
-    console.log('content equal?', isEqual);
-
-    if (!isEqual){
-      OPTS.onlineJson = onlineSettings;
-      saveChanges();
-      window.location.href = './pages/merge-resolver/index.html';
-    } else if (onlineSettings == null && OPTS.json != null){
-      await savePageCloud(OPTS.json);
-    
-  // Feedback button should always be visible when in beta
-  if (!OPTS.showFeedback && !util.isBeta()) {
-    document.querySelector('#feedback').style.display = 'none';
-  }
-}
-  });
+  // TODO: remove
+  document.querySelector('#test-btn').addEventListener('click', loadPageCloud);
 }
 
 const isContentEqual = (a, b) => {
@@ -923,7 +958,7 @@ const isContentEqual = (a, b) => {
         elemA.icon === elemB.icon &&
         elemA.name === elemB.name &&
         elemA.url === elemB.url;
-  });
+    });
 };
 
 window.addEventListener('DOMContentLoaded', prepareAll);
