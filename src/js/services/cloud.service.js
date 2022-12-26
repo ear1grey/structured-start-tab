@@ -10,9 +10,9 @@ export const getPageCloud = async () => {
   const response = await makeRequest(url, 'GET');
 
   // If there are no settings available yet, don't load
-  if((response.status === 404 && response.content?.error) || response.status === 204) {
+  if ((response.status === 404 && response.content?.error) || response.status === 204) {
     return;
-  };
+  }
 
   OPTS.onlineVersion = response.content.version + 1;
 

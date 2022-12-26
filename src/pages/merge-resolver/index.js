@@ -19,13 +19,13 @@ const prepareElements = async () => {
     window.location.href = '/src/index.html';
   });
 
-  document.querySelector('#pick-your').addEventListener('click', () => {
-    save('left');
+  document.querySelector('#pick-your').addEventListener('click', async () => {
+    await save('left');
     window.location.href = '/src/index.html';
   });
 
-  document.querySelector('#pick-incoming').addEventListener('click', () => {
-    save('right');
+  document.querySelector('#pick-incoming').addEventListener('click', async () => {
+    await save('right');
     window.location.href = '/src/index.html';
   });
 
@@ -38,7 +38,9 @@ const prepareElements = async () => {
   jsonToDom(els.right, [...OPTS.onlineJson]);
 };
 
-const save = (pick) => {
+const save = async (pick) => {
+  // TODO: Add loading animation whilst loading
+
   if (pick === 'left') {
     OPTS.json = domToJson(els.left);
   } else if (pick === 'right') {
@@ -46,7 +48,7 @@ const save = (pick) => {
   }
   OPTS.onlineJson = null;
 
-  savePageCloud(OPTS.json)
+  await savePageCloud(OPTS.json);
 
   // TODO: after picking version we need to update the cloud version
 

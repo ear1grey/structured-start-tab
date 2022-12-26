@@ -11,10 +11,10 @@ const makeRequest = async (url, method = 'GET', body = null, headers = {}) => {
   });
 
   response.content = await response.text();
-  try{
+  try {
     response.content = JSON.parse(response.content);
     response.isJSON = true;
-  }catch { }
+  } catch { }
 
   return response;
 };

@@ -13,7 +13,7 @@ const domToJson = (parentElement) => {
 
         jsonContent.push(
           {
-            ident: child.ident || newUuid(),
+            ident: child.getAttribute('ident') || newUuid(),
             id: child.id,
             type: (child.id.includes('trash')) ? 'section' : 'sst-panel',
             backgroundColour: child.style.backgroundColor?.includes('rgba') ? rgbaToHex(child.style.backgroundColor) : child.style.backgroundColor,
@@ -31,7 +31,7 @@ const domToJson = (parentElement) => {
       case 'SST-PANEL':
         jsonContent.push(
           {
-            ident: child.ident || newUuid(),
+            ident: child.getAttribute('ident') || newUuid(),
             id: child.id,
             type: 'sst-panel',
             backgroundColour: child.backgroundColour,
@@ -48,7 +48,7 @@ const domToJson = (parentElement) => {
       case 'A':
         jsonContent.push(
           {
-            ident: child.ident || newUuid(),
+            ident: child.getAttribute('ident') || newUuid(),
             type: 'link',
             backgroundColour: child.style.backgroundColor,
             textColour: child.style.color,
@@ -60,7 +60,7 @@ const domToJson = (parentElement) => {
       case 'P':
         jsonContent.push(
           {
-            ident: child.ident || newUuid(),
+            ident: child.getAttribute('ident') || newUuid(),
             type: 'text',
             content: child.innerHTML,
           });
@@ -68,7 +68,7 @@ const domToJson = (parentElement) => {
       case 'UL':
         jsonContent.push(
           {
-            ident: child.ident || newUuid(),
+            ident: child.getAttribute('ident') || newUuid(),
             type: 'list',
             content: domToJson(child),
           });
@@ -76,7 +76,7 @@ const domToJson = (parentElement) => {
       case 'LI':
         jsonContent.push(
           {
-            ident: child.ident || newUuid(),
+            ident: child.getAttribute('ident') || newUuid(),
             type: 'listItem',
             content: child.innerHTML,
           });
@@ -97,6 +97,7 @@ const jsonToDom = (parentElement, content) => {
 
         // Add properties
         section.id = element.id;
+        section.setAttribute('ident', element.ident);
         section.style.backgroundColor = element.backgroundColour?.includes('rgba') ? rgbaToHex(element.backgroundColour) : element.backgroundColour;
         section.style.color = element.textColour;
         section.style.flexGrow = element.grow;
@@ -124,6 +125,7 @@ const jsonToDom = (parentElement, content) => {
 
         // Add properties
         panel.id = element.id;
+        panel.setAttribute('ident', element.ident);
         panel.backgroundColour = element.backgroundColour;
         panel.textColour = element.textColour;
         panel.direction = element.direction;
@@ -142,7 +144,7 @@ const jsonToDom = (parentElement, content) => {
       }
       case 'link':{
         const link = document.createElement('a');
-
+        link.setAttribute('ident', element.ident);
         // Add properties
         link.style.backgroundColor = element.backgroundColour;
         link.style.color = element.textColour;
@@ -155,6 +157,7 @@ const jsonToDom = (parentElement, content) => {
       }
       case 'text':{
         const text = document.createElement('p');
+        text.setAttribute('ident', element.ident);
         text.innerHTML = element.content;
 
         parentElement.appendChild(text);
@@ -162,6 +165,7 @@ const jsonToDom = (parentElement, content) => {
       }
       case 'list':{
         const list = document.createElement('ul');
+        list.setAttribute('ident', element.ident);
         jsonToDom(list, element.content);
 
         parentElement.appendChild(list);
@@ -169,6 +173,7 @@ const jsonToDom = (parentElement, content) => {
       }
       case 'listItem':{
         const listItem = document.createElement('li');
+        listItem.setAttribute('ident', element.ident);
         listItem.innerHTML = element.content;
 
         parentElement.appendChild(listItem);
