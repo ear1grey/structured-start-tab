@@ -101,6 +101,12 @@
   "showToast": {
     "message": "Time (in seconds) each feedback message is shown. Setting this to zero will disable messages."
   },
+  "showFeedback": {
+    "message": "Show feedback button in home page."
+  },
+  "feedback": {
+    "message": "<p>Feedback can be provided using the following links: <ul><li><a href=\"https://github.com/ear1grey/structured-start-tab/issues\">GitHub</a></li><li><a href=\"https://www.facebook.com/structuredstarttab/\">Facebook</a></li></ul></p>"
+  },
   "lock": {
     "message": "Lock page.  When locked, no drags can occur and no new links can be added."
   },

@@ -72,7 +72,13 @@ class PanelComponent extends HTMLElement {
   }
 
   get grow() { return this.getAttribute('grow') || ''; }
-  set grow(grow) { this.setAttribute('grow', grow); }
+  set grow(grow) {
+    if (grow === '') {
+      this.removeAttribute('grow');
+    } else {
+      this.setAttribute('grow', grow);
+    }
+  }
 
   get blur() { return this.hasAttribute('blur'); }
   set blur(isBlur) {

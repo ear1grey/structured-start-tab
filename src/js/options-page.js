@@ -32,6 +32,7 @@ function updatePrefsWithPage() {
   getCheckBox('showBookmarksSidebar');
   getCheckBox('hideBookmarksInPage');
   getCheckBox('showToolTips');
+  getCheckBox('showFeedback');
   getCheckBox('proportionalSections');
   getCheckBox('useCustomScrollbar');
   getCheckBox('editOnNewDrop');
@@ -62,6 +63,8 @@ function updatePageWithPrefs(prefs) {
   setValue(prefs, 'fontsize');
   setValue(prefs, 'agendaNb');
   setValue(prefs, 'titleAgendaNb');
+
+  if (!util.isBeta()) { setCheckBox(prefs, 'showFeedback'); }
 }
 /**
  * Creates a new 'option' based on a template.
@@ -70,7 +73,7 @@ function updatePageWithPrefs(prefs) {
   * @param attrs - to be added to the input element (e.g. max, min)
   * @param txt - text for the label
   */
-function create(where, type, attrs, txt) {
+function create(where, type, attrs, txt, defaultValue, readonly) {
   const elem = util.cloneTemplate('#template_' + type);
   where.append(elem);
   const elemInDoc = where.lastElementChild;
@@ -83,6 +86,12 @@ function create(where, type, attrs, txt) {
       for (const [attr, val] of Object.entries(attrs)) {
         input.setAttribute(attr, val);
       }
+
+      if (defaultValue != null) {
+        if (input.type === 'checkbox') input.checked = defaultValue;
+        else input.value = defaultValue;
+      }
+      if (readonly) { input.disabled = true; }
     }
     if (txt) {
       const txtElem = elemInDoc.querySelector('[name=text]');
@@ -111,6 +120,8 @@ function createPageWithPrefs(prefs) {
     create(book, 'number', { id: 'showBookmarksLimit' }, chrome.i18n.getMessage('showBookmarksLimit'));
     create(feed, 'checkbox', { id: 'showToolTips' }, chrome.i18n.getMessage('showToolTips'));
     create(feed, 'number', { id: 'showToast' }, chrome.i18n.getMessage('showToast'));
+    create(feed, 'checkbox', { id: 'showFeedback' }, chrome.i18n.getMessage('showFeedback'), true, util.isBeta());
+    create(feed, 'show', { id: 'feedback' }, chrome.i18n.getMessage('feedback'));
     create(layout, 'checkbox', { id: 'lock' }, chrome.i18n.getMessage('lock'));
     create(layout, 'checkbox', { id: 'allowCollapsingLocked' }, chrome.i18n.getMessage('allow_collapsing_locked'));
     create(layout, 'checkbox', { id: 'savePanelStatusLocked' }, chrome.i18n.getMessage('save_panel_status_locked'));

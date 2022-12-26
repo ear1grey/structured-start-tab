@@ -306,3 +306,7 @@ export function newUuid() {
     return v.toString(16);
   });
 }
+
+export function isBeta() {
+  return chrome.runtime.getManifest().version.split('.').length > 3;
+}

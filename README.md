@@ -15,7 +15,8 @@ A browser extension that replaces the default tab content with a page of organis
 
 ## Versions
 
-* From version 1.8.0 versions are managed by running `npm version <major|minor|patch>`.  This will increment the version number, rebuild the code and assemble a zip for release.  Prior to running `npm version`, the git working director must be clean (with no uncommitted work) and code must lint without error or the build will fail. After versioning, a git push will be necessary to sync the git tag with GitHub - this push step has purposefully not been automated (yet).
+* From version 1.8.0 versions are managed by running `npm version <major|minor|patch|beta>`.  This will increment the version number, rebuild the code and assemble a zip for release.  Prior to running `npm version`, the git working director must be clean (with no uncommitted work) and code must lint without error or the build will fail. After versioning, a git push will be necessary to sync the git tag with GitHub - this push step has purposefully not been automated (yet).  
+Note that beta versions are composed of 4 numbers (e.g. `1.10.0.1`) whilst live version are composed of only 3 numbers (e.g. `1.10.1`).
 
 ## Firebase configuration
 

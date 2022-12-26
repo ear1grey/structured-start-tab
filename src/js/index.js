@@ -882,7 +882,12 @@ async function prepareAll() {
       window.location.href = './pages/merge-resolver/index.html';
     } else if (onlineSettings == null && OPTS.json != null){
       await savePageCloud(OPTS.json);
-    }
+    
+  // Feedback button should always be visible when in beta
+  if (!OPTS.showFeedback && !util.isBeta()) {
+    document.querySelector('#feedback').style.display = 'none';
+  }
+}
   });
 }
 
