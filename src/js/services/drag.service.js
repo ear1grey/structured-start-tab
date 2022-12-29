@@ -152,6 +152,7 @@ function dragDrop(e) {
       extractDataFromDrop(e);
     }
     // handle all cases
+    // Not pushing the changes here because it can cause too many requests being sent. Instead, rely on scheduled saves
     saveChanges();
   }
 }

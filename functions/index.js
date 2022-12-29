@@ -4,35 +4,35 @@ import admin from 'firebase-admin';
 admin.initializeApp();
 
 const getSettingsById = (id) => {
-  return new Promise(resolve => 
+  return new Promise(resolve =>
     admin.firestore().collection('settings').doc(id).get().then(doc => {
       if (!doc.exists) {
         resolve({
           status: 404,
-          content: {error: 'Settings not found'}
-        })
+          content: { error: 'Settings not found' },
+        });
       } else {
         const data = doc.data();
         resolve({
           status: 200,
           content: {
             settings: data.settings,
-            version: data.version
-          }
-        })
+            version: data.version,
+          },
+        });
       }
     }).catch(error => {
       resolve({
         status: 500,
-        content: {error}
-      })
-    })
+        content: { error },
+      });
+    }),
   );
-}
+};
 
 export const getSettings = functions.https.onRequest(async (req, res) => {
   const id = req.query.id;
-  const {status, content} = await getSettingsById(id);
+  const { status, content } = await getSettingsById(id);
   console.log();
   res.status(status).send(content);
 });
@@ -42,15 +42,15 @@ export const saveSettings = functions.https.onRequest(async (req, res) => {
   const id = req.body.id;
   const incomingContent = req.body.content;
 
-  const {status, content} = await getSettingsById(id);
+  const { status, content } = await getSettingsById(id);
 
   if (status === 200) {
     if (content.version + 1 !== incomingContent.version) {
       // TODO: handle possible merge conflict
       console.log('!! Possible merge conflict');
-    } 
-  } else if(status >= 400 && status !== 404) { // 404 means that there's no config for the user - we want to create a new config
-    res.status(status).send(content)
+    }
+  } else if (status >= 400 && status !== 404) { // 404 means that there's no config for the user - we want to create a new config
+    res.status(status).send(content);
   }
 
   admin.firestore().collection('settings').doc(id).get().then(doc => {
@@ -58,17 +58,16 @@ export const saveSettings = functions.https.onRequest(async (req, res) => {
       admin.firestore().collection('settings').doc(id).set(incomingContent).then(() => {
         res.send('Settings saved');
       }).catch(error => {
-        res.send({error});
+        res.send({ error });
       });
     } else {
       admin.firestore().collection('settings').doc(id).update(incomingContent).then(() => {
         res.status(204).send();
       }).catch(error => {
-        res.status(500).send({error});
+        res.status(500).send({ error });
       });
     }
   }).catch(error => {
-    res.status(500).send({error});
+    res.status(500).send({ error });
   });
-  
 });
