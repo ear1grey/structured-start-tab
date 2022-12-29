@@ -6,7 +6,7 @@
 #top {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-areas: "auto manual" "main main";
+  grid-template-areas: "auto manual""main main";
   align-items: center;
   padding: 0.125rem;
   border: solid darkgrey thin;
@@ -18,13 +18,21 @@
   padding: 0.5rem;
 }
 
-#auto, #manual, #main {
+#auto,
+#manual,
+#main {
   display: block;
   border-radius: 0.25rem;
 }
 
-#auto { grid-area: auto; }
-#manual { grid-area: manual;}
+#auto {
+  grid-area: auto;
+}
+
+#manual {
+  grid-area: manual;
+}
+
 #main {
   grid-area: main;
   background: lightgrey;
@@ -35,6 +43,7 @@
 #manual.on {
   background: lightgrey;
   border-color: darkgrey;
+  color: black;
 }
 
 #manual.on {
@@ -45,6 +54,7 @@
   border-radius: 0.25rem 0 0.25rem 0.25rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  color: black;
 }
 
 #main label {
