@@ -75,7 +75,7 @@ function updatePageWithPrefs(prefs) {
   * @param attrs - to be added to the input element (e.g. max, min)
   * @param txt - text for the label
   */
-function create(where, type, attrs, txt, defaultValue, readonly) {
+function create(where, type, attrs, txt, defaultValue, readonly, onInputEvent) {
   const elem = util.cloneTemplate('#template_' + type);
   where.append(elem);
   const elemInDoc = where.lastElementChild;
@@ -105,7 +105,10 @@ function create(where, type, attrs, txt, defaultValue, readonly) {
         }
       }
     }
-    elemInDoc.addEventListener('input', saveOptions);
+    elemInDoc.addEventListener('input', (e) => {
+      saveOptions();
+      if (onInputEvent != null) { onInputEvent(e); }
+    });
   }
   return elemInDoc;
 }
@@ -138,7 +141,11 @@ function createPageWithPrefs(prefs) {
     create(agenda, 'checkbox', { id: 'showLocationAgenda' }, chrome.i18n.getMessage('showLocationAgenda'));
     create(agenda, 'checkbox', { id: 'showEndDateAgenda' }, chrome.i18n.getMessage('showEndDateAgenda'));
     create(configureShortcut, 'show', { id: 'textConfigure' }, chrome.i18n.getMessage('configure_shortcut'));
-    create(cloud, 'checkbox', { id: 'useCloudStorage' }, chrome.i18n.getMessage('use_cloud'));
+    create(cloud, 'checkbox', { id: 'useCloudStorage' }, chrome.i18n.getMessage('use_cloud'), false, false, (e) => {
+      if (e.target.checked) {
+        alert(chrome.i18n.getMessage('cloud_warn'));
+      }
+    });
   }
   updatePageWithPrefs(prefs);
 }
