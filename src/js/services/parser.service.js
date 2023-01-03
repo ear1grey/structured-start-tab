@@ -1,4 +1,4 @@
-import { setFavicon, rgbaToHex } from '../lib/util.js';
+import { rgbaToHex, setFavicon } from '../lib/util.js';
 
 // Ids of elements that we don't want parsed
 const domToJson = (parentElement) => {
@@ -86,7 +86,7 @@ const domToJson = (parentElement) => {
 const jsonToDom = (parentElement, content) => {
   for (const element of content) {
     switch (element.type) {
-      case 'section':{
+      case 'section': {
         const section = document.createElement('section');
 
         // Add properties
@@ -113,7 +113,7 @@ const jsonToDom = (parentElement, content) => {
         appendItemWithDefaults(parentElement, section);
         break;
       }
-      case 'sst-panel':{
+      case 'sst-panel': {
         const panel = document.createElement('sst-panel');
 
         // Add properties
@@ -134,7 +134,7 @@ const jsonToDom = (parentElement, content) => {
         appendItemWithDefaults(parentElement, panel);
         break;
       }
-      case 'link':{
+      case 'link': {
         const link = document.createElement('a');
 
         // Add properties
@@ -147,21 +147,21 @@ const jsonToDom = (parentElement, content) => {
         appendItemWithDefaults(parentElement, link);
         break;
       }
-      case 'text':{
+      case 'text': {
         const text = document.createElement('p');
         text.innerHTML = element.content;
 
         parentElement.appendChild(text);
         break;
       }
-      case 'list':{
+      case 'list': {
         const list = document.createElement('ul');
         jsonToDom(list, element.content);
 
         parentElement.appendChild(list);
         break;
       }
-      case 'listItem':{
+      case 'listItem': {
         const listItem = document.createElement('li');
         listItem.innerHTML = element.content;
 
