@@ -1,11 +1,11 @@
 // or chrome.storage.sync
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
-import * as toast from './lib/toast.js';
-import * as util from './lib/util.js';
-import { OPTS } from './lib/options.js';
-import * as options from './lib/options.js';
-import { htmlStringToJson } from './services/parser.service.js';
+import * as toast from '../../js/lib/toast.js';
+import * as util from '../../js/lib/util.js';
+import { OPTS } from '../../js/lib/options.js';
+import * as options from '../../js/lib/options.js';
+import { htmlStringToJson } from '../../js/services/parser.service.js';
 
 function setCheckBox(prefs, what) {
   const elem = document.getElementById(what);

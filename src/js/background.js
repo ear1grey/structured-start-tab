@@ -66,7 +66,7 @@ const menuItems = [
 ];
 const urls = [
   chrome.runtime.getURL('src/index.html'),
-  chrome.runtime.getURL('src/options-page.html'),
+  chrome.runtime.getURL('src/pages/options/index.html'),
   'chrome://newtab/',
 ];
 // message sender used whenever any of our

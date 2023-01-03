@@ -38,7 +38,7 @@
     "newtab": "src/index.html"
   },
   "options_ui": {
-    "page": "src/options-page.html"
+    "page": "src/pages/options/index.html"
   },
   "web_accessible_resources": [
     {
