@@ -344,6 +344,7 @@ section section nav {
 .switch input:checked+label {
   background-color: #d3d3d3;
   box-shadow: none;
+  color: black;
 }
 
 #radioHorizontal+label {
