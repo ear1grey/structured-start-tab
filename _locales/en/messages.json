@@ -144,7 +144,7 @@
     "message": "Colour"
   },
   "tranparency": {
-    "message": "Tranparency"
+    "message": "Transparency"
   },
   "opacity": {
     "message": "Opacity"
@@ -207,7 +207,7 @@
     "message": "Return"
   },
   "editOnNewDrop": {
-    "message": "Open edit dialogue after create and drop new panel/link"
+    "message": "Open edit dialogue after create and drop new panel/link"
   },
   "top_sites_panel": {
     "message": "Top sites"
@@ -282,7 +282,7 @@
     "message": "Add agenda"
   },
   "bad_agenda_link": {
-    "message": "<h1>Bad link</h1><p>Verify the agenda URL in the pannel</p>"
+    "message": "<h1>Bad link</h1><p>Verify the agenda URL in the panel</p>"
   },
   "agenda_nb": {
     "message": "Enter the number of events in your calendar that you want to appear."
@@ -297,7 +297,13 @@
     "message": "Configuring keyboard shortcuts"
   },
   "configure_shortcut": {
-    "message": "<p>The keyboard shortcuts used to toggle the sidebar (and other features) can be configured to suit your preferemce.  Depending on your browser the way to do this will be different, so please consult these guides.</p><ul><li><a href=\"https://obie.ai/blog/how-to-add-and-remove-custom-keyboard-shortcuts-and-hotkeys-for-a-chrome-extension-in-5-seconds-flat/\">Chrome</a></li><li><a href=\"https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox\">Firefox</a></li></ul>"
+    "message": "<p>The keyboard shortcuts used to toggle the sidebar (and other features) can be configured to suit your preference.  Depending on your browser the way to do this will be different, so please consult these guides.</p><ul><li><a href=\"https://obie.ai/blog/how-to-add-and-remove-custom-keyboard-shortcuts-and-hotkeys-for-a-chrome-extension-in-5-seconds-flat/\">Chrome</a></li><li><a href=\"https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox\">Firefox</a></li></ul>"
+  },
+  "cloud": {
+    "message": "Cloud storage"
+  },
+  "use_cloud": {
+    "message": "Use cloud storage"
   },
   "title_agenda_nb": {
     "message": "Number of words to be displayed from the event title"
@@ -309,7 +315,7 @@
     "message": "Display the end date of the event"
   },
   "private": {
-    "message": "Pannel private"
+    "message": "Panel private"
   },
   "presentation_mode": {
     "message": "Toggle presentation mode"

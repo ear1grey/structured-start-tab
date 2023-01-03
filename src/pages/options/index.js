@@ -38,6 +38,7 @@ function updatePrefsWithPage() {
   getCheckBox('editOnNewDrop');
   getCheckBox('showLocationAgenda');
   getCheckBox('showEndDateAgenda');
+  getCheckBox('useCloudStorage');
   getValue('showToast');
   getValue('showBookmarksLimit');
   getValue('space');
@@ -57,6 +58,7 @@ function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'editOnNewDrop');
   setCheckBox(prefs, 'showLocationAgenda');
   setCheckBox(prefs, 'showEndDateAgenda');
+  setCheckBox(prefs, 'useCloudStorage');
   setValue(prefs, 'showToast');
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
@@ -115,6 +117,7 @@ function createPageWithPrefs(prefs) {
     const feed = create(settings, 'section', {}, chrome.i18n.getMessage('messages'));
     const agenda = create(settings, 'section', {}, chrome.i18n.getMessage('agenda'));
     const configureShortcut = create(settings, 'section', {}, chrome.i18n.getMessage('configure_shortcut_title'));
+    const cloud = create(settings, 'section', {}, chrome.i18n.getMessage('cloud'));
     create(book, 'checkbox', { id: 'showBookmarksSidebar' }, chrome.i18n.getMessage('showBookmarksSidebar'));
     create(book, 'checkbox', { id: 'hideBookmarksInPage' }, chrome.i18n.getMessage('hideBookmarksInPage'));
     create(book, 'number', { id: 'showBookmarksLimit' }, chrome.i18n.getMessage('showBookmarksLimit'));
@@ -135,6 +138,7 @@ function createPageWithPrefs(prefs) {
     create(agenda, 'checkbox', { id: 'showLocationAgenda' }, chrome.i18n.getMessage('showLocationAgenda'));
     create(agenda, 'checkbox', { id: 'showEndDateAgenda' }, chrome.i18n.getMessage('showEndDateAgenda'));
     create(configureShortcut, 'show', { id: 'textConfigure' }, chrome.i18n.getMessage('configure_shortcut'));
+    create(cloud, 'checkbox', { id: 'useCloudStorage' }, chrome.i18n.getMessage('use_cloud'));
   }
   updatePageWithPrefs(prefs);
 }

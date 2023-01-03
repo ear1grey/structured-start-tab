@@ -263,7 +263,7 @@ export function saveChanges({ makeBackup = true, cloudSave = false } = {}) {
   OPTS.json = domToJson(els.main);
   options.write();
 
-  if (cloudSave) {
+  if (cloudSave && OPTS.useCloudStorage) {
     savePageCloud(OPTS.json);
   }
 
@@ -920,7 +920,7 @@ async function prepareAll() {
   updateAgenda();
   util.localizeHtml(document);
 
-  await loadPageCloud();
+  if (OPTS.useCloudStorage) { await loadPageCloud(); }
 
   // TODO: remove
   document.querySelector('#test-btn').addEventListener('click', loadPageCloud);
