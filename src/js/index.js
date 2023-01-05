@@ -921,9 +921,6 @@ async function prepareAll() {
   util.localizeHtml(document);
 
   if (OPTS.useCloudStorage) { await loadPageCloud(); }
-
-  // TODO: remove
-  document.querySelector('#test-btn').addEventListener('click', loadPageCloud);
 }
 
 const isContentEqual = (a, b) => {
