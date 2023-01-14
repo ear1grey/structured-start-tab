@@ -15,6 +15,7 @@ function getCheckBox(what) {
   const elem = document.getElementById(what);
   OPTS[what] = elem.checked;
 }
+
 function setValue(prefs, what, defaultValue = 0) {
   const elem = document.getElementById(what);
   elem.valueAsNumber = prefs[what] || defaultValue;
@@ -23,6 +24,16 @@ function getValue(what) {
   const elem = document.getElementById(what);
   OPTS[what] = elem.valueAsNumber;
 }
+
+function setText(prefs, what) {
+  const elem = document.getElementById(what);
+  elem.value = prefs[what];
+}
+function getText(what) {
+  const elem = document.getElementById(what);
+  OPTS[what] = elem.value;
+}
+
 // incorporate the latest values of the page into
 // the OPTS object that gets stored.
 function updatePrefsWithPage() {
@@ -39,6 +50,7 @@ function updatePrefsWithPage() {
   getCheckBox('showLocationAgenda');
   getCheckBox('showEndDateAgenda');
   getCheckBox('useCloudStorage');
+  getText('storageUrl');
   getValue('showToast');
   getValue('showBookmarksLimit');
   getValue('space');
@@ -59,6 +71,7 @@ function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'showLocationAgenda');
   setCheckBox(prefs, 'showEndDateAgenda');
   setCheckBox(prefs, 'useCloudStorage');
+  setText(prefs, 'storageUrl');
   setValue(prefs, 'showToast');
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
@@ -146,6 +159,7 @@ function createPageWithPrefs(prefs) {
         alert(chrome.i18n.getMessage('cloud_warn'));
       }
     });
+    create(cloud, 'text', { id: 'storageUrl' }, chrome.i18n.getMessage('storage_url'));
   }
   updatePageWithPrefs(prefs);
 }

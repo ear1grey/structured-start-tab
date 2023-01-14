@@ -305,6 +305,9 @@
   "use_cloud": {
     "message": "Use cloud storage"
   },
+  "storage_url": {
+    "message": "Storage URL"
+  },
   "cloud_warn": {
     "message": "Warning: this feature uses your Google Id and the data will be stored on Google servers. If your Google Id is compromised, your data will be compromised too."
   },

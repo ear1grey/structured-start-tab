@@ -1,11 +1,9 @@
 import { makeRequest } from './api.service.js';
 import { OPTS } from '../lib/options.js';
 
-const storageUrl = 'http://127.0.0.1:5001/structured-start-tab-68c48/us-central1';
-
 export const getPageCloud = async () => {
   const identifier = (await chrome.identity.getProfileUserInfo()).id;
-  const url = `${storageUrl}/getSettings?id=${identifier}`;
+  const url = `${OPTS.storageUrl}/getSettings?id=${identifier}`;
 
   const response = await makeRequest(url, 'GET');
 
@@ -20,7 +18,7 @@ export const getPageCloud = async () => {
 };
 
 export const savePageCloud = async (object) => {
-  const url = `${storageUrl}/saveSettings`;
+  const url = `${OPTS.storageUrl}/saveSettings`;
 
   const identifier = (await chrome.identity.getProfileUserInfo()).id;
 

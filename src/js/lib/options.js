@@ -30,6 +30,7 @@ export const OPTS = {
   agendas: [],
   onlineVersion: 1,
   useCloudStorage: false,
+  storageUrl: '',
 };
 
 const settingKey = 'structured-start-tab';

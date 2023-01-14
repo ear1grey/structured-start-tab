@@ -32,7 +32,7 @@ A `.firebaserc` with the Firebase project ID needs to present in the root folder
 
 Run emulator:
 
-```sh'
+```sh
 firebase emulators:start --import ./firebase_data --export-on-exit
 ```
 
