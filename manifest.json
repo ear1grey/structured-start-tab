@@ -18,7 +18,8 @@
   ],
   "host_permissions": [
     "https://calendar.google.com/calendar/*",
-    "http://127.0.0.1:5001/*"
+    "http://127.0.0.1:5001/*",
+    "*://*.cloudfunctions.net/*"
   ],
   "background": {
     "service_worker": "src/js/background.js",
