@@ -927,7 +927,7 @@ const isContentEqual = (a, b) => {
   if ((a == null && b == null) || !Array.isArray(a)) return true;
 
   // Each content is an array - if the length is different, they are not equal
-  if (a.length !== b.length) return false;
+  if (a.filter(elem => elem.id !== 'trash').length !== b.filter(elem => elem.id !== 'trash').length) return false;
 
   return a
     .filter(elem => elem.id !== 'trash') // Trash content does not need to be equal
