@@ -1,5 +1,13 @@
 import { setFavicon, rgbaToHex, newUuid } from '../lib/util.js';
 
+const findIdent = (element) => {
+  if (element.getAttribute('ident')) {
+    const ident = element.getAttribute('ident');
+    if (ident !== 'undefined') { return ident; }
+  }
+  return newUuid();
+};
+
 // Ids of elements that we don't want parsed
 const domToJson = (parentElement) => {
   const jsonContent = [];
@@ -13,7 +21,7 @@ const domToJson = (parentElement) => {
 
         jsonContent.push(
           {
-            ident: child.getAttribute('ident') || newUuid(),
+            ident: findIdent(child),
             id: child.id,
             type: (child.id.includes('trash')) ? 'section' : 'sst-panel',
             backgroundColour: child.style.backgroundColor?.includes('rgba') ? rgbaToHex(child.style.backgroundColor) : child.style.backgroundColor,
@@ -31,7 +39,7 @@ const domToJson = (parentElement) => {
       case 'SST-PANEL':
         jsonContent.push(
           {
-            ident: child.getAttribute('ident') || newUuid(),
+            ident: findIdent(child),
             id: child.id,
             type: 'sst-panel',
             backgroundColour: child.backgroundColour,
@@ -48,7 +56,7 @@ const domToJson = (parentElement) => {
       case 'A':
         jsonContent.push(
           {
-            ident: child.getAttribute('ident') || newUuid(),
+            ident: findIdent(child),
             type: 'link',
             backgroundColour: child.style.backgroundColor,
             textColour: child.style.color,
@@ -60,7 +68,7 @@ const domToJson = (parentElement) => {
       case 'P':
         jsonContent.push(
           {
-            ident: child.getAttribute('ident') || newUuid(),
+            ident: findIdent(child),
             type: 'text',
             content: child.innerHTML,
           });
@@ -68,7 +76,7 @@ const domToJson = (parentElement) => {
       case 'UL':
         jsonContent.push(
           {
-            ident: child.getAttribute('ident') || newUuid(),
+            ident: findIdent(child),
             type: 'list',
             content: domToJson(child),
           });
@@ -76,7 +84,7 @@ const domToJson = (parentElement) => {
       case 'LI':
         jsonContent.push(
           {
-            ident: child.getAttribute('ident') || newUuid(),
+            ident: findIdent(child),
             type: 'listItem',
             content: child.innerHTML,
           });
