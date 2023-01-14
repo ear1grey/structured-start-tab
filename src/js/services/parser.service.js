@@ -62,7 +62,6 @@ const domToJson = (parentElement) => {
             textColour: child.style.color,
             name: child.textContent,
             url: child.href,
-            icon: child.querySelector('img.favicon')?.src,
           });
         break;
       case 'P':

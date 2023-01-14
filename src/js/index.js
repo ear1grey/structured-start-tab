@@ -952,7 +952,6 @@ const isContentEqual = (a, b) => {
         elemA.type === elemB.type &&
 
         // link only properties
-        elemA.icon === elemB.icon &&
         elemA.name === elemB.name &&
         elemA.url === elemB.url;
     });

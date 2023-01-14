@@ -24,7 +24,12 @@ export const savePageCloud = async (object) => {
 
   const body = {
     id: identifier,
-    content: { settings: JSON.stringify(object), version: OPTS.onlineVersion },
+    content: {
+      settings: JSON.stringify(
+        object
+          .filter(panel => panel.id !== 'trash')), // make sure to exclude the trash panel
+      version: OPTS.onlineVersion,
+    },
   };
 
   return await makeRequest(url, 'POST', body);
