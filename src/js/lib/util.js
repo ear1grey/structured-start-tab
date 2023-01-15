@@ -195,8 +195,9 @@ export function calculateDynamicFlex(where) {
 }
 
 export function findTarget(e) {
-  if (e.path[0].tagName === 'A') return e.path[0];
-  return e.target.tagName === 'SST-PANEL' ? e.path.find(x => x.tagName === 'SST-PANEL') : e.target;
+  const path = e.path || (e.composedPath && e.composedPath());
+  if (path[0].tagName === 'A') return path[0];
+  return e.target.tagName === 'SST-PANEL' ? path.find(x => x.tagName === 'SST-PANEL') : e.target;
 }
 
 /**

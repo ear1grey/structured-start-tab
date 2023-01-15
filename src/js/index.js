@@ -587,9 +587,10 @@ function showBookmarks(visible = true) {
 }
 
 function findEventFirstSection(e) {
-  for (let i = 0; i < e.path.length; i++) {
-    if (e.path[i].tagName === 'SECTION') {
-      return e.path[i];
+  const path = e.path || (e.composedPath && e.composedPath());
+  for (let i = 0; i < path.length; i++) {
+    if (path[i].tagName === 'SECTION') {
+      return path[i];
     }
   }
 

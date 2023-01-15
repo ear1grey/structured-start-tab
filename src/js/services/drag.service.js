@@ -45,7 +45,8 @@ function dragStart(e) {
   }
   document.body.classList.add('dragOngoing');
   if (document.body.classList.contains('editing')) { return; }
-  let target = e.target.tagName === 'SST-PANEL' ? e.path[0] : e.target;
+  const path = e.path || (e.composedPath && e.composedPath());
+  let target = e.target.tagName === 'SST-PANEL' ? path : e.target;
   if (target.tagName === 'IMG') {
     target = target.parentElement;
 
