@@ -1,5 +1,5 @@
 import { makeRequest } from './api.service.js';
-import { OPTS } from '../lib/options.js';
+import { OPTS, write } from '../lib/options.js';
 import { isContentEqual } from '../lib/util.js';
 
 export const getPageCloud = async () => {
@@ -61,15 +61,17 @@ export const syncPageCloud = async () => {
 
   // Possible merge conflict
   if (response.status === 409) {
-    const { version, settings } = response.content;
+    const { version, settings } = response.content.content;
     if (version == null || settings == null) return;
 
-    const isEqual = isContentEqual(settings, OPTS.json);
+    const isEqual = isContentEqual(JSON.parse(settings), OPTS.json);
 
     if (isEqual) {
       OPTS.contentVersion = version + 1;
     } else {
       OPTS.hasMergeConflict = true;
     }
+
+    write();
   }
 };

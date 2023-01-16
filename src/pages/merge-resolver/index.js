@@ -53,6 +53,7 @@ const save = async (pick) => {
 
   OPTS.onlineJson = null;
   OPTS.onlineVersion = null;
+  OPTS.hasMergeConflict = false;
 
   options.write();
 };

@@ -888,18 +888,22 @@ async function loadPageCloud() {
 
   const [onlineSettings, onlineVersion] = await getPageCloud();
 
-  const isEqual = util.isContentEqual(onlineSettings, OPTS.json);
+  const parsedSettings = JSON.parse(onlineSettings);
+
+  const isEqual = util.isContentEqual(parsedSettings, OPTS.json);
   console.log('content equal?', isEqual);
 
   if (!isEqual) {
-    OPTS.onlineJson = onlineSettings;
+    OPTS.onlineJson = parsedSettings;
     OPTS.onlineVersion = onlineVersion;
     saveChanges();
     window.location.href = './pages/merge-resolver/index.html';
-  } else if (onlineSettings == null && OPTS.json != null) {
+  } else if (parsedSettings == null && OPTS.json != null) {
     // await savePageCloud(OPTS.json);
   } else {
     OPTS.contentVersion = onlineVersion + 1;
+    OPTS.hasMergeConflict = false;
+    options.write();
   }
 }
 

@@ -85,13 +85,13 @@ export const syncSettings = functions.https.onRequest(async (req, res) => {
 
   if (status === 200) {
     // if the version that we have is the same or greater than the incoming version, we may have a merge conflict
-    if (content.version > incomingContent.version) {
+    if (content.version >= incomingContent.version) {
       res.status(409).send({ content }); // return the current saved content to be dealt with on the client side
     }
   } else if (status >= 400 && status !== 404) { // 404 means that there's no config for the user - we want to create a new config
     res.status(status).send(content);
+  } else {
+    // if all is OK, we save the content
+    pushSettings(id, incomingContent, res);
   }
-
-  // if all is OK, we save the content
-  pushSettings(id, incomingContent, res);
 });
