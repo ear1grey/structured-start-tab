@@ -329,3 +329,37 @@ export function newUuid() {
 export function isBeta() {
   return chrome.runtime.getManifest().version.split('.').length > 3;
 }
+
+export function isContentEqual(a, b) {
+  if ((a == null && b == null) || !Array.isArray(a)) return true;
+
+  // Each content is an array - if the length is different, they are not equal
+  if (a.filter(elem => elem.id !== 'trash').length !== b.filter(elem => elem.id !== 'trash').length) return false;
+
+  return a
+    .filter(elem => elem.id !== 'trash') // Trash content does not need to be equal
+    .every(elemA => {
+      const elemB = b.find(elemB => elemB.ident === elemA.ident);
+      if (!elemB) return false;
+
+      return elemA.backgroundColour === elemB.backgroundColour &&
+        elemA.textColour === elemB.textColour &&
+        elemA.type === elemB.type &&
+
+        // panel only properties
+        isContentEqual(elemA.content, elemB.content) &&
+        elemA.direction === elemB.direction &&
+        elemA.folded === elemB.folded &&
+        elemA.grow === elemB.grow &&
+        elemA.header === elemB.header &&
+        elemA.id === elemB.id &&
+        elemA.private === elemB.private &&
+        elemA.singleLineDisplay === elemB.singleLineDisplay &&
+        elemA.textColour === elemB.textColour &&
+        elemA.type === elemB.type &&
+
+        // link only properties
+        elemA.name === elemB.name &&
+        elemA.url === elemB.url;
+    });
+}

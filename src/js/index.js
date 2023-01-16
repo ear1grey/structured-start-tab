@@ -6,7 +6,7 @@ import { OPTS } from './lib/options.js';
 import { updateAgendaBackground } from './background.js';
 import { domToJson, jsonToDom } from './services/parser.service.js';
 import { prepareDrag } from './services/drag.service.js';
-import { getPageCloud, savePageCloud } from './services/cloud.service.js';
+import { getPageCloud, savePageCloud, syncPageCloud } from './services/cloud.service.js';
 
 // TODO: import all components from a common file?
 import './components/agenda-item/index.js';
@@ -266,9 +266,9 @@ export function saveChanges({ makeBackup = true, cloudSave = false } = {}) {
   OPTS.json = domToJson(els.main);
   options.write();
 
-  if (cloudSave && OPTS.useCloudStorage) {
-    savePageCloud(OPTS.json);
-  }
+  // if (cloudSave && OPTS.useCloudStorage) {
+  //   savePageCloud(OPTS.json);
+  // }
 
   prepareListeners();
 
@@ -282,7 +282,7 @@ function detectKeydown(e) {
     util.simulateClick('#editok');
   }
   if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey)) {
-    if (OPTS.backup) {
+    if (OPTS.jsonBackup) {
       const copy = [...OPTS.json];
       OPTS.json = [...OPTS.jsonBackup];
       OPTS.jsonBackup = copy;
@@ -884,24 +884,39 @@ function migrateLinks() {
 }
 
 async function loadPageCloud() {
-  const onlineSettings = await getPageCloud();
+  if (!OPTS.hasMergeConflict) return;
 
-  const isEqual = isContentEqual(onlineSettings, OPTS.json);
+  const [onlineSettings, onlineVersion] = await getPageCloud();
+
+  const isEqual = util.isContentEqual(onlineSettings, OPTS.json);
   console.log('content equal?', isEqual);
 
   if (!isEqual) {
     OPTS.onlineJson = onlineSettings;
+    OPTS.onlineVersion = onlineVersion;
     saveChanges();
     window.location.href = './pages/merge-resolver/index.html';
   } else if (onlineSettings == null && OPTS.json != null) {
-    await savePageCloud(OPTS.json);
-
-    // Feedback button should always be visible when in beta
-    if (!OPTS.showFeedback && !util.isBeta()) {
-      document.querySelector('#feedback').style.display = 'none';
-    }
+    // await savePageCloud(OPTS.json);
+  } else {
+    OPTS.contentVersion = onlineVersion + 1;
   }
 }
+
+const prepareSectionActions = () => {
+  // Feedback button should always be visible when in beta
+  if (!OPTS.showFeedback && !util.isBeta()) {
+    document.querySelector('#feedback').style.display = 'none';
+  }
+
+  //! TODO: uncomment after testing
+  // if (!OPTS.useCloudStorage) {
+  //   document.querySelector('#forceCloudSync').style.display = 'none';
+  // }
+  document.querySelector('#forceCloudSync a').addEventListener('click', () => {
+    syncPageCloud();
+  });
+};
 
 async function prepareAll() {
   await options.load();
@@ -924,41 +939,10 @@ async function prepareAll() {
   updateAgenda();
   util.localizeHtml(document);
 
+  prepareSectionActions();
+
   if (OPTS.useCloudStorage) { await loadPageCloud(); }
 }
 
-const isContentEqual = (a, b) => {
-  if ((a == null && b == null) || !Array.isArray(a)) return true;
-
-  // Each content is an array - if the length is different, they are not equal
-  if (a.filter(elem => elem.id !== 'trash').length !== b.filter(elem => elem.id !== 'trash').length) return false;
-
-  return a
-    .filter(elem => elem.id !== 'trash') // Trash content does not need to be equal
-    .every(elemA => {
-      const elemB = b.find(elemB => elemB.ident === elemA.ident);
-      if (!elemB) return false;
-
-      return elemA.backgroundColour === elemB.backgroundColour &&
-        elemA.textColour === elemB.textColour &&
-        elemA.type === elemB.type &&
-
-        // panel only properties
-        isContentEqual(elemA.content, elemB.content) &&
-        elemA.direction === elemB.direction &&
-        elemA.folded === elemB.folded &&
-        elemA.grow === elemB.grow &&
-        elemA.header === elemB.header &&
-        elemA.id === elemB.id &&
-        elemA.private === elemB.private &&
-        elemA.singleLineDisplay === elemB.singleLineDisplay &&
-        elemA.textColour === elemB.textColour &&
-        elemA.type === elemB.type &&
-
-        // link only properties
-        elemA.name === elemB.name &&
-        elemA.url === elemB.url;
-    });
-};
 
 window.addEventListener('DOMContentLoaded', prepareAll);

@@ -601,6 +601,7 @@ section#feedback {
   flex: unset;
 }
 
+section#forceCloudSync a,
 section#feedback a {
   margin: .5em;
 }

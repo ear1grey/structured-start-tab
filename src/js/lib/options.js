@@ -28,9 +28,11 @@ export const OPTS = {
   json: {},
   linkStats: {},
   agendas: [],
-  onlineVersion: 1,
+  // Cloud sync options
   useCloudStorage: false,
   storageUrl: '',
+  contentVersion: 1,
+  hasMergeConflict: false,
 };
 
 const settingKey = 'structured-start-tab';
@@ -50,6 +52,7 @@ export function load() {
     });
   });
 }
+
 export function write() {
   return new Promise(resolve => {
     chrome.storage.local.set({ [settingKey]: OPTS }, () => {

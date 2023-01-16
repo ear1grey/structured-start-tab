@@ -30,6 +30,26 @@ const getSettingsById = (id) => {
   );
 };
 
+const pushSettings = (id, content, res) => {
+  admin.firestore().collection('settings').doc(id).get().then(doc => {
+    if (!doc.exists) {
+      admin.firestore().collection('settings').doc(id).set(content).then(() => {
+        res.send('Settings saved');
+      }).catch(error => {
+        res.send({ error });
+      });
+    } else {
+      admin.firestore().collection('settings').doc(id).update(content).then(() => {
+        res.status(204).send();
+      }).catch(error => {
+        res.status(500).send({ error });
+      });
+    }
+  }).catch(error => {
+    res.status(500).send({ error });
+  });
+};
+
 export const getSettings = functions.https.onRequest(async (req, res) => {
   const id = req.query.id;
   const { status, content } = await getSettingsById(id);
@@ -51,23 +71,27 @@ export const saveSettings = functions.https.onRequest(async (req, res) => {
     }
   } else if (status >= 400 && status !== 404) { // 404 means that there's no config for the user - we want to create a new config
     res.status(status).send(content);
+    return;
   }
 
-  admin.firestore().collection('settings').doc(id).get().then(doc => {
-    if (!doc.exists) {
-      admin.firestore().collection('settings').doc(id).set(incomingContent).then(() => {
-        res.send('Settings saved');
-      }).catch(error => {
-        res.send({ error });
-      });
-    } else {
-      admin.firestore().collection('settings').doc(id).update(incomingContent).then(() => {
-        res.status(204).send();
-      }).catch(error => {
-        res.status(500).send({ error });
-      });
+  pushSettings(id, incomingContent, res);
+});
+
+export const syncSettings = functions.https.onRequest(async (req, res) => {
+  const id = req.body.id;
+  const incomingContent = req.body.content;
+
+  const { status, content } = await getSettingsById(id);
+
+  if (status === 200) {
+    // if the version that we have is the same or greater than the incoming version, we may have a merge conflict
+    if (content.version > incomingContent.version) {
+      res.status(409).send({ content }); // return the current saved content to be dealt with on the client side
     }
-  }).catch(error => {
-    res.status(500).send({ error });
-  });
+  } else if (status >= 400 && status !== 404) { // 404 means that there's no config for the user - we want to create a new config
+    res.status(status).send(content);
+  }
+
+  // if all is OK, we save the content
+  pushSettings(id, incomingContent, res);
 });

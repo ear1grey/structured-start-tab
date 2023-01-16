@@ -46,11 +46,13 @@ const save = async (pick) => {
   } else if (pick === 'right') {
     OPTS.json = domToJson(els.right);
   }
-  OPTS.onlineJson = null;
+
+  OPTS.contentVersion = OPTS.onlineVersion + 1;
 
   await savePageCloud(OPTS.json);
 
-  // TODO: after picking version we need to update the cloud version
+  OPTS.onlineJson = null;
+  OPTS.onlineVersion = null;
 
   options.write();
 };

@@ -43,6 +43,9 @@ function dragStart(e) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
+
+  OPTS.jsonBackup = [...OPTS.json];
+
   document.body.classList.add('dragOngoing');
   if (document.body.classList.contains('editing')) { return; }
   const path = e.path || (e.composedPath && e.composedPath());
