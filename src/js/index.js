@@ -69,6 +69,7 @@ function updateClickCount(a) {
 }
 
 function toHex(x, m = 1) {
+  if (isNaN(x)) { return '00'; }
   return ('0' + parseInt(String(m * x), 10).toString(16)).slice(-2);
 }
 
@@ -80,7 +81,9 @@ function translateColor(rgba) {
     toHex(Number(parts[2])),
     toHex(Number(parts[3]), 255),
   ];
-  const result = '#' + converted.join('');
+  let result = '#' + converted.join('');
+  if (result.includes('#ffffff')) result = '!' + result;
+
   return result;
 }
 
@@ -88,8 +91,8 @@ export function editStart(elem) {
   els.edit.textContent = ''; // reset
   const style = window.getComputedStyle(elem);
 
-  let bgcol = elem.dataset.bg ? elem.dataset.bg : '!' + translateColor(style.backgroundColor);
-  let fgcol = elem.dataset.fg ? elem.dataset.fg : '!' + translateColor(style.color);
+  let bgcol = elem.dataset.bg ? elem.dataset.bg : translateColor(style.backgroundColor);
+  let fgcol = elem.dataset.fg ? elem.dataset.fg : translateColor(style.color);
 
   if (elem instanceof HTMLAnchorElement) {
     cloneToDialog('#template_edit_link');

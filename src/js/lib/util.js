@@ -113,8 +113,10 @@ export function moveElement(e, dragging) {
   const tgt = findTarget(e);
   if (!dragging || dragging.el === tgt) { return; } // can't drop on self
   if (tgt.id.includes('agenda')) { return; } // can't drop on agenda
+
   const nav = findNav(tgt);
   const position = tgt === dragging.el.nextElementSibling ? 'afterend' : 'beforebegin';
+
   if (dragging.el.tagName === 'A') {
     if (tgt.tagName === 'H1') {
       return nav.prepend(dragging.el);
@@ -122,6 +124,8 @@ export function moveElement(e, dragging) {
     if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
     return nav.prepend(dragging.el);
   }
+
+  // support for previous versions
   if (dragging.el.tagName === 'SECTION') {
     // can't drop *inside* self
     if (dragging.el.contains(tgt) || dragging.el.shadow?.contains(tgt)) { return; }
@@ -132,27 +136,41 @@ export function moveElement(e, dragging) {
       return tgt.parentElement.insertAdjacentElement(beforeOrAfter, dragging.el);
     }
     if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
-    if (tgt.tagName === 'MAIN') { return nav.append(dragging.el); }
-    if (nav.children.length === 0) { return nav.prepend(dragging.el); }
+    if (tgt.tagName === 'MAIN') { return appendElement(nav, dragging.el); }
+    if (nav.children.length === 0) { return appendElement(nav, dragging.el, true); }
   }
+
   if (dragging.el.tagName === 'SST-PANEL') {
     // can't drop *inside* self
     if (isElementContained(dragging.el, tgt)) { return; }
 
+    const actualTarget = findTarget(e, true);
+
     // dropping on a heading inserted before that heading's parent
-    if (tgt.tagName === 'H1') {
+    if (actualTarget.tagName === 'H1') {
       const closestTarget = findTarget(e);
 
-      if (dragging.el.contains(closestTarget)) return;
+      if (dragging.el.contains(closestTarget) || closestTarget.parentElement.contains(dragging.el)) return;
 
       const beforeOrAfter = calculatePositionWithinTarget(e);
       return closestTarget.insertAdjacentElement(beforeOrAfter, dragging.el);
     }
+
     if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
-    if (tgt.tagName === 'MAIN') { return nav.append(dragging.el); }
-    return nav.prepend(dragging.el);
+    if (tgt.tagName === 'MAIN') { return appendElement(nav, dragging.el); }
+
+    return appendElement(nav, dragging.el, true);
   }
 }
+
+const appendElement = (parent, child, prepend = false) => {
+  if (parent.contains(child)) return;
+  if (prepend) {
+    return parent.prepend(child);
+  } else {
+    return parent.append(child);
+  }
+};
 
 export function replaceElementInOriginalPosition(dragging) {
   if (!dragging || !dragging.parent) { return; }
@@ -194,9 +212,9 @@ export function calculateDynamicFlex(where) {
   return total;
 }
 
-export function findTarget(e) {
+export function findTarget(e, returnFirst = false) {
   const path = e.path || (e.composedPath && e.composedPath());
-  if (path[0].tagName === 'A') return path[0];
+  if (path[0].tagName === 'A' || returnFirst) return path[0];
   return e.target.tagName === 'SST-PANEL' ? path.find(x => x.tagName === 'SST-PANEL') : e.target;
 }
 
