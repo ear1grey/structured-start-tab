@@ -68,9 +68,9 @@ function updateClickCount(a) {
   options.write();
 }
 
-function toHex(x, m = 1) {
+function toHex(x) {
   if (isNaN(x)) { return '00'; }
-  return ('0' + parseInt(String(m * x), 10).toString(16)).slice(-2);
+  return x.toString(16).padStart(2, '0');
 }
 
 function translateColor(rgba) {
@@ -79,7 +79,7 @@ function translateColor(rgba) {
     toHex(Number(parts[0])),
     toHex(Number(parts[1])),
     toHex(Number(parts[2])),
-    toHex(Number(parts[3]), 255),
+    toHex(Number(parts[3] || '255')),
   ];
   let result = '#' + converted.join('');
   if (result.includes('#ffffff')) result = '!' + result;

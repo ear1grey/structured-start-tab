@@ -35,6 +35,8 @@ export const savePageCloud = async (object) => {
 };
 
 export const syncPageCloud = async () => {
+  // TODO: add parameter to indicate if the sync should handle the merge conflict in the UI
+
   // TODO: this should be a parameter of the function
   const idsToIgnore = ['trash'];
 
@@ -55,23 +57,18 @@ export const syncPageCloud = async () => {
   };
 
   const response = await makeRequest(url, 'POST', body);
+  const { version, settings } = response.content;
+  if (version == null) return;
 
-  // All OK
-  if (response.status >= 200 && response.status < 300) return;
-
-  // Possible merge conflict
-  if (response.status === 409) {
-    const { version, settings } = response.content.content;
-    if (version == null || settings == null) return;
-
+  if (response.status === 409) { // Possible merge conflict
+    if (!settings) return;
     const isEqual = isContentEqual(JSON.parse(settings), OPTS.json);
 
-    if (isEqual) {
-      OPTS.contentVersion = version + 1;
-    } else {
+    if (!isEqual) {
       OPTS.hasMergeConflict = true;
     }
-
-    write();
   }
+
+  OPTS.contentVersion = version + 1;
+  write();
 };

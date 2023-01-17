@@ -40,7 +40,7 @@ const pushSettings = (id, content, res) => {
       });
     } else {
       admin.firestore().collection('settings').doc(id).update(content).then(() => {
-        res.status(204).send();
+        res.status(200).send({ version: content.version });
       }).catch(error => {
         res.status(500).send({ error });
       });
@@ -84,14 +84,15 @@ export const syncSettings = functions.https.onRequest(async (req, res) => {
   const { status, content } = await getSettingsById(id);
 
   if (status === 200) {
-    // if the version that we have is the same or greater than the incoming version, we may have a merge conflict
+    // if the version that we have is greater than the incoming version, we may have a merge conflict
     if (content.version >= incomingContent.version) {
-      res.status(409).send({ content }); // return the current saved content to be dealt with on the client side
+      res.status(409).send(content); // return the current saved content to be dealt with on the client side
+      return;
     }
   } else if (status >= 400 && status !== 404) { // 404 means that there's no config for the user - we want to create a new config
     res.status(status).send(content);
-  } else {
-    // if all is OK, we save the content
-    pushSettings(id, incomingContent, res);
+    return;
   }
+  // if all is OK, we save the content
+  pushSettings(id, incomingContent, res);
 });
