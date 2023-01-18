@@ -16,6 +16,24 @@ export const getPageCloud = async () => {
   return [response.content.settings, response.content.version];
 };
 
+export const savePageCloud = async (object) => {
+  const url = `${OPTS.storageUrl}/saveSettings`;
+
+  const identifier = (await chrome.identity.getProfileUserInfo()).id;
+
+  const body = {
+    id: identifier,
+    content: {
+      settings: JSON.stringify(
+        object
+          .filter(panel => panel.id !== 'trash')), // make sure to exclude the trash panel
+      version: OPTS.contentVersion,
+    },
+  };
+
+  return await makeRequest(url, 'POST', body);
+};
+
 export const syncPageCloud = async () => {
   // TODO: this should be a parameter of the function
   const idsToIgnore = ['trash'];
