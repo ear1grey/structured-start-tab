@@ -1,6 +1,7 @@
 import { parseIcs } from './lib/icalparse.js';
 import { OPTS } from './lib/options.js';
 import * as options from './lib/options.js';
+import { syncPageCloud } from './services/cloud.service.js';
 // define the menu item
 const menuItems = [
   {
@@ -139,8 +140,8 @@ const handleAlarm = (details) => {
       updateAgendasBackground();
       break;
     case 'savePage':
-      console.log('savePage (not implemented)');
-      // TODO: needs implementation: savePageCloud(OPTS.json)
+      syncPageCloud();
+      console.warn('Saving page cloud (check quota!)');
       break;
     default:
       break;

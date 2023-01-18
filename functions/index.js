@@ -57,26 +57,6 @@ export const getSettings = functions.https.onRequest(async (req, res) => {
   res.status(status).send(content);
 });
 
-
-export const saveSettings = functions.https.onRequest(async (req, res) => {
-  const id = req.body.id;
-  const incomingContent = req.body.content;
-
-  const { status, content } = await getSettingsById(id);
-
-  if (status === 200) {
-    if (content.version + 1 !== incomingContent.version) {
-      // TODO: handle possible merge conflict
-      console.log('!! Possible merge conflict');
-    }
-  } else if (status >= 400 && status !== 404) { // 404 means that there's no config for the user - we want to create a new config
-    res.status(status).send(content);
-    return;
-  }
-
-  pushSettings(id, incomingContent, res);
-});
-
 export const syncSettings = functions.https.onRequest(async (req, res) => {
   const id = req.body.id;
   const incomingContent = req.body.content;

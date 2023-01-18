@@ -6,7 +6,7 @@ import { OPTS } from './lib/options.js';
 import { updateAgendaBackground } from './background.js';
 import { domToJson, jsonToDom } from './services/parser.service.js';
 import { prepareDrag } from './services/drag.service.js';
-import { getPageCloud, savePageCloud, syncPageCloud } from './services/cloud.service.js';
+import { getPageCloud, syncPageCloud } from './services/cloud.service.js';
 
 // TODO: import all components from a common file?
 import './components/agenda-item/index.js';
@@ -231,7 +231,7 @@ function editOk() {
       }
 
       dialog.close();
-      saveChanges({ cloudSave: true });
+      saveChanges();
       flash(els.editing);
       els.editing.classList.remove('edited');
       return;
@@ -247,13 +247,13 @@ function editOk() {
   els.editing.setAttribute('style', styleString);
 
   dialog.close();
-  saveChanges({ cloudSave: true });
+  saveChanges();
   flash(els.editing);
   els.editing.classList.remove('edited');
   delete els.editing;
 }
 
-export function saveChanges({ makeBackup = true, cloudSave = false } = {}) {
+export function saveChanges(makeBackup = true) {
   if (els.main == null) return;
 
   if (els.main.classList.contains('heatmap')) {
@@ -760,7 +760,7 @@ function emptyTrash() {
   delete els.trash;
   document.querySelector('#trash')?.remove();
   prepareTrash();
-  saveChanges({ makeBackup: false });
+  saveChanges();
 }
 
 function lock() {
@@ -897,9 +897,7 @@ async function loadPageCloud() {
     OPTS.onlineJson = parsedSettings;
     OPTS.onlineVersion = onlineVersion;
     saveChanges();
-    window.location.href = './pages/merge-resolver/index.html';
-  } else if (parsedSettings == null && OPTS.json != null) {
-    // await savePageCloud(OPTS.json);
+    document.querySelector('#mergeConflictResolver').style.display = 'block';
   } else {
     OPTS.contentVersion = onlineVersion + 1;
     OPTS.hasMergeConflict = false;
@@ -908,12 +906,17 @@ async function loadPageCloud() {
 }
 
 const prepareSectionActions = () => {
+  // Merge conflict resolver trigger
+  document.querySelector('#mergeConflictResolver').addEventListener('click', () => {
+    window.location.href = './pages/merge-resolver/index.html';
+  });
+
   // Feedback button should always be visible when in beta
   if (!OPTS.showFeedback && !util.isBeta()) {
     document.querySelector('#feedback').style.display = 'none';
   }
 
-  //! TODO: uncomment after testing
+  //! TODO: uncomment after testing/demo
   // if (!OPTS.useCloudStorage) {
   //   document.querySelector('#forceCloudSync').style.display = 'none';
   // }

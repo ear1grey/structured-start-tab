@@ -49,8 +49,6 @@ const disableAllButtons = () => {
 };
 
 const save = async (pick) => {
-  // TODO: Add loading animation whilst loading
-
   if (pick === 'left') {
     OPTS.json = domToJson(els.left);
   } else if (pick === 'right') {

@@ -611,12 +611,14 @@ color-switch {
   flex-grow: 1;
 }
 
-section#forceCloudSync,
-section#feedback {
+section.extra-action {
   flex: unset;
 }
 
-section#forceCloudSync a,
-section#feedback a {
+section.extra-action a {
   margin: .5em;
+}
+
+#mergeConflictResolver {
+  display: none;
 }
