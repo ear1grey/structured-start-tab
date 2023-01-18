@@ -583,6 +583,20 @@ footer {
   }
 }
 
+@keyframes spin-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin-animation 1s infinite linear;
+}
+
 dialog {
   background: var(--bg-mid);
   color: var(--fg-mid);
@@ -597,6 +611,7 @@ color-switch {
   flex-grow: 1;
 }
 
+section#forceCloudSync,
 section#feedback {
   flex: unset;
 }

@@ -363,3 +363,24 @@ export function isContentEqual(a, b) {
         elemA.url === elemB.url;
     });
 }
+
+export function spinElement(element, duration = 0) {
+  element.classList.add('spin');
+  if (duration > 0) {
+    setTimeout(() => {
+      element.classList.remove('spin');
+    }, duration);
+  }
+}
+
+export function addSpinner(element) {
+  // set element properties for better styling
+  element.style.display = 'flex';
+  element.style.alignItems = 'center';
+  // create the spinner element
+  const spinner = document.createElement('p');
+  spinner.textContent = '⏳';
+  spinner.style.marginRight = '0.5em';
+  spinElement(spinner);
+  element.prepend(spinner);
+}

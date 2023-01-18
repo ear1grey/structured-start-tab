@@ -2,7 +2,7 @@ import { OPTS } from '../../js/lib/options.js';
 import * as options from '../../js/lib/options.js';
 import { jsonToDom, domToJson } from '../../js/services/parser.service.js';
 import '../../js/components/panel/index.js';
-import { prepareCSSVariables } from '../../js/lib/util.js';
+import { prepareCSSVariables, addSpinner } from '../../js/lib/util.js';
 import { prepareDrag } from '../../js/services/drag.service.js';
 import { prepareFoldables } from '../../js/index.js';
 import { savePageCloud } from '../../js/services/cloud.service.js';
@@ -19,12 +19,16 @@ const prepareElements = async () => {
     window.location.href = '/src/index.html';
   });
 
-  document.querySelector('#pick-your').addEventListener('click', async () => {
+  document.querySelector('#pick-your').addEventListener('click', async (e) => {
+    addSpinner(e.target);
+    disableAllButtons();
     await save('left');
     window.location.href = '/src/index.html';
   });
 
-  document.querySelector('#pick-incoming').addEventListener('click', async () => {
+  document.querySelector('#pick-incoming').addEventListener('click', async (e) => {
+    addSpinner(e.target);
+    disableAllButtons();
     await save('right');
     window.location.href = '/src/index.html';
   });
@@ -36,6 +40,12 @@ const prepareElements = async () => {
 
   jsonToDom(els.left, [...OPTS.json]);
   jsonToDom(els.right, [...OPTS.onlineJson]);
+};
+
+const disableAllButtons = () => {
+  document.querySelectorAll('button').forEach((button) => {
+    button.disabled = true;
+  });
 };
 
 const save = async (pick) => {

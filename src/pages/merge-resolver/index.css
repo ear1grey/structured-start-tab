@@ -66,7 +66,12 @@ button {
   margin-left: 1em;
 }
 
-button:hover {
+button:disabled {
+  background: #ccc;
+  color: #666;
+}
+
+button:hover:not(:disabled) {
   cursor: pointer;
   filter: brightness(125%);
 }
