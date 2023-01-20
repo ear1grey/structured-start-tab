@@ -40,6 +40,11 @@ export const syncPageCloud = async () => {
 
   if (OPTS.hasMergeConflict) return;
 
+  if (OPTS.json == null || OPTS.json.length === 0) {
+    console.warn('No settings to save');
+    return;
+  }
+
   const url = `${OPTS.storageUrl}/syncSettings`;
 
   const identifier = (await chrome.identity.getProfileUserInfo()).id;
@@ -54,6 +59,7 @@ export const syncPageCloud = async () => {
     },
   };
 
+  console.warn('Saving page cloud (check quota!)');
   const response = await makeRequest(url, 'POST', body);
   const { version, settings } = response.content;
   if (version == null) return;

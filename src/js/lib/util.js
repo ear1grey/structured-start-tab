@@ -349,7 +349,7 @@ export function isContentEqual(a, b) {
         // panel only properties
         isContentEqual(elemA.content, elemB.content) &&
         elemA.direction === elemB.direction &&
-        elemA.folded === elemB.folded &&
+        // elemA.folded === elemB.folded &&  // No need to sync fold state
         elemA.grow === elemB.grow &&
         elemA.header === elemB.header &&
         elemA.id === elemB.id &&

@@ -25,7 +25,7 @@ export const OPTS = {
   showEndDateAgenda: true,
   // StringOpts
   backup: '',
-  json: {},
+  json: [],
   linkStats: {},
   agendas: [],
   // Cloud sync options

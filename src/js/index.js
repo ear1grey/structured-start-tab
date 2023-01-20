@@ -68,7 +68,9 @@ function updateClickCount(a) {
   options.write();
 }
 
-function toHex(x) {
+function toHex(x, scale = 1) {
+  // We need to scale the value to 0-255
+  x = Math.round(x * scale);
   if (isNaN(x)) { return '00'; }
   return x.toString(16).padStart(2, '0');
 }
@@ -79,7 +81,7 @@ function translateColor(rgba) {
     toHex(Number(parts[0])),
     toHex(Number(parts[1])),
     toHex(Number(parts[2])),
-    toHex(Number(parts[3] || '255')),
+    toHex(Number(parts[3] || '255'), 255),
   ];
   let result = '#' + converted.join('');
   if (result.includes('#ffffff')) result = '!' + result;

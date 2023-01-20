@@ -141,7 +141,6 @@ const handleAlarm = (details) => {
       break;
     case 'savePage':
       syncPageCloud();
-      console.warn('Saving page cloud (check quota!)');
       break;
     default:
       break;
