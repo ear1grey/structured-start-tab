@@ -355,5 +355,14 @@
   },
   "placeholder_panel_email_agenda": {
     "message": "Agenda email"
+  },
+  "action_merge_conflict": {
+    "message": "Merge conflict"
+  },
+  "action_feedback": {
+    "message": "Feedback"
+  },
+  "action_cloud_sync": {
+    "message": "Cloud Sync"
   }
 }

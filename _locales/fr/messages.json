@@ -358,5 +358,14 @@
   },
   "placeholder_panel_email_agenda": {
     "message": "L'email de l'agenda"
+  },
+  "action_merge_conflict": {
+    "message": "Conflit de fusion"
+  },
+  "action_feedback": {
+    "message": "Commentaires"
+  },
+  "action_cloud_sync": {
+    "message": "Synchronisation cloud"
   }
 }
