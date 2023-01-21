@@ -889,7 +889,6 @@ async function loadPageCloud() {
   const parsedPage = JSON.parse(onlinePage);
 
   const isEqual = util.isContentEqual(parsedPage, OPTS.json);
-  console.log('content equal?', isEqual);
 
   if (!isEqual) {
     OPTS.onlineJson = parsedPage;
@@ -914,10 +913,10 @@ const prepareSectionActions = () => {
     document.querySelector('#feedback').style.display = 'none';
   }
 
-  //! TODO: uncomment after testing/demo
-  // if (!OPTS.cloud.enabled) {
-  //   document.querySelector('#forceCloudSync').style.display = 'none';
-  // }
+  if (!OPTS.cloud.enabled) {
+    document.querySelector('#forceCloudSync').style.display = 'none';
+  }
+
   document.querySelector('#forceCloudSync a').addEventListener('click', () => {
     syncPageCloud();
   });

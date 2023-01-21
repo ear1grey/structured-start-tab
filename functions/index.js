@@ -27,6 +27,9 @@ const getPageByUserId = (id) => {
 };
 
 const pushPage = (id, content, res) => {
+  // v++
+  content.version++;
+
   admin.firestore().collection('pages').doc(id).get().then(doc => {
     if (!doc.exists) {
       admin.firestore().collection('pages').doc(id).set(content).then(() => {
@@ -109,12 +112,10 @@ export const savePage = functions.https.onRequest(async (req, res) => {
 
   const { status, content } = await getPageByUserId(id);
 
-  if (status === 200) {
-    if (content.version + 1 !== incomingContent.version) {
-      // TODO: handle possible merge conflict
-      console.log('!! Possible merge conflict');
-    }
-  } else if (status >= 400 && status !== 404) { // 404 means that there's no config for the user - we want to create a new config
+  if (status === 404) { // if we don't have a page, we create one
+    pushPage(id, incomingContent, res);
+    return;
+  } else if (status !== 200) {
     res.status(status).send(content);
     return;
   }
@@ -137,10 +138,8 @@ export const syncPage = functions.https.onRequest(async (req, res) => {
   }
 
   const syncAction = getSyncAction(JSON.parse(incomingContent.page), JSON.parse(content.page), content.options);
-  console.log('syncAction', syncAction);
   switch (syncAction) {
     case 'push':
-      incomingContent.version = content.version + 1;
       pushPage(id, incomingContent, res);
       return;
     case 'conflict':

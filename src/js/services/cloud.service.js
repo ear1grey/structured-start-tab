@@ -67,7 +67,7 @@ export const syncPageCloud = async () => {
     case 409:
       OPTS.cloud.hasConflict = true;
       break;
-    default: console.log('Unknown response', response);
+    default: console.warn('Unknown response', response);
   }
 
   write();

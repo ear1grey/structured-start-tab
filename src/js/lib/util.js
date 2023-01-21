@@ -349,14 +349,14 @@ export function isContentEqual(a, b) {
         // panel only properties
         isContentEqual(elemA.content, elemB.content) &&
         elemA.direction === elemB.direction &&
-        // elemA.folded === elemB.folded &&  // No need to sync fold state
         elemA.grow === elemB.grow &&
         elemA.header === elemB.header &&
         elemA.id === elemB.id &&
-        elemA.private === elemB.private &&
         elemA.singleLineDisplay === elemB.singleLineDisplay &&
         elemA.textColour === elemB.textColour &&
         elemA.type === elemB.type &&
+        (OPTS.cloud.syncFoldStatus ? elemA.folded === elemB.folded : true) &&
+        (OPTS.cloud.syncPrivateStatus ? elemA.private === elemB.private : true) &&
 
         // link only properties
         elemA.name === elemB.name &&
