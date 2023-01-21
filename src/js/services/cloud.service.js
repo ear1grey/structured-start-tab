@@ -1,33 +1,32 @@
 import { makeRequest } from './api.service.js';
 import { OPTS, write } from '../lib/options.js';
-import { isContentEqual } from '../lib/util.js';
 
 export const getPageCloud = async () => {
   const identifier = (await chrome.identity.getProfileUserInfo()).id;
-  const url = `${OPTS.storageUrl}/getSettings?id=${identifier}`;
+  const url = `${OPTS.storageUrl}/getPage?id=${identifier}`;
 
   const response = await makeRequest(url, 'GET');
 
-  // If there are no settings available yet, don't load
+  // If there is no page available yet, don't load
   if ((response.status === 404 && response.content?.error) || response.status === 204) {
     return;
   }
 
-  return [response.content.settings, response.content.version];
+  return [response.content.page, response.content.version];
 };
 
 export const savePageCloud = async (object) => {
-  const url = `${OPTS.storageUrl}/saveSettings`;
+  const url = `${OPTS.storageUrl}/savePage`;
 
   const identifier = (await chrome.identity.getProfileUserInfo()).id;
 
   const body = {
     id: identifier,
     content: {
-      settings: JSON.stringify(
+      page: JSON.stringify(
         object
           .filter(panel => panel.id !== 'trash')), // make sure to exclude the trash panel
-      version: OPTS.contentVersion,
+      version: OPTS.cloud.version,
     },
   };
 
@@ -35,44 +34,41 @@ export const savePageCloud = async (object) => {
 };
 
 export const syncPageCloud = async () => {
-  // TODO: this should be a parameter of the function
-  const idsToIgnore = ['trash'];
-
-  if (OPTS.hasMergeConflict) return;
+  if (OPTS.cloud.hasConflict) return;
 
   if (OPTS.json == null || OPTS.json.length === 0) {
-    console.warn('No settings to save');
+    console.warn('No page to save');
     return;
   }
 
-  const url = `${OPTS.storageUrl}/syncSettings`;
-
+  // TODO: this should be a parameter of the function
+  const idsToIgnore = ['trash'];
+  const url = `${OPTS.storageUrl}/syncPage`;
   const identifier = (await chrome.identity.getProfileUserInfo()).id;
 
   const body = {
     id: identifier,
     content: {
-      settings: JSON.stringify(
+      page: JSON.stringify(
         OPTS.json
           .filter(panel => !idsToIgnore.includes(panel.id))), // make sure to exclude the trash panel
-      version: OPTS.contentVersion,
+      version: OPTS.cloud.version,
     },
   };
 
   console.warn('Saving page cloud (check quota!)');
   const response = await makeRequest(url, 'POST', body);
-  const { version, settings } = response.content;
-  if (version == null) return;
 
-  if (response.status === 409) { // Possible merge conflict
-    if (!settings) return;
-    const isEqual = isContentEqual(JSON.parse(settings), OPTS.json);
-
-    if (!isEqual) {
-      OPTS.hasMergeConflict = true;
-    }
+  switch (response.status) {
+    case 200:
+    case 201:
+      OPTS.cloud.version = response.content.version;
+      break;
+    case 409:
+      OPTS.cloud.hasConflict = true;
+      break;
+    default: console.log('Unknown response', response);
   }
 
-  OPTS.contentVersion = version + 1;
   write();
 };

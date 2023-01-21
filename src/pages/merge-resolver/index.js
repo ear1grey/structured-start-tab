@@ -55,13 +55,13 @@ const save = async (pick) => {
     OPTS.json = domToJson(els.right);
   }
 
-  OPTS.contentVersion = OPTS.onlineVersion + 1;
+  OPTS.cloud.version = OPTS.onlinePageVersion + 1;
 
   await savePageCloud(OPTS.json);
 
   OPTS.onlineJson = null;
-  OPTS.onlineVersion = null;
-  OPTS.hasMergeConflict = false;
+  OPTS.onlinePageVersion = null;
+  OPTS.cloud.hasConflict = false;
 
   options.write();
 };

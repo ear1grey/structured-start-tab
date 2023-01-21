@@ -9,29 +9,39 @@ import { htmlStringToJson } from '../../js/services/parser.service.js';
 
 function setCheckBox(prefs, what) {
   const elem = document.getElementById(what);
-  elem.checked = prefs[what];
+  elem.checked = deepGet(prefs, what);
 }
 function getCheckBox(what) {
   const elem = document.getElementById(what);
-  OPTS[what] = elem.checked;
+  deepSet(OPTS, what, elem.checked);
 }
 
 function setValue(prefs, what, defaultValue = 0) {
   const elem = document.getElementById(what);
-  elem.valueAsNumber = prefs[what] || defaultValue;
+  elem.valueAsNumber = deepGet(prefs, what) || defaultValue;
 }
 function getValue(what) {
   const elem = document.getElementById(what);
-  OPTS[what] = elem.valueAsNumber;
+  deepSet(OPTS, what, elem.valueAsNumber);
 }
 
 function setText(prefs, what) {
   const elem = document.getElementById(what);
-  elem.value = prefs[what];
+  elem.value = deepGet(prefs, what);
 }
 function getText(what) {
   const elem = document.getElementById(what);
-  OPTS[what] = elem.value;
+  deepSet(OPTS, what, elem.value);
+}
+
+function deepGet(obj, path) {
+  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+}
+function deepSet(obj, path, value) {
+  const parts = path.split('.');
+  const last = parts.pop();
+  const target = parts.reduce((acc, part) => acc[part], obj);
+  target[last] = value;
 }
 
 // incorporate the latest values of the page into
@@ -49,14 +59,19 @@ function updatePrefsWithPage() {
   getCheckBox('editOnNewDrop');
   getCheckBox('showLocationAgenda');
   getCheckBox('showEndDateAgenda');
-  getCheckBox('useCloudStorage');
-  getText('storageUrl');
   getValue('showToast');
   getValue('showBookmarksLimit');
   getValue('space');
   getValue('fontsize');
   getValue('agendaNb');
   getValue('titleAgendaNb');
+
+  // Cloud
+  getCheckBox('cloud.enabled');
+  getText('cloud.url');
+  getCheckBox('cloud.autoAdd');
+  getCheckBox('cloud.syncFoldStatus');
+  getCheckBox('cloud.syncPrivateStatus');
 }
 function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'lock');
@@ -70,8 +85,6 @@ function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'editOnNewDrop');
   setCheckBox(prefs, 'showLocationAgenda');
   setCheckBox(prefs, 'showEndDateAgenda');
-  setCheckBox(prefs, 'useCloudStorage');
-  setText(prefs, 'storageUrl');
   setValue(prefs, 'showToast');
   setValue(prefs, 'showBookmarksLimit');
   setValue(prefs, 'space');
@@ -79,6 +92,14 @@ function updatePageWithPrefs(prefs) {
   setValue(prefs, 'agendaNb');
   setValue(prefs, 'titleAgendaNb');
 
+  // Cloud
+  setCheckBox(prefs, 'cloud.enabled');
+  setText(prefs, 'cloud.url');
+  setCheckBox(prefs, 'cloud.autoAdd');
+  setCheckBox(prefs, 'cloud.syncFoldStatus');
+  setCheckBox(prefs, 'cloud.syncPrivateStatus');
+
+  // Defaults
   if (!util.isBeta()) { setCheckBox(prefs, 'showFeedback'); }
 }
 /**
@@ -154,12 +175,16 @@ function createPageWithPrefs(prefs) {
     create(agenda, 'checkbox', { id: 'showLocationAgenda' }, chrome.i18n.getMessage('showLocationAgenda'));
     create(agenda, 'checkbox', { id: 'showEndDateAgenda' }, chrome.i18n.getMessage('showEndDateAgenda'));
     create(configureShortcut, 'show', { id: 'textConfigure' }, chrome.i18n.getMessage('configure_shortcut'));
-    create(cloud, 'checkbox', { id: 'useCloudStorage' }, chrome.i18n.getMessage('use_cloud'), false, false, (e) => {
+    // Cloud
+    create(cloud, 'checkbox', { id: 'cloud.enabled' }, chrome.i18n.getMessage('cloud_enabled'), false, false, (e) => {
       if (e.target.checked) {
         alert(chrome.i18n.getMessage('cloud_warn'));
       }
     });
-    create(cloud, 'text', { id: 'storageUrl' }, chrome.i18n.getMessage('storage_url'));
+    create(cloud, 'text', { id: 'cloud.url' }, chrome.i18n.getMessage('cloud_url'));
+    create(cloud, 'checkbox', { id: 'cloud.autoAdd' }, chrome.i18n.getMessage('cloud_autoAdd'), false);
+    create(cloud, 'checkbox', { id: 'cloud.syncFoldStatus' }, chrome.i18n.getMessage('cloud_syncFoldedStatus'), false);
+    create(cloud, 'checkbox', { id: 'cloud.syncPrivateStatus' }, chrome.i18n.getMessage('cloud_syncPrivateStatus'), false);
   }
   updatePageWithPrefs(prefs);
 }

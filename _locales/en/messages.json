@@ -302,11 +302,20 @@
   "cloud": {
     "message": "Cloud storage"
   },
-  "use_cloud": {
+  "cloud_enabled": {
     "message": "Use cloud storage"
   },
-  "storage_url": {
+  "cloud_url": {
     "message": "Storage URL"
+  },
+  "cloud_autoAdd": {
+    "message": "Automatically add new panels"
+  },
+  "cloud_syncFoldedStatus": {
+    "message": "Sync panel folded status"
+  },
+  "cloud_syncPrivateStatus": {
+    "message": "Sync panel private status"
   },
   "cloud_warn": {
     "message": "Warning: this feature uses your Google Id and the data will be stored on Google servers. If your Google Id is compromised, your data will be compromised too."

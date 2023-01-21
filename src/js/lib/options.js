@@ -28,11 +28,18 @@ export const OPTS = {
   json: [],
   linkStats: {},
   agendas: [],
-  // Cloud sync options
-  useCloudStorage: false,
-  storageUrl: '',
-  contentVersion: 1,
-  hasMergeConflict: false,
+  // Cloud sync settings
+  cloud: {
+    version: 0,
+    hasConflict: false,
+
+    enabled: false,
+    url: '',
+
+    autoAdd: false,
+    syncFoldStatus: false,
+    syncPrivateStatus: false,
+  },
 };
 
 const settingKey = 'structured-start-tab';

@@ -268,10 +268,6 @@ export function saveChanges(makeBackup = true) {
   OPTS.json = domToJson(els.main);
   options.write();
 
-  // if (cloudSave && OPTS.useCloudStorage) {
-  //   savePageCloud(OPTS.json);
-  // }
-
   prepareListeners();
 
   util.prepareCSSVariables(OPTS);
@@ -886,23 +882,23 @@ function migrateLinks() {
 }
 
 async function loadPageCloud() {
-  if (!OPTS.hasMergeConflict) return;
+  if (!OPTS.cloud.hasConflict) return;
 
-  const [onlineSettings, onlineVersion] = await getPageCloud();
+  const [onlinePage, onlinePageVersion] = await getPageCloud();
 
-  const parsedSettings = JSON.parse(onlineSettings);
+  const parsedPage = JSON.parse(onlinePage);
 
-  const isEqual = util.isContentEqual(parsedSettings, OPTS.json);
+  const isEqual = util.isContentEqual(parsedPage, OPTS.json);
   console.log('content equal?', isEqual);
 
   if (!isEqual) {
-    OPTS.onlineJson = parsedSettings;
-    OPTS.onlineVersion = onlineVersion;
+    OPTS.onlineJson = parsedPage;
+    OPTS.onlinePageVersion = onlinePageVersion;
     saveChanges();
     document.querySelector('#mergeConflictResolver').style.display = 'block';
   } else {
-    OPTS.contentVersion = onlineVersion + 1;
-    OPTS.hasMergeConflict = false;
+    OPTS.cloud.version = onlinePageVersion + 1;
+    OPTS.cloud.hasConflict = false;
     options.write();
   }
 }
@@ -919,7 +915,7 @@ const prepareSectionActions = () => {
   }
 
   //! TODO: uncomment after testing/demo
-  // if (!OPTS.useCloudStorage) {
+  // if (!OPTS.cloud.enabled) {
   //   document.querySelector('#forceCloudSync').style.display = 'none';
   // }
   document.querySelector('#forceCloudSync a').addEventListener('click', () => {
@@ -950,7 +946,7 @@ async function prepareAll() {
 
   prepareSectionActions();
 
-  if (OPTS.useCloudStorage) { await loadPageCloud(); }
+  if (OPTS.cloud.enabled) { await loadPageCloud(); }
 }
 
 
