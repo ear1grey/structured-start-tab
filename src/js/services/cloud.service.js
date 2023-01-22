@@ -34,7 +34,7 @@ export const savePageCloud = async (object) => {
 };
 
 export const syncPageCloud = async () => {
-  if (OPTS.cloud.hasConflict) return;
+  if (!OPTS.cloud.enabled || OPTS.cloud.hasConflict) return;
 
   if (OPTS.json == null || OPTS.json.length === 0) {
     console.warn('No page to save');

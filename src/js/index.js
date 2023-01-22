@@ -3,7 +3,7 @@ import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import { OPTS } from './lib/options.js';
-import { updateAgendaBackground } from './background.js';
+import { updateAgendaBackground } from './services/agenda.service.js';
 import { domToJson, jsonToDom } from './services/parser.service.js';
 import { prepareDrag } from './services/drag.service.js';
 import { getPageCloud, syncPageCloud } from './services/cloud.service.js';
@@ -923,6 +923,8 @@ const prepareSectionActions = () => {
 };
 
 async function prepareAll() {
+  prepareBackgroundListener();
+
   await options.load();
   els = util.prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
 
@@ -932,7 +934,6 @@ async function prepareAll() {
   util.prepareCSSVariables(OPTS);
   prepareMain();
   prepareTrash();
-  prepareBackgroundListener();
   toast.prepare();
   toast.popup(`Structured Start Tab v${chrome.runtime.getManifest().version}`);
   toast.popup(chrome.i18n.getMessage('popup_toggle_sidebar'));
