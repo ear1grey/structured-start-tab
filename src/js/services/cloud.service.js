@@ -3,7 +3,7 @@ import { OPTS, write } from '../lib/options.js';
 
 export const getPageCloud = async () => {
   const identifier = (await chrome.identity.getProfileUserInfo()).id;
-  const url = `${OPTS.storageUrl}/getPage?id=${identifier}`;
+  const url = `${OPTS.cloud.url}/getPage?id=${identifier}`;
 
   const response = await makeRequest(url, 'GET');
 
@@ -16,7 +16,7 @@ export const getPageCloud = async () => {
 };
 
 export const savePageCloud = async (object) => {
-  const url = `${OPTS.storageUrl}/savePage`;
+  const url = `${OPTS.cloud.url}/savePage`;
 
   const identifier = (await chrome.identity.getProfileUserInfo()).id;
 
@@ -43,7 +43,7 @@ export const syncPageCloud = async () => {
 
   // TODO: this should be a parameter of the function
   const idsToIgnore = ['trash'];
-  const url = `${OPTS.storageUrl}/syncPage`;
+  const url = `${OPTS.cloud.url}/syncPage`;
   const identifier = (await chrome.identity.getProfileUserInfo()).id;
 
   const body = {
