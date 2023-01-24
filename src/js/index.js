@@ -532,8 +532,8 @@ export function buildBookmarks(OPTS, data, target, count) {
   for (const x of data) {
     if (count === 0) { break; }
     if (!x.url) { continue; } // skip folders
-    const indoc = OPTS.hideBookmarksInPage && document.querySelector(`[href="${x.url}"]`);
-    if (indoc || (x.dateAdded && x.dateAdded < Date.now() - twoWeeks)) {
+    const indoc = OPTS.hideBookmarksInPage && getAllBySelector(els.main, `[href="${x.url}"]`);
+    if (indoc.length > 0 || (x.dateAdded && x.dateAdded < Date.now() - twoWeeks)) {
       // bookmark is already in doc, or its older
       // than three weeks, so skip it.
       // TODO make this an option?
