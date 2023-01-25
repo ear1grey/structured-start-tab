@@ -75,11 +75,13 @@ function hex(x) {
   return ('0' + parseInt(x).toString(16)).slice(-2);
 }
 
-export function createExampleLink(text = chrome.i18n.getMessage('example'), href = 'http://example.org') {
+export function createExampleLink(text = chrome.i18n.getMessage('example'), href = '') {
   const a = document.createElement('a');
-  a.href = href;
+  if (href) {
+    a.href = href;
+    setFavicon(a, href);
+  }
   a.textContent = text;
-  setFavicon(a, href);
   addAnchorListeners(a);
   return a;
 }

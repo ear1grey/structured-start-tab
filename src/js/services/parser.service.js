@@ -155,9 +155,11 @@ const jsonToDom = (parentElement, content) => {
         // Add properties
         link.style.backgroundColor = element.backgroundColour;
         link.style.color = element.textColour;
-        link.setAttribute('href', element.url);
         link.textContent = element.name;
-        setFavicon(link, element.url);
+        if (element.url) {
+          link.setAttribute('href', element.url);
+          setFavicon(link, element.url);
+        }
 
         appendItemWithDefaults(parentElement, link);
         break;

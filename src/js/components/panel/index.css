@@ -86,6 +86,9 @@ a {
   text-decoration: none;
   overflow: hidden;
   flex-grow: 1;
+}
+
+a[href] {
   cursor: pointer;
 }
 

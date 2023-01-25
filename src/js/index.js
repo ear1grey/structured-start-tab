@@ -190,8 +190,14 @@ function addRemoveClassList(toCheck, toAdd, toRemove) {
 function editOk() {
   if (els.editing instanceof HTMLAnchorElement) {
     els.editing.textContent = getValue('#editname');
-    els.editing.href = getValue('#editurl');
-    util.setFavicon(els.editing, getValue('#editurl'));
+    els.editing.draggable = true;
+    const url = getValue('#editurl');
+    if (url) {
+      els.editing.href = getValue('#editurl');
+      util.setFavicon(els.editing, getValue('#editurl'));
+    } else {
+      els.editing.removeAttribute('href');
+    }
   } else {
     if (els.editing.tagName === 'SECTION') { // Legacy support
       els.editing.firstElementChild.textContent = getValue('#editname');
