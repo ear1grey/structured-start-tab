@@ -1,5 +1,6 @@
-import { makeRequest } from './api.service.js';
 import { OPTS, write } from '../lib/options.js';
+
+import { makeRequest } from './api.service.js';
 
 export const getPageCloud = async () => {
   const identifier = (await chrome.identity.getProfileUserInfo()).id;

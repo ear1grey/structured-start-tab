@@ -1,5 +1,5 @@
-import { updateAgendasBackground } from './services/agenda.service.js';
 import { syncPageCloud } from './services/cloud.service.js';
+import { updateAgendasBackground } from './services/agenda.service.js';
 
 // define the menu item
 const menuItems = [

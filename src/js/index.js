@@ -1,16 +1,18 @@
-import * as util from './lib/util.js';
-import * as options from './lib/options.js';
-import * as toast from './lib/toast.js';
-import * as tooltip from './lib/tooltip.js';
-import { OPTS } from './lib/options.js';
-import { updateAgendaBackground } from './services/agenda.service.js';
-import { domToJson, jsonToDom } from './services/parser.service.js';
-import { prepareDrag } from './services/drag.service.js';
-import { getPageCloud, syncPageCloud } from './services/cloud.service.js';
-
 // TODO: import all components from a common file?
 import './components/agenda-item/index.js';
 import './components/panel/index.js';
+
+import * as options from './lib/options.js';
+import * as toast from './lib/toast.js';
+import * as tooltip from './lib/tooltip.js';
+import * as util from './lib/util.js';
+
+import { domToJson, jsonToDom } from './services/parser.service.js';
+import { getPageCloud, syncPageCloud } from './services/cloud.service.js';
+
+import { OPTS } from './lib/options.js';
+import { prepareDrag } from './services/drag.service.js';
+import { updateAgendaBackground } from './services/agenda.service.js';
 
 const oneDay = 1000 * 60 * 60 * 24;
 const fourDays = oneDay * 4;
@@ -532,8 +534,8 @@ export function buildBookmarks(OPTS, data, target, count) {
   for (const x of data) {
     if (count === 0) { break; }
     if (!x.url) { continue; } // skip folders
-    const indoc = OPTS.hideBookmarksInPage && document.querySelector(`[href="${x.url}"]`);
-    if (indoc || (x.dateAdded && x.dateAdded < Date.now() - twoWeeks)) {
+    const indoc = OPTS.hideBookmarksInPage && getAllBySelector(els.main, `[href="${x.url}"]`);
+    if (indoc.length > 0 || (x.dateAdded && x.dateAdded < Date.now() - twoWeeks)) {
       // bookmark is already in doc, or its older
       // than three weeks, so skip it.
       // TODO make this an option?
