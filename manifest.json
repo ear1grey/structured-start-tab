@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "version": "1.10.1.1",
+  "version": "1.10.2.1",
   "name": "Structured Start Tab (Beta)",
-  "description": "Show a structured page when a new tab is opened.",
+  "description": "Show a structured page when a new tab is opened. (beta)",
   "author": "Rich Boakes",
   "default_locale": "en",
   "permissions": [
