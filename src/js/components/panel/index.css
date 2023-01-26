@@ -7,7 +7,9 @@
 
 section>h1 {
   flex-grow: 0;
+}
 
+section>h1:not(:empty) {
   margin-top: var(--small);
   border: 0.125rem solid transparent;
 }

@@ -154,6 +154,14 @@ export function editStart(elem) {
 
 function editCancel() {
   toast.html('editcancelled', chrome.i18n.getMessage('edit_cancelled'));
+
+  if (els.editing instanceof HTMLAnchorElement) {
+    if (!getValue('#editurl') && !OPTS.allowEmptyUrl) {
+      els.editing.remove();
+      saveChanges();
+    }
+  }
+
   closeDialog();
 }
 
@@ -196,6 +204,10 @@ function editOk() {
       els.editing.href = getValue('#editurl');
       util.setFavicon(els.editing, getValue('#editurl'));
     } else {
+      if (!OPTS.allowEmptyUrl) {
+        wiggleElement(document.querySelector('#editurl'));
+        return;
+      }
       els.editing.removeAttribute('href');
     }
   } else {
@@ -281,6 +293,11 @@ export function saveChanges(makeBackup = true) {
   util.prepareCSSVariables(OPTS);
   util.prepareDynamicFlex(els.main);
   prepareBookmarks(OPTS, els.bookmarksnav);
+}
+
+function wiggleElement(el) {
+  el.classList.add('wiggle');
+  setTimeout(() => el.classList.remove('wiggle'), 500);
 }
 
 function detectKeydown(e) {

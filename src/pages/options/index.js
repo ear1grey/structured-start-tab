@@ -57,6 +57,7 @@ function updatePrefsWithPage() {
   getCheckBox('proportionalSections');
   getCheckBox('useCustomScrollbar');
   getCheckBox('editOnNewDrop');
+  getCheckBox('allowEmptyUrl');
   getCheckBox('showLocationAgenda');
   getCheckBox('showEndDateAgenda');
   getValue('showToast');
@@ -83,6 +84,7 @@ function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'proportionalSections');
   setCheckBox(prefs, 'useCustomScrollbar');
   setCheckBox(prefs, 'editOnNewDrop');
+  setCheckBox(prefs, 'allowEmptyUrl');
   setCheckBox(prefs, 'showLocationAgenda');
   setCheckBox(prefs, 'showEndDateAgenda');
   setValue(prefs, 'showToast');
@@ -170,6 +172,7 @@ function createPageWithPrefs(prefs) {
     create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, chrome.i18n.getMessage('fontsize'));
     create(layout, 'checkbox', { id: 'useCustomScrollbar' }, chrome.i18n.getMessage('useCustomScrollbar'));
     create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
+    create(layout, 'checkbox', { id: 'allowEmptyUrl' }, chrome.i18n.getMessage('allowEmptyUrl'));
     create(agenda, 'number', { id: 'agendaNb' }, chrome.i18n.getMessage('agenda_nb'));
     create(agenda, 'number', { id: 'titleAgendaNb' }, chrome.i18n.getMessage('title_agenda_nb'));
     create(agenda, 'checkbox', { id: 'showLocationAgenda' }, chrome.i18n.getMessage('showLocationAgenda'));
