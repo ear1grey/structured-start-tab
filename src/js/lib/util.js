@@ -386,3 +386,14 @@ export function addSpinner(element) {
   spinElement(spinner);
   element.prepend(spinner);
 }
+
+export function getAllBySelector(element, selector) {
+  const elements = [...element.querySelectorAll(selector)];
+  for (const child of element.children) {
+    elements.push(...getAllBySelector(child, selector));
+  }
+  if (element.shadowRoot) {
+    elements.push(...getAllBySelector(element.shadowRoot, selector));
+  }
+  return elements;
+}
