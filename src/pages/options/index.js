@@ -222,9 +222,32 @@ function importLoadedFile(file) {
       }
     }
 
+    // Create an agenda object for each agenda found in the imported file
+    const agendas = [];
+    getAgendasFromObject(OPTS.json, agendas);
+    if (agendas.length > 0) {
+      OPTS.agendas = [];
+      for (let i = 0; i < agendas.length; i++) {
+        OPTS.agendas.push({
+          agendaUrl: chrome.i18n.getMessage('default_agenda_link'),
+          events: [],
+          email: '',
+        });
+      }
+    }
+
     saveOptions();
   }
 }
+
+function getAgendasFromObject(obj, agendas = []) {
+  if (Array.isArray(obj)) {
+    obj.forEach((item) => {
+      getAgendasFromObject(item, agendas);
+    });
+  } else if (obj.id.includes('agenda')) { agendas.push(obj.id); }
+}
+
 function upload(file) {
   if (file) {
     const reader = new FileReader();
