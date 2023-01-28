@@ -673,3 +673,7 @@ section.extra-action a {
 #mergeConflictResolver {
   display: none;
 }
+
+edit-window {
+  position: absolute;
+}

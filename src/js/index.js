@@ -1,11 +1,13 @@
 // TODO: import all components from a common file?
 import './components/agenda-item/index.js';
 import './components/panel/index.js';
+import './components/edit-window/index.js';
 
 import * as options from './lib/options.js';
 import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import * as util from './lib/util.js';
+import * as ui from './services/ui.service.js';
 
 import { domToJson, jsonToDom } from './services/parser.service.js';
 import { getPageCloud, syncPageCloud } from './services/cloud.service.js';
@@ -13,6 +15,7 @@ import { getPageCloud, syncPageCloud } from './services/cloud.service.js';
 import { OPTS } from './lib/options.js';
 import { prepareDrag } from './services/drag.service.js';
 import { updateAgendaBackground } from './services/agenda.service.js';
+import { editLink } from './services/edit.service.js';
 
 const oneDay = 1000 * 60 * 60 * 24;
 const fourDays = oneDay * 4;
@@ -52,7 +55,7 @@ function linkClicked(e) {
   if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
     if (e.shiftKey) {
       e.preventDefault();
-      editStart(e.target);
+      editLink(e.target);
     } else if (!e.target.id) {
       updateClickCount(e.target);
     }
@@ -170,7 +173,7 @@ function closeDialog() {
   dialog.remove();
   if (els.editing) {
     els.editing.classList.remove('edited');
-    flash(els.editing);
+    ui.flash(els.editing);
   }
   delete els.editing;
 }
@@ -205,7 +208,7 @@ function editOk() {
       util.setFavicon(els.editing, getValue('#editurl'));
     } else {
       if (!OPTS.allowEmptyUrl) {
-        wiggleElement(document.querySelector('#editurl'));
+        ui.wiggleElement(document.querySelector('#editurl'));
         return;
       }
       els.editing.removeAttribute('href');
@@ -254,7 +257,7 @@ function editOk() {
 
       dialog.close();
       saveChanges();
-      flash(els.editing);
+      ui.flash(els.editing);
       els.editing.classList.remove('edited');
       return;
     } else {
@@ -270,7 +273,7 @@ function editOk() {
 
   dialog.close();
   saveChanges();
-  flash(els.editing);
+  ui.flash(els.editing);
   els.editing.classList.remove('edited');
   delete els.editing;
 }
@@ -295,10 +298,6 @@ export function saveChanges(makeBackup = true) {
   prepareBookmarks(OPTS, els.bookmarksnav);
 }
 
-function wiggleElement(el) {
-  el.classList.add('wiggle');
-  setTimeout(() => el.classList.remove('wiggle'), 500);
-}
 
 function detectKeydown(e) {
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
@@ -315,9 +314,13 @@ function detectKeydown(e) {
     toast.html('undo', chrome.i18n.getMessage('undo'));
   }
   if (e.code === 'Escape') {
+    // TODO: remove once edit-window development is complete
     if (els.body.classList.contains('editing')) {
       editCancel();
     }
+
+    // Remove all edit windows
+    document.querySelectorAll('edit-window').forEach((el) => el.remove());
   }
 }
 
@@ -395,7 +398,7 @@ function addLink(target) {
   }
   a.scrollIntoView({ behavior: 'smooth' });
   toast.html('addlink', chrome.i18n.getMessage('toast_link_add'));
-  flash(a, 'highlight');
+  ui.flash(a, 'highlight');
 }
 
 function addPanel() {
@@ -421,7 +424,7 @@ function addTopSitesPanel() {
     e = e.parentElement;
   }
   panel.scrollIntoView({ behavior: 'smooth' });
-  flash(panel, 'highlight');
+  ui.flash(panel, 'highlight');
 }
 
 function updateTopSites() {
@@ -457,7 +460,7 @@ function toogleBookmarksPanel() {
     e = e.parentElement;
   }
   panel.scrollIntoView({ behavior: 'smooth' });
-  flash(panel, 'highlight');
+  ui.flash(panel, 'highlight');
 }
 
 async function updateBookmarksPanel() {
@@ -508,7 +511,7 @@ async function updateAgenda(updateAgendas = true) {
 }
 
 function displayNewAgenda(index, agenda) {
-  const rootPanel = getAllBySelector(els.main, '#agenda-' + String(index))[0]?._panel;
+  const rootPanel = util.getAllBySelector(els.main, '#agenda-' + String(index))[0]?._panel;
   if (!rootPanel) { return; }
   while (rootPanel.lastElementChild.firstChild) {
     rootPanel.lastElementChild.removeChild(rootPanel.lastElementChild.lastChild);
@@ -539,7 +542,7 @@ function duplicatePanel(keepLinks) {
   dupe.firstElementChild.innerHTML = chrome.i18n.getMessage('copy') + dupe.firstElementChild.innerHTML;
   section.after(dupe);
   dupe.scrollIntoView({ behavior: 'smooth' });
-  flash(dupe, 'highlight');
+  ui.flash(dupe, 'highlight');
   dupe.addEventListener('contextmenu', saveElmContextClicked);
   toast.html('locked', chrome.i18n.getMessage('duplicate_panel'));
 }
@@ -557,7 +560,7 @@ export function buildBookmarks(OPTS, data, target, count) {
   for (const x of data) {
     if (count === 0) { break; }
     if (!x.url) { continue; } // skip folders
-    const indoc = OPTS.hideBookmarksInPage && getAllBySelector(els.main, `[href="${x.url}"]`);
+    const indoc = OPTS.hideBookmarksInPage && util.getAllBySelector(els.main, `[href="${x.url}"]`);
     if (indoc.length > 0 || (x.dateAdded && x.dateAdded < Date.now() - twoWeeks)) {
       // bookmark is already in doc, or its older
       // than three weeks, so skip it.
@@ -572,12 +575,6 @@ export function buildBookmarks(OPTS, data, target, count) {
       target.append(a);
     }
   }
-}
-
-
-function flash(elem, cls = 'flash') {
-  elem.classList.add(cls);
-  elem.addEventListener('animationend', () => { elem.classList.remove(cls); });
 }
 
 export async function prepareBookmarks(OPTS, target) {
@@ -688,19 +685,8 @@ export function prepareFoldables(selectors = 'main') {
   elems.forEach(e => e.addEventListener('click', editSection));
 }
 
-function getAllBySelector(element, selector) {
-  const elements = [...element.querySelectorAll(selector)];
-  for (const child of element.children) {
-    elements.push(...getAllBySelector(child, selector));
-  }
-  if (element.shadowRoot) {
-    elements.push(...getAllBySelector(element.shadowRoot, selector));
-  }
-  return elements;
-}
-
 function prepareListeners() {
-  const anchors = getAllBySelector(els.main, 'a');
+  const anchors = util.getAllBySelector(els.main, 'a');
   for (const a of anchors) {
     util.addAnchorListeners(a, linkClicked);
   }
@@ -796,7 +782,7 @@ function lock() {
 }
 
 function togglePresentation() {
-  const panels = getAllBySelector(els.main, '[private]');
+  const panels = util.getAllBySelector(els.main, '[private]');
 
   els.main.classList.toggle('private-on');
   const isPrivateOn = els.main.classList.contains('private-on');

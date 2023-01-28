@@ -1,0 +1,72 @@
+dialog {
+  display: flex;
+  flex-direction: column;
+
+  background: var(--bg-mid);
+  color: var(--fg-mid);
+  margin: auto;
+  padding: var(--large);
+  box-shadow: 0 var(--medium) var(--large) var(--fg-mid);
+  border-radius: var(--medium);
+  border: none;
+}
+
+dialog::backdrop {
+  background: rgba(66, 66, 66, 0.5);
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+label {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+label>* {
+  width: 10rem;
+  margin: var(--medium);
+}
+
+label>input {
+  padding: var(--small) var(--medium);
+  flex-grow: 1;
+  height: 2rem;
+  min-width: 30rem;
+  background: var(--bg-light);
+  color: var(--fg-dark);
+  border: none;
+  border-radius: var(--small);
+  font-size: 1rem;
+}
+
+color-switch {
+  flex-grow: 1;
+}
+
+button {
+  padding: var(--large);
+  margin: var(--large);
+  background: var(--bg-dark);
+  border-radius: var(--medium);
+  width: 10rem;
+  color: var(--fg-mid);
+  font-size: 1rem;
+}
+
+button:hover {
+  cursor: pointer;
+  background: var(--bg-light);
+}
+
+footer {
+  display: flex;
+  flex-direction: row-reverse;
+}

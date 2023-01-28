@@ -6,6 +6,18 @@ export function prepareCSSVariables(OPTS) {
   document.documentElement.style.setProperty('--page-font-size', `${OPTS.fontsize}%`);
   document.documentElement.classList.toggle('use-custom-scrollbar', OPTS.useCustomScrollbar);
 }
+
+export function getAllBySelector(element, selector) {
+  const elements = [...element.querySelectorAll(selector)];
+  for (const child of element.children) {
+    elements.push(...getAllBySelector(child, selector));
+  }
+  if (element.shadowRoot) {
+    elements.push(...getAllBySelector(element.shadowRoot, selector));
+  }
+  return elements;
+}
+
 export function localizeHtml(doc) {
   doc.querySelectorAll('[data-locale]').forEach(elem => {
     const messageKey = elem.getAttribute('data-locale');
