@@ -39,7 +39,7 @@ label>input {
   padding: var(--small) var(--medium);
   flex-grow: 1;
   height: 2rem;
-  min-width: 30rem;
+  width: 30rem;
   background: var(--bg-light);
   color: var(--fg-dark);
   border: none;
@@ -47,8 +47,44 @@ label>input {
   font-size: 1rem;
 }
 
+label>input[type="checkbox"] {
+  width: auto;
+  flex-grow: 0.01;
+}
+
 color-switch {
   flex-grow: 1;
+}
+
+.switch input {
+  display: none;
+}
+
+.switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-width: 30rem;
+  gap: 0.0625em;
+}
+
+.switch label {
+  text-align: center;
+  border: 0.0625em solid rgba(0, 0, 0, 0.2);
+
+  padding: var(--small) 0;
+  flex-grow: 1;
+  height: 2rem;
+  border-radius: var(--small);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.switch input:checked+label {
+  background-color: #d3d3d3;
+  box-shadow: none;
+  color: black;
 }
 
 button {

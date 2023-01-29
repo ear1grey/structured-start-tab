@@ -1,8 +1,10 @@
-import { OPTS } from '../../js/lib/options.js';
 import * as util from '../lib/util.js';
 import * as toast from '../lib/toast.js';
-import { saveChanges, editStart } from '../index.js';
 import * as tooltip from '../lib/tooltip.js';
+
+import { OPTS } from '../../js/lib/options.js';
+import { saveChanges } from '../index.js';
+import { editLink, editPanel, editAgenda } from './edit.service.js';
 
 let dragging;
 let els;
@@ -164,7 +166,14 @@ function dragDrop(e) {
 function dragEnd() {
   try {
     if (!dragging || !dragging.el.classList.contains('dragging')) {
-      if (OPTS.editOnNewDrop && dragging.el.classList.contains('new') && dragging.dummy && els.main) { editStart(dragging.el); }
+      if (OPTS.editOnNewDrop && dragging.el.classList.contains('new') && dragging.dummy && els.main) {
+        // trigger edit window
+        if (dragging.el.tagName === 'A') {
+          editLink(dragging.el);
+        } else if (dragging.el.id.startsWith('agenda')) {
+          editAgenda(dragging.el);
+        } else { editPanel(dragging.el); }
+      }
       return;
     }
     if (OPTS.lock) {

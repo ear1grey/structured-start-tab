@@ -14,42 +14,13 @@ import { getPageCloud, syncPageCloud } from './services/cloud.service.js';
 
 import { OPTS } from './lib/options.js';
 import { prepareDrag } from './services/drag.service.js';
-import { updateAgendaBackground } from './services/agenda.service.js';
-import { editLink } from './services/edit.service.js';
+import { updateAgendaBackground, displayNewAgenda } from './services/agenda.service.js';
+import { editLink, editPanel, editAgenda } from './services/edit.service.js';
 
 const oneDay = 1000 * 60 * 60 * 24;
 const fourDays = oneDay * 4;
 const twoWeeks = oneDay * 14;
-let dialog;
 let els;
-
-function setValue(where, what, open = false) {
-  const elem = document.querySelector(where);
-  elem.value = what ?? '';
-  if (open) { elem.dataset.open = 'true'; }
-}
-
-function getValue(where) {
-  return document.querySelector(where).value;
-}
-
-function setColorValue(where, what) {
-  const elem = document.querySelector(where);
-  if (what[0] === '!') {
-    elem.value = what.slice(1);
-    elem.open = false;
-  } else {
-    elem.value = what;
-    elem.open = true;
-  }
-}
-
-function getColorValue(where) {
-  const elem = document.querySelector(where);
-  const color = elem.value;
-  const open = elem.open ? '' : '!';
-  return open + color;
-}
 
 function linkClicked(e) {
   if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
@@ -73,209 +44,11 @@ function updateClickCount(a) {
   options.write();
 }
 
-function toHex(x, scale = 1) {
-  // We need to scale the value to 0-255
-  x = Math.round(x * scale);
-  if (isNaN(x)) { return '00'; }
-  return x.toString(16).padStart(2, '0');
-}
-
-function translateColor(rgba) {
-  const parts = rgba.split('(')[1].split(')')[0].split(',');
-  const converted = [
-    toHex(Number(parts[0])),
-    toHex(Number(parts[1])),
-    toHex(Number(parts[2])),
-    toHex(Number(parts[3] || '255'), 255),
-  ];
-  let result = '#' + converted.join('');
-  if (result.includes('#ffffff')) result = '!' + result;
-
-  return result;
-}
-
-export function editStart(elem) {
-  els.edit.textContent = ''; // reset
-  const style = window.getComputedStyle(elem);
-
-  let bgcol = elem.dataset.bg ? elem.dataset.bg : translateColor(style.backgroundColor);
-  let fgcol = elem.dataset.fg ? elem.dataset.fg : translateColor(style.color);
-
-  if (elem instanceof HTMLAnchorElement) {
-    cloneToDialog('#template_edit_link');
-    setValue('#editname', elem.textContent);
-    setValue('#editurl', elem.href);
-    document.querySelector('#editname').select();
-  } else {
-    if (elem.tagName === 'SECTION' || elem.tagName === 'SST-PANEL') {
-      if (elem.id.includes('agenda')) {
-        cloneToDialog('#template_edit_panel_agenda');
-        const index = parseInt(elem.id.split('-')[1]);
-        setValue('#urlInput', OPTS.agendas[index]?.agendaUrl);
-        setValue('#emailInput', OPTS.agendas[index]?.email);
-      } else {
-        cloneToDialog('#template_edit_panel');
-      }
-
-      if (elem.tagName === 'SECTION') { // Legacy support
-        setValue('#editname', elem.firstElementChild.textContent);
-        if (elem.classList.contains('vertical')) {
-          document.querySelector('#radioVertical').checked = true;
-        }
-        if (elem.classList.contains('private')) {
-          document.querySelector('#privateInput').checked = true;
-        }
-        if (elem.classList.contains('flex-disabled')) {
-          document.querySelector('#flexInput').checked = true;
-        }
-      } else {
-        setValue('#editname', elem.header);
-        document.querySelector('#radioVertical').checked = elem.direction === 'vertical';
-        document.querySelector('#privateInput').checked = elem.private;
-        document.querySelector('#flexInput').checked = elem.singleLineDisplay;
-
-        bgcol = elem.backgroundColour;
-        fgcol = elem.textColour;
-      }
-    } else {
-      return;
-    }
-  }
-
-  setColorValue('#bgcol', bgcol);
-  setColorValue('#fgcol', fgcol);
-
-  dialog.addEventListener('close', closeDialog);
-  dialog.addEventListener('cancel', editCancel);
-  dialog.showModal();
-  els.editing = elem;
-  elem.classList.add('edited');
-  document.querySelector('#editok').addEventListener('click', editOk);
-  document.querySelector('#editcancel').addEventListener('click', editCancel);
-  els.editname = document.querySelector('#editname');
-}
-
-function editCancel() {
-  toast.html('editcancelled', chrome.i18n.getMessage('edit_cancelled'));
-
-  if (els.editing instanceof HTMLAnchorElement) {
-    if (!getValue('#editurl') && !OPTS.allowEmptyUrl) {
-      els.editing.remove();
-      saveChanges();
-    }
-  }
-
-  closeDialog();
-}
-
-function closeDialog() {
-  dialog.close();
-  dialog.remove();
-  if (els.editing) {
-    els.editing.classList.remove('edited');
-    ui.flash(els.editing);
-  }
-  delete els.editing;
-}
-
 function prepareFavicons() {
   const links = els.main.querySelectorAll('a');
   for (const a of links) {
     util.setFavicon(a, a.href);
   }
-}
-
-const createStyleString = (n, v) => v[0] === '!' ? '' : `${n}:${v};`;
-function addRemoveClassList(toCheck, toAdd, toRemove) {
-  if (document.querySelector(toCheck).checked) {
-    for (const s of toAdd) {
-      els.editing.classList.add(s);
-    }
-  } else {
-    for (const s of toRemove) {
-      els.editing.classList.remove(s);
-    }
-  }
-}
-// store the updated version
-function editOk() {
-  if (els.editing instanceof HTMLAnchorElement) {
-    els.editing.textContent = getValue('#editname');
-    els.editing.draggable = true;
-    const url = getValue('#editurl');
-    if (url) {
-      els.editing.href = getValue('#editurl');
-      util.setFavicon(els.editing, getValue('#editurl'));
-    } else {
-      if (!OPTS.allowEmptyUrl) {
-        ui.wiggleElement(document.querySelector('#editurl'));
-        return;
-      }
-      els.editing.removeAttribute('href');
-    }
-  } else {
-    if (els.editing.tagName === 'SECTION') { // Legacy support
-      els.editing.firstElementChild.textContent = getValue('#editname');
-      if (document.querySelector('#flexInput').checked) {
-        els.editing.classList.add('flex-disabled');
-      } else {
-        els.editing.classList.remove('flex-disabled');
-      }
-      addRemoveClassList('#radioVertical', ['vertical'], ['vertical']);
-      addRemoveClassList('#privateInput', ['private'], ['private', 'blur']);
-      if (els.editing.id.includes('agenda')) {
-        let index = parseInt(els.editing.id.split('-')[1]);
-
-        if (OPTS.agendas.length === 0) {
-          OPTS.agendas = [{}];
-          index = 0;
-        }
-
-        OPTS.agendas[index].agendaUrl = getValue('#urlInput');
-        OPTS.agendas[index].email = getValue('#emailInput');
-        options.write();
-        updateAgendaBackground(OPTS.agendas[index], index)
-          .then(() => displayNewAgenda(index, OPTS.agendas[index]));
-      }
-    } else if (els.editing.tagName === 'SST-PANEL') {
-      els.editing.header = getValue('#editname');
-      els.editing.singleLineDisplay = document.querySelector('#flexInput').checked;
-      els.editing.direction = document.querySelector('#radioVertical').checked ? 'vertical' : 'horizontal';
-      els.editing.private = document.querySelector('#privateInput').checked;
-
-      els.editing.backgroundColour = getColorValue('#bgcol');
-      els.editing.textColour = getColorValue('#fgcol');
-
-      if (els.editing.id.includes('agenda')) {
-        const index = parseInt(els.editing.id.split('-')[1]);
-        OPTS.agendas[index].agendaUrl = getValue('#urlInput');
-        OPTS.agendas[index].email = getValue('#emailInput');
-        options.write();
-        updateAgendaBackground(OPTS.agendas[index], index)
-          .then(() => displayNewAgenda(index, OPTS.agendas[index]));
-      }
-
-      dialog.close();
-      saveChanges();
-      ui.flash(els.editing);
-      els.editing.classList.remove('edited');
-      return;
-    } else {
-      return;
-    }
-  }
-  els.editing.dataset.bg = getColorValue('#bgcol');
-  els.editing.dataset.fg = getColorValue('#fgcol');
-  let styleString = '';
-  styleString += createStyleString('background', els.editing.dataset.bg);
-  styleString += createStyleString('color', els.editing.dataset.fg);
-  els.editing.setAttribute('style', styleString);
-
-  dialog.close();
-  saveChanges();
-  ui.flash(els.editing);
-  els.editing.classList.remove('edited');
-  delete els.editing;
 }
 
 export function saveChanges(makeBackup = true) {
@@ -301,7 +74,8 @@ export function saveChanges(makeBackup = true) {
 
 function detectKeydown(e) {
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-    util.simulateClick('#editok');
+    // Run same function as clicking the save button
+    document.querySelectorAll('edit-window').forEach((el) => el.ok());
   }
   if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey)) {
     if (OPTS.jsonBackup) {
@@ -314,13 +88,12 @@ function detectKeydown(e) {
     toast.html('undo', chrome.i18n.getMessage('undo'));
   }
   if (e.code === 'Escape') {
-    // TODO: remove once edit-window development is complete
-    if (els.body.classList.contains('editing')) {
-      editCancel();
-    }
-
     // Remove all edit windows
-    document.querySelectorAll('edit-window').forEach((el) => el.remove());
+    const editWindow = document.querySelector('edit-window');
+    if (editWindow) {
+      editWindow.remove();
+      toast.html('editcancelled', chrome.i18n.getMessage('edit_cancelled'));
+    }
   }
 }
 
@@ -510,21 +283,6 @@ async function updateAgenda(updateAgendas = true) {
   }
 }
 
-function displayNewAgenda(index, agenda) {
-  const rootPanel = util.getAllBySelector(els.main, '#agenda-' + String(index))[0]?._panel;
-  if (!rootPanel) { return; }
-  while (rootPanel.lastElementChild.firstChild) {
-    rootPanel.lastElementChild.removeChild(rootPanel.lastElementChild.lastChild);
-  }
-  for (const event of agenda.events.slice(0, OPTS.agendaNb)) {
-    const agendaItem = document.createElement('agenda-item');
-    agendaItem.setAttribute('time', event.utcDate);
-    agendaItem.setAttribute('title', event.title);
-    agendaItem.setAttribute('href', event.url);
-    rootPanel.querySelector('nav').append(agendaItem);
-  }
-}
-
 function duplicatePanel(keepLinks) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
@@ -609,17 +367,6 @@ function showBookmarks(visible = true) {
   }
 }
 
-function findEventFirstSection(e) {
-  const path = e.path || (e.composedPath && e.composedPath());
-  for (let i = 0; i < path.length; i++) {
-    if (path[i].tagName === 'SECTION') {
-      return path[i];
-    }
-  }
-
-  return null;
-}
-
 function findSection(elem) {
   if (!elem) { return null; }
   if (elem.tagName === 'SECTION') return elem; // Legacy support
@@ -659,28 +406,16 @@ function editSection(e) {
   if (!e.shiftKey) return;
 
   const target = util.findTarget(e);
-  if (target.tagName === 'A') {
-    return;
-  }
+  if (target.tagName === 'A') return;
 
-  if (els.body.classList.contains('editing')) { return; }
-
-  const elementToEdit = findEventFirstSection(e);
-
-  if (els.main == null) return;
-
-  if (elementToEdit.id.includes('agenda')) {
-    editStart(elementToEdit);
-  } else if (target.tagName === 'SST-PANEL' && target.shadow?.contains(elementToEdit)) {
-    editStart(target);
-  } else if (elementToEdit instanceof HTMLElement && elementToEdit?.tagName === 'SECTION') { // Legacy support
-    editStart(elementToEdit);
-  }
+  if (target.id.startsWith('agenda')) {
+    editAgenda(target);
+  } else { editPanel(target); }
 }
 
 /** add a fold button to the page if necessary */
-export function prepareFoldables(selectors = 'main') {
-  const elems = [...document.querySelectorAll(selectors)];
+export function prepareFoldables() {
+  const elems = [...document.querySelectorAll('main')];
   elems.forEach(e => e.addEventListener('dblclick', toggleFold));
   elems.forEach(e => e.addEventListener('click', editSection));
 }
@@ -730,29 +465,6 @@ function toggleTrash() {
   } else {
     els.main.scrollIntoView({ behavior: 'smooth' });
   }
-}
-
-function clearDialog() {
-  while (dialog?.firstElementChild) {
-    dialog.firstElementChild.remove();
-  }
-}
-
-function cloneToDialog(selector) {
-  dialog = document.createElement('dialog');
-  dialog.id = 'dialog';
-  document.body.append(dialog);
-  const template = document.querySelector(selector);
-  if (!(template instanceof HTMLTemplateElement)) {
-    throw new Error('Failed to clone. Selector ' + selector + ' in dialog must point to a template.');
-  }
-  util.localizeHtml(template.content);
-  const clone = document.importNode(template.content, true);
-  if (!clone) {
-    throw new Error('Failed to clone ' + selector + ' in dialog.  Template needs children to continue.  Sad.');
-  }
-  clearDialog();
-  dialog.append(clone);
 }
 
 function prepareTrash() {

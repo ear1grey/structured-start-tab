@@ -27,8 +27,12 @@ function translateColor(rgba) {
 export function getColours(el) {
   const style = window.getComputedStyle(el);
   return {
-    backgroundColour: el.dataset.bg ? el.dataset.bg : translateColor(style.backgroundColor),
-    foregroundColour: el.dataset.fg ? el.dataset.fg : translateColor(style.color),
+    backgroundColour: el.backgroundColour
+      ? el.backgroundColour
+      : el.dataset.bg ? el.dataset.bg : translateColor(style.backgroundColor),
+    foregroundColour: el.textColour
+      ? el.textColour
+      : el.dataset.fg ? el.dataset.fg : translateColor(style.color),
   };
 }
 

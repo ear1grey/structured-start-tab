@@ -1,10 +1,10 @@
 import * as ui from '../../services/ui.service.js';
 import { localizeHtml } from '../../lib/util.js';
 
-fetch('js/components/edit-window/index.html') // Load HTML
+fetch('/src/js/components/edit-window/index.html') // Load HTML
   .then(stream => stream.text())
   .then(text =>
-    fetch('js/components/edit-window/index.css') // Locs CSS
+    fetch('/src/js/components/edit-window/index.css') // Locs CSS
       .then(stream => stream.text())
       .then(css => {
         define(text, css);
@@ -33,15 +33,7 @@ const define = (template, css) => {
       });
 
       this.$okBtn.addEventListener('click', () => {
-        if (this._callBack) {
-          const resObject = {};
-          for (const prop of this._properties) {
-            resObject[prop.name] = this.getPropValueByType(this.shadow.querySelector(`#${prop.name}`), prop.type);
-          }
-
-          this._callBack(resObject);
-        }
-        this.isVisible = false;
+        this.ok();
       });
     }
 
@@ -54,6 +46,10 @@ const define = (template, css) => {
           return label.querySelector('input').value;
         case 'colour':
           return label.querySelector('color-switch').value;
+        case 'switch':
+          return label.querySelector('input:checked').id.split('-')[1];
+        case 'checkbox':
+          return label.querySelector('input').checked;
         default:
           return null;
       }
@@ -116,12 +112,34 @@ const define = (template, css) => {
             propValue.manual = 'Manual';
             propValue.open = property.value?.[0] !== '!';
             break;
+          case 'switch':
+            propValue = document.createElement('div');
+            propValue.classList.add('switch');
+            for (const option of property.options) {
+              const input = document.createElement('input');
+              input.type = 'radio';
+              input.name = property.name;
+              input.id = `${property.name}-${option.name}`;
+              const label = document.createElement('label');
+              label.textContent = option.name;
+              label.setAttribute('for', input.id);
+              label.setAttribute('data-locale', option.locale);
+
+              if (option.name === property.selectedOption) input.checked = true;
+
+              propValue.appendChild(input);
+              propValue.appendChild(label);
+            }
+            break;
+          case 'checkbox':
+            propValue = document.createElement('input');
+            propValue.type = 'checkbox';
+            propValue.checked = property.value;
+            break;
         }
 
-        if (property.locale) {
-          propValue.id = `__${property.name}`;
-          propValue.setAttribute('data-locale', property.locale);
-        }
+        if (property.locale?.primary) propName.setAttribute('data-locale', property.locale.primary);
+        if (property.locale?.secondary) propValue.setAttribute('data-locale', property.locale.secondary);
         if (property.placeholder) propValue.setAttribute('placeholder', property.placeholder);
 
         label.appendChild(propValue);
@@ -140,6 +158,18 @@ const define = (template, css) => {
       }
 
       return true;
+    }
+
+    ok() {
+      if (this._callBack) {
+        const resObject = {};
+        for (const prop of this._properties) {
+          resObject[prop.name] = this.getPropValueByType(this.shadow.querySelector(`#${prop.name}`), prop.type);
+        }
+
+        this._callBack(resObject);
+      }
+      this.isVisible = false;
     }
 
     // Structure
