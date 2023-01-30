@@ -14,7 +14,7 @@ import { getPageCloud, syncPageCloud } from './services/cloud.service.js';
 
 import { OPTS } from './lib/options.js';
 import { prepareDrag } from './services/drag.service.js';
-import { updateAgendaBackground, displayNewAgenda } from './services/agenda.service.js';
+import { updateAgendaBackground, displayNewAgenda, getAgendasFromObject } from './services/agenda.service.js';
 import { editLink, editPanel, editAgenda } from './services/edit.service.js';
 
 const oneDay = 1000 * 60 * 60 * 24;
@@ -260,13 +260,15 @@ function inDepthBookmarkTree(toTreat, parentPanel) {
 
 function addAgenda() {
   const panel = util.createPanel(els.main, false);
-  panel.id = 'agenda-' + String(OPTS.agendas.length);
+  // New agenda id is the highest id + 1
+  panel.id = 'agenda-' + Math.max(...OPTS.agendas.map(agenda => parseInt(agenda.agendaId.split('-')[1])));
   panel.header = chrome.i18n.getMessage('agenda');
   panel.direction = 'vertical';
   OPTS.agendas.push({
     agendaUrl: chrome.i18n.getMessage('default_agenda_link'),
     events: [],
     email: '',
+    agendaId: panel.id,
   });
   options.write();
   updateAgenda();
@@ -277,9 +279,9 @@ async function updateAgenda(updateAgendas = true) {
     const agenda = OPTS.agendas[index];
     if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { continue; }
     if (agenda.events.length === 0 && updateAgendas) {
-      await updateAgendaBackground(agenda, index);
+      await updateAgendaBackground(agenda);
     }
-    displayNewAgenda(index, agenda);
+    displayNewAgenda(agenda);
   }
 }
 
@@ -449,7 +451,6 @@ function prepareContent() {
     prepareFavicons();
   } else {
     jsonToDom(els.main, OPTS.json);
-    updateAgenda(false);
   }
 
   prepareListeners();
@@ -645,6 +646,14 @@ const prepareSectionActions = () => {
   });
 };
 
+function prepareAgendas() {
+  const agendas = [];
+  getAgendasFromObject(OPTS.json, agendas);
+
+  // Remove agendas not in the window
+  OPTS.agendas = [...OPTS.agendas.filter(agenda => agendas.includes(agenda.agendaId))];
+}
+
 async function prepareAll() {
   prepareBackgroundListener();
 
@@ -657,6 +666,7 @@ async function prepareAll() {
   util.prepareCSSVariables(OPTS);
   prepareMain();
   prepareTrash();
+  prepareAgendas();
   toast.prepare();
   toast.popup(`Structured Start Tab v${chrome.runtime.getManifest().version}`);
   toast.popup(chrome.i18n.getMessage('popup_toggle_sidebar'));
@@ -664,7 +674,7 @@ async function prepareAll() {
   migrateLinks();
   updateTopSites();
   updateBookmarksPanel();
-  updateAgenda();
+  updateAgenda(false);
   util.localizeHtml(document);
 
   prepareSectionActions();

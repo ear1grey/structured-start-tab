@@ -6,6 +6,7 @@ import * as util from '../../js/lib/util.js';
 import { OPTS } from '../../js/lib/options.js';
 import * as options from '../../js/lib/options.js';
 import { htmlStringToJson } from '../../js/services/parser.service.js';
+import { getAgendasFromObject } from '../../js/services/agenda.service.js';
 
 function setCheckBox(prefs, what) {
   const elem = document.getElementById(what);
@@ -238,14 +239,6 @@ function importLoadedFile(file) {
 
     saveOptions();
   }
-}
-
-function getAgendasFromObject(obj, agendas = []) {
-  if (Array.isArray(obj)) {
-    obj.forEach((item) => {
-      getAgendasFromObject(item, agendas);
-    });
-  } else if (obj.id.includes('agenda')) { agendas.push(obj.id); }
 }
 
 function upload(file) {

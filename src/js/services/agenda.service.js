@@ -20,18 +20,18 @@ export async function updateAgendasBackground() {
 }
 
 /** Update specific agenda */
-export async function updateAgendaBackground(agenda, index) {
+export async function updateAgendaBackground(agenda) {
   if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { return; }
   try {
     const response = await fetch(agenda.agendaUrl);
     const text = await response.text();
-    await parseIcs(text, index, agenda.email);
+    await parseIcs(text, agenda, agenda.email);
   } catch (e) { }
   await options.write();
 }
 
-export function displayNewAgenda(index, agenda) {
-  const rootPanel = getAllBySelector(document.querySelector('main'), '#agenda-' + String(index))[0]?._panel;
+export function displayNewAgenda(agenda) {
+  const rootPanel = getAllBySelector(document.querySelector('main'), `#${agenda.agendaId}`)[0]?._panel;
   if (!rootPanel) { return; }
   while (rootPanel.lastElementChild.firstChild) {
     rootPanel.lastElementChild.removeChild(rootPanel.lastElementChild.lastChild);
@@ -42,5 +42,19 @@ export function displayNewAgenda(index, agenda) {
     agendaItem.setAttribute('title', event.title);
     agendaItem.setAttribute('href', event.url);
     rootPanel.querySelector('nav').append(agendaItem);
+  }
+}
+
+export function getAgendasFromObject(obj, agendas = []) {
+  if (Array.isArray(obj)) {
+    obj.forEach((item) => {
+      getAgendasFromObject(item, agendas);
+    });
+  } else if (obj.content?.length > 0) {
+    obj.content.forEach((item) => {
+      getAgendasFromObject(item, agendas);
+    });
+  } else if (obj.id?.includes('agenda')) {
+    agendas.push(obj.id);
   }
 }

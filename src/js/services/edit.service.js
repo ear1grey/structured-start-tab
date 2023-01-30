@@ -103,22 +103,26 @@ export function editPanel(element) {
 }
 
 export function editAgenda(element) {
-  const index = parseInt(element.id.split('-')[1]);
+  let agenda = OPTS.agendas.filter(agenda => agenda.agendaId === element.id)?.[0];
   editPanelBase(element, [
-    { name: 'agendaUrl', type: 'text', value: OPTS.agendas[index]?.agendaUrl, locale: { primary: 'url_agenda', secondary: 'placeholder_panel_url_agenda' } },
-    { name: 'email', type: 'text', value: OPTS.agendas[index]?.email, locale: { primary: 'email_agenda', secondary: 'placeholder_panel_email_agenda' } },
-  ], (properties) => {
-    let index = parseInt(element.id.split('-')[1]);
-
-    if (OPTS.agendas.length === 0) {
-      OPTS.agendas = [{}];
-      index = 0;
+    { name: 'agendaUrl', type: 'text', value: agenda?.agendaUrl || '', locale: { primary: 'url_agenda', secondary: 'placeholder_panel_url_agenda' } },
+    { name: 'email', type: 'text', value: agenda?.email || '', locale: { primary: 'email_agenda', secondary: 'placeholder_panel_email_agenda' } },
+  ], async (properties) => {
+    if (agenda == null) {
+      agenda = {
+        agendaId: element.id,
+        agendaUrl: properties.agendaUrl,
+        email: properties.email,
+        events: [],
+      };
+      OPTS.agendas.push(agenda);
+    } else {
+      agenda.agendaUrl = properties.agendaUrl;
+      agenda.email = properties.email;
     }
 
-    OPTS.agendas[index].agendaUrl = properties.agendaUrl;
-    OPTS.agendas[index].email = properties.email;
     options.write();
-    updateAgendaBackground(OPTS.agendas[index], index)
-      .then(() => displayNewAgenda(index, OPTS.agendas[index]));
+    await updateAgendaBackground(agenda);
+    await displayNewAgenda(agenda);
   });
 }

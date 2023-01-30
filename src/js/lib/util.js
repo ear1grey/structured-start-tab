@@ -15,7 +15,7 @@ export function getAllBySelector(element, selector) {
   if (element.shadowRoot) {
     elements.push(...getAllBySelector(element.shadowRoot, selector));
   }
-  return elements;
+  return [...new Set(elements)];
 }
 
 export function localizeHtml(doc) {
