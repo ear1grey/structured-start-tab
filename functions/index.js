@@ -137,7 +137,7 @@ export const syncPage = functions.https.onRequest(async (req, res) => {
     return;
   }
 
-  const syncAction = getSyncAction(JSON.parse(incomingContent.page), JSON.parse(content.page), content.options);
+  const syncAction = getSyncAction(JSON.parse(incomingContent.page), JSON.parse(content.page), incomingContent.options);
   switch (syncAction) {
     case 'push':
       pushPage(id, incomingContent, res);
