@@ -62,7 +62,9 @@ const getSyncAction = (incoming, cloud, { autoAdd = false, syncFold = true, sync
   cloud = cloud.filter(elem => elem.id !== 'trash');
 
   // if the lengths are different and we can't auto add, we have a conflict
-  if (incoming.length !== cloud.length && !autoAdd) return 'conflict';
+  if (incoming.length < cloud.length || (incoming.length > cloud.length && !autoAdd)) return 'conflict';
+
+  // TODO: push only new elements and not the whole page
 
   for (const incomingElement of incoming.filter(elem => elem.id !== 'trash')) {
     const cloudElement = cloud.find(elem => elem.ident === incomingElement.ident);
