@@ -4,7 +4,7 @@ Every release for the foreseeable future will be an alpha level release.  This m
 
 ## Current Beta Release
 
-* 1.10.2.1 [Cloud Sync](https://github.com/ear1grey/structured-start-tab/milestone/23?closed=1)
+* 1.11.0.0 [Cloud Sync](https://github.com/ear1grey/structured-start-tab/milestone/23?closed=1)
 
 ## Current Stable Release
 
