@@ -1,4 +1,5 @@
 import { OPTS, write } from '../lib/options.js';
+import { saveChanges } from '../index.js';
 
 import { makeRequest } from './api.service.js';
 
@@ -34,7 +35,7 @@ export const savePageCloud = async (object) => {
   return await makeRequest(url, 'POST', body);
 };
 
-export const syncPageCloud = async () => {
+export const syncPageCloud = async (showMergeResolution = false) => {
   if (!OPTS.cloud.enabled || OPTS.cloud.hasConflict) return;
 
   if (OPTS.json == null || OPTS.json.length === 0) {
@@ -72,6 +73,14 @@ export const syncPageCloud = async () => {
       break;
     case 409:
       OPTS.cloud.hasConflict = true;
+
+      if (showMergeResolution) {
+        OPTS.onlineJson = JSON.parse(response.content.page);
+        OPTS.onlinePageVersion = response.content.version;
+        saveChanges();
+        document.querySelector('#mergeConflictResolver').style.display = 'block';
+      }
+
       break;
     default: console.warn('Unknown response', response);
   }

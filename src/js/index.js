@@ -642,7 +642,7 @@ const prepareSectionActions = () => {
   }
 
   document.querySelector('#forceCloudSync a').addEventListener('click', () => {
-    syncPageCloud();
+    syncPageCloud(true);
   });
 };
 
