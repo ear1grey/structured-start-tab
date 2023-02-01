@@ -1,10 +1,12 @@
 import * as ui from '../services/ui.service.js';
 import * as options from '../lib/options.js';
+import * as io from './io.service.js';
 
 import { saveChanges } from '../index.js';
 import { OPTS } from '../lib/options.js';
 import { setFavicon } from '../lib/util.js';
 import { updateAgendaBackground, displayNewAgenda } from './agenda.service.js';
+import { domToJson, jsonElementToDom } from './parser.service.js';
 
 const createStyleString = (n, v) => v[0] === '!' ? '' : `${n}:${v};`;
 
@@ -52,14 +54,15 @@ export function editLink(element) {
   });
 }
 
-function editPanelBase(element, extraProperties = [], additionalCallback = null) {
+function editPanelBase({ element, customActions = [], extraProperties = [], additionalCallback = null }) {
   const editWindow = document.createElement('edit-window');
   document.body.appendChild(editWindow);
 
   const { backgroundColour, foregroundColour } = ui.getColours(element);
 
   editWindow.init({
-    title: 'Edit Panel',
+    title: 'Edit Panel', // TODO: Localise
+    customActions,
     callBack: (properties) => {
       element.header = properties.name;
       element.backgroundColour = properties.background;
@@ -99,30 +102,75 @@ function editPanelBase(element, extraProperties = [], additionalCallback = null)
 }
 
 export function editPanel(element) {
-  editPanelBase(element);
+  editPanelBase({
+    element,
+    customActions: [
+      {
+        name: 'export',
+        icon: 'file-code',
+        event: () => {
+          const json = domToJson({ children: [element] })[0];
+          io.downloadJson({ name: `${element.ident}.json`, data: json });
+        },
+      },
+      {
+        name: 'file-import',
+        icon: 'file-download',
+        event: ({ dialog }) => {
+          io.loadFile().then((content) => {
+            const json = JSON.parse(content);
+            const newElement = jsonElementToDom(json, true);
+            newElement.setAttribute('draggable', true);
+            element.replaceWith(newElement);
+            dialog.isVisible = false;
+          });
+        },
+      },
+      {
+        name: 'cloud-import',
+        icon: 'cloud-download',
+        event: () => {
+          // TODO: allow user to insert a 'panel code' and then download the panel
+        },
+      },
+      {
+        name: 'cloud-export',
+        icon: 'cloud-upload',
+        event: () => {
+          // TODO: when clicked, upload the panel to the cloud. Show the panel id besides the panel name.
+          // TODO: if the panel is being shared, show 'delete from cloud' button instead
+        },
+      },
+    ],
+  });
 }
 
 export function editAgenda(element) {
   let agenda = OPTS.agendas.filter(agenda => agenda.agendaId === element.id)?.[0];
-  editPanelBase(element, [
-    { name: 'agendaUrl', type: 'text', value: agenda?.agendaUrl || '', locale: { primary: 'url_agenda', secondary: 'placeholder_panel_url_agenda' } },
-    { name: 'email', type: 'text', value: agenda?.email || '', locale: { primary: 'email_agenda', secondary: 'placeholder_panel_email_agenda' } },
-  ], async (properties) => {
-    if (agenda == null) {
-      agenda = {
-        agendaId: element.id,
-        agendaUrl: properties.agendaUrl,
-        email: properties.email,
-        events: [],
-      };
-      OPTS.agendas.push(agenda);
-    } else {
-      agenda.agendaUrl = properties.agendaUrl;
-      agenda.email = properties.email;
-    }
+  editPanelBase(
+    {
+      element,
+      extraProperties: [
+        { name: 'agendaUrl', type: 'text', value: agenda?.agendaUrl || '', locale: { primary: 'url_agenda', secondary: 'placeholder_panel_url_agenda' } },
+        { name: 'email', type: 'text', value: agenda?.email || '', locale: { primary: 'email_agenda', secondary: 'placeholder_panel_email_agenda' } },
+      ],
+      additionalCallback: async (properties) => {
+        if (agenda == null) {
+          agenda = {
+            agendaId: element.id,
+            agendaUrl: properties.agendaUrl,
+            email: properties.email,
+            events: [],
+          };
+          OPTS.agendas.push(agenda);
+        } else {
+          agenda.agendaUrl = properties.agendaUrl;
+          agenda.email = properties.email;
+        }
 
-    options.write();
-    await updateAgendaBackground(agenda);
-    await displayNewAgenda(agenda);
-  });
+        options.write();
+        await updateAgendaBackground(agenda);
+        await displayNewAgenda(agenda);
+      },
+    });
 }

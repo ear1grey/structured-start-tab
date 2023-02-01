@@ -3,10 +3,13 @@
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
 import * as toast from '../../js/lib/toast.js';
 import * as util from '../../js/lib/util.js';
-import { OPTS } from '../../js/lib/options.js';
 import * as options from '../../js/lib/options.js';
+import * as io from '../../js/services/io.service.js';
+
+import { OPTS } from '../../js/lib/options.js';
 import { htmlStringToJson } from '../../js/services/parser.service.js';
 import { getAgendasFromObject } from '../../js/services/agenda.service.js';
+
 
 function setCheckBox(prefs, what) {
   const elem = document.getElementById(what);
@@ -194,29 +197,28 @@ function createPageWithPrefs(prefs) {
 }
 function exportStartTab() {
   const now = (new Date()).toISOString().slice(0, 10).replace(/-/g, '_');
-
-  const json = JSON.stringify(OPTS.json);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `sst_backup_${now}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  io.downloadJson({
+    name: `sst_backup_${now}.json`,
+    data: OPTS.json,
+  });
 }
 function importStartTab() {
-  util.simulateClick('#fileupload');
+  io.loadFile().then((file) => {
+    importLoadedFile(file);
+  });
+
+  // util.simulateClick('#fileupload');
 }
 function importLoadedFile(file) {
-  if (file.target && typeof file.target.result === 'string') {
+  if (file) {
     OPTS.jsonBackup = [...OPTS.json];
 
     // Keep support for old backups in HTML format
-    if (file.target.result.includes('<section')) {
-      OPTS.json = htmlStringToJson(file.target.result);
+    if (file.includes('<section')) {
+      OPTS.json = htmlStringToJson(file);
     } else {
       try {
-        OPTS.json = JSON.parse(file.target.result);
+        OPTS.json = JSON.parse(file);
       } catch (e) {
         alert('Invalid file');
         return;
@@ -244,7 +246,9 @@ function importLoadedFile(file) {
 function upload(file) {
   if (file) {
     const reader = new FileReader();
-    reader.addEventListener('load', importLoadedFile);
+    reader.addEventListener('load', (file) => {
+      if (typeof file?.target?.result === 'string') { importLoadedFile(file.target.result); }
+    });
     reader.readAsText(file);
   }
 }
@@ -255,12 +259,7 @@ function uploadFile(e) {
     upload(file);
   }
 }
-function uploadFiles(e) {
-  e.preventDefault();
-  const target = e.target;
-  const file = target.files && target.files[0];
-  upload(file);
-}
+
 function resetStartTab() {
   const backup = confirm(chrome.i18n.getMessage('suggest_backup'));
   if (backup) {
@@ -270,6 +269,7 @@ function resetStartTab() {
   OPTS.json = htmlStringToJson(chrome.i18n.getMessage('default_message'));
   options.write();
 }
+
 function prepareListeners() {
   // ! ensures that if any of these elems don't exist a NPE is thrown.
   document.getElementById('export').addEventListener('click', exportStartTab);
@@ -278,8 +278,6 @@ function prepareListeners() {
   const importDropZone = document.getElementById('importdropzone');
   importDropZone.addEventListener('dragover', e => e.preventDefault());
   importDropZone.addEventListener('drop', uploadFile);
-  const fileupload = document.getElementById('fileupload');
-  fileupload.addEventListener('change', uploadFiles, false);
   chrome.runtime.onMessage.addListener(receiveBackgroundMessages);
 }
 export async function loadOptions() {

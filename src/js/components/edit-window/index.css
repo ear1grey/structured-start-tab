@@ -15,6 +15,35 @@ dialog::backdrop {
   background: rgba(66, 66, 66, 0.5);
 }
 
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#custom-actions-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.custom-action {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.custom-action:hover {
+  transform: scale(1.1);
+}
+
+.custom-action svg {
+  display: block;
+  width: 1.7rem;
+  height: 1.7rem;
+  fill: var(--fg-mid);
+}
+
 main {
   display: flex;
   flex-direction: column;

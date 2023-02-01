@@ -27,6 +27,8 @@ class PanelComponent extends HTMLElement {
   // Getters & setters
   get content() { return this._content; }
 
+  get ident() { return this.getAttribute('ident'); }
+
   // Exclamation mark used to identify if the value is default or not
   get backgroundColour() { return this.getAttribute('background-color') || '!#00000019'; }
   set backgroundColour(color) {

@@ -58,6 +58,7 @@ const define = (template, css) => {
     // Components
     get $dialog() { return this.shadow.querySelector('dialog'); }
     get $title() { return this.shadow.querySelector('#title'); }
+    get $customActionsContainer() { return this.shadow.querySelector('#custom-actions-container'); }
     get $main() { return this.shadow.querySelector('main'); }
     get $cancelBtn() { return this.shadow.querySelector('#edit-cancel'); }
     get $okBtn() { return this.shadow.querySelector('#edit-ok'); }
@@ -75,15 +76,43 @@ const define = (template, css) => {
       }
     }
 
-    init({ title, properties, callBack, options }) {
+    init({ title, customActions, properties, callBack, options }) {
       this.$title.textContent = title;
       this._callBack = callBack;
       this._options = options;
-      this.addProperties(properties);
+
+      if (customActions) { this.addCustomActions(customActions); }
+      if (properties) { this.addProperties(properties); }
 
       this.isVisible = true;
 
       localizeHtml(this.shadow);
+    }
+
+    addCustomActions(customActions) {
+      // TODO: Add tooltip on hover
+
+      for (const action of customActions) {
+        const actionElement = document.createElement('a');
+        actionElement.classList.add('custom-action');
+        if (action.icon) {
+          // import svg icon locally
+          fetch(`/src/img/icons/${action.icon}.svg`)
+            .then(stream => stream.text())
+            .then(text => {
+              actionElement.innerHTML = text;
+              actionElement.classList.add('icon');
+            });
+        } else {
+          actionElement.textContent = action.name;
+        }
+
+        actionElement.addEventListener('click', (event) => {
+          action?.event?.({ event, dialog: this });
+        });
+
+        this.$customActionsContainer.appendChild(actionElement);
+      }
     }
 
     addProperties(properties) {
