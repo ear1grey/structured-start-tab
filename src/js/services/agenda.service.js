@@ -46,6 +46,7 @@ export function displayNewAgenda(agenda) {
 }
 
 export function getAgendasFromObject(obj, agendas = []) {
+  if (obj.id === 'trash') { return; }
   if (Array.isArray(obj)) {
     obj.forEach((item) => {
       getAgendasFromObject(item, agendas);

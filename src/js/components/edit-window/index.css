@@ -44,6 +44,16 @@ header {
   fill: var(--fg-mid);
 }
 
+#custom-actions-container label>input {
+  width: unset;
+}
+
+#custom-actions-container label>button {
+  width: unset !important;
+  margin: 0px;
+  padding: var(--medium)
+}
+
 main {
   display: flex;
   flex-direction: column;

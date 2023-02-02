@@ -94,6 +94,7 @@ const define = (template, css) => {
 
       for (const action of customActions) {
         const actionElement = document.createElement('a');
+        actionElement.id = action.name;
         actionElement.classList.add('custom-action');
         if (action.icon) {
           // import svg icon locally

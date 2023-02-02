@@ -86,3 +86,31 @@ export const syncPageCloud = async (showMergeResolution = false) => {
 
   write();
 };
+
+export const getPanelCloud = async (panelId) => {
+  const url = `${OPTS.cloud.url}/getPanel?id=${panelId}`;
+  const response = await makeRequest(url, 'GET');
+
+  // If there is no panel available yet, don't load
+  if ((response.status === 404 && response.content?.error) || response.status === 204) {
+    return;
+  }
+
+  return response.content.panel;
+};
+
+export const sharePanelCloud = async (panelId, panel) => {
+  const url = `${OPTS.cloud.url}/sharePanel`;
+  const identifier = (await chrome.identity.getProfileUserInfo()).id;
+
+  const body = {
+    id: panelId,
+    content: {
+      owner: identifier,
+      panel,
+    },
+  };
+
+  const response = await makeRequest(url, 'POST', body);
+  return response;
+};

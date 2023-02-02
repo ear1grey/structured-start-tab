@@ -7,6 +7,7 @@ import { OPTS } from '../lib/options.js';
 import { setFavicon } from '../lib/util.js';
 import { updateAgendaBackground, displayNewAgenda } from './agenda.service.js';
 import { domToJson, jsonElementToDom } from './parser.service.js';
+import { getPanelCloud, sharePanelCloud } from './cloud.service.js';
 
 const createStyleString = (n, v) => v[0] === '!' ? '' : `${n}:${v};`;
 
@@ -129,16 +130,43 @@ export function editPanel(element) {
       {
         name: 'cloud-import',
         icon: 'cloud-download',
-        event: () => {
-          // TODO: allow user to insert a 'panel code' and then download the panel
+        event: ({ dialog }) => {
+          // TODO: only should cloud buttons if cloud sync is enabled and there's a URL
+          // TODO: localization
+          const label = document.createElement('label');
+          const input = document.createElement('input');
+          input.placeholder = 'Panel Code';
+          const button = document.createElement('button');
+          button.textContent = 'Import';
+          button.addEventListener('click', () => {
+            if (!input.value) return;
+
+            getPanelCloud(input.value)
+              .then((panelContent) => {
+                if (panelContent != null) {
+                  const newElement = jsonElementToDom(panelContent, true);
+                  newElement.setAttribute('draggable', true);
+                  element.replaceWith(newElement);
+
+                  dialog.isVisible = false;
+                }
+              });
+          });
+
+          label.appendChild(input);
+          label.appendChild(button);
+
+          dialog.$customActionsContainer.querySelector('#cloud-import').insertAdjacentElement('beforebegin', label);
         },
       },
       {
         name: 'cloud-export',
         icon: 'cloud-upload',
-        event: () => {
-          // TODO: when clicked, upload the panel to the cloud. Show the panel id besides the panel name.
+        event: async () => {
+          // TODO: Show the panel id besides the panel name.
           // TODO: if the panel is being shared, show 'delete from cloud' button instead
+          const json = domToJson({ children: [element] })[0];
+          const result = await sharePanelCloud(element.ident, json);
         },
       },
     ],
