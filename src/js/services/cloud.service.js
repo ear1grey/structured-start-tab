@@ -1,5 +1,4 @@
 import { OPTS, write } from '../lib/options.js';
-import { saveChanges } from '../index.js';
 
 import { makeRequest } from './api.service.js';
 
@@ -77,7 +76,7 @@ export const syncPageCloud = async (showMergeResolution = false) => {
       if (showMergeResolution) {
         OPTS.onlineJson = JSON.parse(response.content.page);
         OPTS.onlinePageVersion = response.content.version;
-        saveChanges();
+        write();
         document.querySelector('#mergeConflictResolver').style.display = 'block';
       }
 
