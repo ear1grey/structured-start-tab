@@ -63,6 +63,7 @@ function editPanelBase({ element, customActions = [], extraProperties = [], addi
 
   editWindow.init({
     title: 'Edit Panel', // TODO: Localise
+    ident: element.ident,
     customActions,
     callBack: (properties) => {
       element.header = properties.name;
@@ -103,41 +104,24 @@ function editPanelBase({ element, customActions = [], extraProperties = [], addi
 }
 
 export function editPanel(element) {
-  editPanelBase({
-    element,
-    customActions: [
-      {
-        name: 'export',
-        icon: 'file-code',
-        event: () => {
-          const json = domToJson({ children: [element] })[0];
-          io.downloadJson({ name: `${element.ident}.json`, data: json });
-        },
-      },
-      {
-        name: 'file-import',
-        icon: 'file-download',
-        event: ({ dialog }) => {
-          io.loadFile().then((content) => {
-            const json = JSON.parse(content);
-            const newElement = jsonElementToDom(json, true);
-            newElement.setAttribute('draggable', true);
-            element.replaceWith(newElement);
-            dialog.isVisible = false;
-          });
-        },
-      },
+  let cloudActions = [];
+  if (OPTS.cloud.enabled && OPTS.cloud.url) {
+    cloudActions = [
       {
         name: 'cloud-import',
         icon: 'cloud-download',
         event: ({ dialog }) => {
-          // TODO: only should cloud buttons if cloud sync is enabled and there's a URL
-          // TODO: localization
+          if (dialog.shadow.querySelector('#cloud-import-code')) {
+            dialog.shadow.querySelector('#cloud-import-code').remove();
+            return;
+          }
+
           const label = document.createElement('label');
+          label.id = 'cloud-import-code';
           const input = document.createElement('input');
-          input.placeholder = 'Panel Code';
+          input.placeholder = 'Panel Code'; // TODO: localization
           const button = document.createElement('button');
-          button.textContent = 'Import';
+          button.textContent = 'Import'; // TODO: localization
           button.addEventListener('click', () => {
             if (!input.value) return;
 
@@ -162,13 +146,40 @@ export function editPanel(element) {
       {
         name: 'cloud-export',
         icon: 'cloud-upload',
-        event: async () => {
-          // TODO: Show the panel id besides the panel name.
-          // TODO: if the panel is being shared, show 'delete from cloud' button instead
+        event: async ({ dialog }) => {
           const json = domToJson({ children: [element] })[0];
           const result = await sharePanelCloud(element.ident, json);
+          if (result.ok) { dialog.showIdent = true; }
         },
       },
+    ];
+  }
+
+  editPanelBase({
+    element,
+    customActions: [
+      {
+        name: 'export',
+        icon: 'file-code',
+        event: () => {
+          const json = domToJson({ children: [element] })[0];
+          io.downloadJson({ name: `${element.ident}.json`, data: json });
+        },
+      },
+      {
+        name: 'file-import',
+        icon: 'file-download',
+        event: ({ dialog }) => {
+          io.loadFile().then((content) => {
+            const json = JSON.parse(content);
+            const newElement = jsonElementToDom(json, true);
+            newElement.setAttribute('draggable', true);
+            element.replaceWith(newElement);
+            dialog.isVisible = false;
+          });
+        },
+      },
+      ...cloudActions,
     ],
   });
 }

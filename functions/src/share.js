@@ -53,3 +53,24 @@ export const sharePanel = (req, res) => {
     res.status(500).send({ error });
   });
 };
+
+export const deletePanel = (req, res) => {
+  const { id } = req.query;
+  admin.firestore().collection('shared').doc(id).delete().then(() => {
+    res.status(200).send('Panel deleted');
+  }).catch(error => {
+    res.status(500).send({ error });
+  });
+};
+
+export const deleteAllPanels = (req, res) => {
+  const { owner } = req.query;
+  admin.firestore().collection('shared').where('owner', '==', owner).get().then(snapshot => {
+    snapshot.forEach(doc => {
+      admin.firestore().collection('shared').doc(doc.id).delete();
+    });
+    res.status(200).send('Panels deleted');
+  }).catch(error => {
+    res.status(500).send({ error });
+  });
+};

@@ -35,6 +35,9 @@ const define = (template, css) => {
       this.$okBtn.addEventListener('click', () => {
         this.ok();
       });
+
+      this.showIdent = false;
+      this.onShowIdentChanged();
     }
 
     getPropValueByType(label, type) {
@@ -58,6 +61,7 @@ const define = (template, css) => {
     // Components
     get $dialog() { return this.shadow.querySelector('dialog'); }
     get $title() { return this.shadow.querySelector('#title'); }
+    get $ident() { return this.shadow.querySelector('#ident'); }
     get $customActionsContainer() { return this.shadow.querySelector('#custom-actions-container'); }
     get $main() { return this.shadow.querySelector('main'); }
     get $cancelBtn() { return this.shadow.querySelector('#edit-cancel'); }
@@ -66,6 +70,9 @@ const define = (template, css) => {
     // Props
     get isVisible() { return this.hasAttribute('visible'); }
     set isVisible(value) { value ? this.setAttribute('visible', '') : this.removeAttribute('visible'); }
+
+    get showIdent() { return this.hasAttribute('show-ident'); }
+    set showIdent(value) { value ? this.setAttribute('show-ident', '') : this.removeAttribute('show-ident'); }
 
     // Methods
     onVisibleChanged() {
@@ -76,8 +83,17 @@ const define = (template, css) => {
       }
     }
 
-    init({ title, customActions, properties, callBack, options }) {
+    onShowIdentChanged() {
+      if (this.showIdent) {
+        this.$ident.classList.remove('hidden');
+      } else {
+        this.$ident.classList.add('hidden');
+      }
+    }
+
+    init({ title, ident, customActions, properties, callBack, options }) {
       this.$title.textContent = title;
+      this.$ident.textContent = ident;
       this._callBack = callBack;
       this._options = options;
 
@@ -204,7 +220,7 @@ const define = (template, css) => {
 
     // Structure
     static get observedAttributes() {
-      return ['visible'];
+      return ['visible', 'show-ident'];
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -213,6 +229,9 @@ const define = (template, css) => {
       switch (name) {
         case 'visible':
           this.onVisibleChanged();
+          break;
+        case 'show-ident':
+          this.onShowIdentChanged();
           break;
         default:
           break;

@@ -111,6 +111,5 @@ export const sharePanelCloud = async (panelId, panel) => {
     },
   };
 
-  const response = await makeRequest(url, 'POST', body);
-  return response;
+  return makeRequest(url, 'POST', body);
 };
