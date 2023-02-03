@@ -393,8 +393,13 @@ export function addSpinner(element) {
   element.style.alignItems = 'center';
   // create the spinner element
   const spinner = document.createElement('p');
+  spinner.id = 'spinner';
   spinner.textContent = '⏳';
   spinner.style.marginRight = '0.5em';
   spinElement(spinner);
   element.prepend(spinner);
+}
+
+export function removeSpinner(element) {
+  element.querySelectorAll('#spinner').forEach(e => e.remove());
 }

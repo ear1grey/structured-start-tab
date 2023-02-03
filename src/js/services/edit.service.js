@@ -125,6 +125,7 @@ export function editPanel(element) {
           button.addEventListener('click', () => {
             if (!input.value) return;
 
+            dialog.setLoading(true);
             getPanelCloud(input.value)
               .then((panelContent) => {
                 if (panelContent != null) {
@@ -134,6 +135,10 @@ export function editPanel(element) {
 
                   dialog.isVisible = false;
                 }
+                dialog.setLoading(false);
+              })
+              .catch(() => {
+                dialog.setLoading(false);
               });
           });
 
@@ -147,9 +152,11 @@ export function editPanel(element) {
         name: 'cloud-export',
         icon: 'cloud-upload',
         event: async ({ dialog }) => {
+          dialog.setLoading(true);
           const json = domToJson({ children: [element] })[0];
           const result = await sharePanelCloud(element.ident, json);
           if (result.ok) { dialog.showIdent = true; }
+          dialog.setLoading(false);
         },
       },
     ];

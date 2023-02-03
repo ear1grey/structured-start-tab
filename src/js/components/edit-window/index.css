@@ -1,3 +1,7 @@
+p {
+  margin: 0;
+}
+
 dialog {
   display: flex;
   flex-direction: column;
@@ -44,7 +48,7 @@ header section p {
   transition: transform 0.2s;
 }
 
-.custom-action:hover {
+.custom-action:hover:not(.disabled) {
   transform: scale(1.1);
 }
 
@@ -160,4 +164,25 @@ footer {
 /* Attributes */
 .hidden {
   display: none;
+}
+
+*[disabled],
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: default;
+}
+
+@keyframes spin-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin-animation 1s infinite linear;
 }

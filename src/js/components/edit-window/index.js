@@ -1,5 +1,5 @@
 import * as ui from '../../services/ui.service.js';
-import { localizeHtml } from '../../lib/util.js';
+import { localizeHtml, addSpinner, removeSpinner } from '../../lib/util.js';
 
 fetch('/src/js/components/edit-window/index.html') // Load HTML
   .then(stream => stream.text())
@@ -216,6 +216,21 @@ const define = (template, css) => {
         this._callBack(resObject);
       }
       this.isVisible = false;
+    }
+
+    setLoading(value) {
+      if (value) addSpinner(this.$title);
+      else removeSpinner(this.$title);
+
+      this.shadow.querySelectorAll('button, a').forEach(el => {
+        if (value) {
+          el.classList.add('disabled');
+          el.disabled = true;
+        } else {
+          el.classList.remove('disabled');
+          el.disabled = false;
+        }
+      });
     }
 
     // Structure
