@@ -7,16 +7,9 @@ import { getAllBySelector } from '../lib/util.js';
 /** Update all agendas */
 export async function updateAgendasBackground() {
   await options.load();
-  for (let index = 0; index < OPTS.agendas.length; index++) {
-    const agenda = OPTS.agendas[index];
-    if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { continue; }
-    try {
-      const response = await fetch(agenda.agendaUrl);
-      const text = await response.text();
-      await parseIcs(text, index, agenda.email);
-    } catch (e) { }
-  }
-  await options.write();
+  OPTS.agendas.forEach(async (agenda) => {
+    await updateAgendaBackground(agenda);
+  });
 }
 
 /** Update specific agenda */
@@ -27,7 +20,6 @@ export async function updateAgendaBackground(agenda) {
     const text = await response.text();
     await parseIcs(text, agenda, agenda.email);
   } catch (e) { }
-  await options.write();
 }
 
 export function displayNewAgenda(agenda) {
@@ -51,7 +43,7 @@ export function getAgendasFromObject(obj, agendas = []) {
     obj.forEach((item) => {
       getAgendasFromObject(item, agendas);
     });
-  } else if (obj.content?.length > 0) {
+  } else if (Array.isArray(obj.content) && obj.content?.length > 0) {
     obj.content.forEach((item) => {
       getAgendasFromObject(item, agendas);
     });

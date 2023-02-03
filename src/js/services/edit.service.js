@@ -18,7 +18,7 @@ export function editLink(element) {
   const { backgroundColour, foregroundColour } = ui.getColours(element);
 
   editWindow.init({
-    title: 'Edit Link',
+    title: chrome.i18n.getMessage('edit_link'),
     callBack: (properties) => {
       // Name
       element.textContent = properties.name;
@@ -55,14 +55,14 @@ export function editLink(element) {
   });
 }
 
-function editPanelBase({ element, customActions = [], extraProperties = [], additionalCallback = null }) {
+function editPanelBase({ element, title, customActions = [], extraProperties = [], additionalCallback = null }) {
   const editWindow = document.createElement('edit-window');
   document.body.appendChild(editWindow);
 
   const { backgroundColour, foregroundColour } = ui.getColours(element);
 
   editWindow.init({
-    title: 'Edit Panel', // TODO: Localise
+    title: title || chrome.i18n.getMessage('edit_panel'),
     ident: element.ident,
     customActions,
     callBack: (properties) => {
@@ -119,9 +119,9 @@ export function editPanel(element) {
           const label = document.createElement('label');
           label.id = 'cloud-import-code';
           const input = document.createElement('input');
-          input.placeholder = 'Panel Code'; // TODO: localization
+          input.placeholder = chrome.i18n.getMessage('cloud_panel_code');
           const button = document.createElement('button');
-          button.textContent = 'Import'; // TODO: localization
+          button.textContent = chrome.i18n.getMessage('import');
           button.addEventListener('click', () => {
             if (!input.value) return;
 
@@ -146,6 +146,8 @@ export function editPanel(element) {
           label.appendChild(button);
 
           dialog.$customActionsContainer.querySelector('#cloud-import').insertAdjacentElement('beforebegin', label);
+
+          input.focus();
         },
       },
       {
@@ -196,6 +198,7 @@ export function editAgenda(element) {
   editPanelBase(
     {
       element,
+      title: chrome.i18n.getMessage('edit_agenda_panel'),
       extraProperties: [
         { name: 'agendaUrl', type: 'text', value: agenda?.agendaUrl || '', locale: { primary: 'url_agenda', secondary: 'placeholder_panel_url_agenda' } },
         { name: 'email', type: 'text', value: agenda?.email || '', locale: { primary: 'email_agenda', secondary: 'placeholder_panel_email_agenda' } },

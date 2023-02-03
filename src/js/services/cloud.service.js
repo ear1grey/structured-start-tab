@@ -3,8 +3,7 @@ import { OPTS, write } from '../lib/options.js';
 import { makeRequest } from './api.service.js';
 
 export const getPageCloud = async () => {
-  const identifier = (await chrome.identity.getProfileUserInfo()).id;
-  const url = `${OPTS.cloud.url}/getPage?id=${identifier}`;
+  const url = `${OPTS.cloud.url}/getPage?id=${OPTS.cloud.userId}`;
 
   const response = await makeRequest(url, 'GET');
 
@@ -19,10 +18,8 @@ export const getPageCloud = async () => {
 export const savePageCloud = async (object) => {
   const url = `${OPTS.cloud.url}/savePage`;
 
-  const identifier = (await chrome.identity.getProfileUserInfo()).id;
-
   const body = {
-    id: identifier,
+    id: OPTS.cloud.userId,
     content: {
       page: JSON.stringify(
         object
@@ -45,10 +42,9 @@ export const syncPageCloud = async (showMergeResolution = false) => {
   // TODO: this should be a parameter of the function
   const idsToIgnore = ['trash'];
   const url = `${OPTS.cloud.url}/syncPage`;
-  const identifier = (await chrome.identity.getProfileUserInfo()).id;
 
   const body = {
-    id: identifier,
+    id: OPTS.cloud.userId,
     content: {
       page: JSON.stringify(
         OPTS.json
@@ -99,14 +95,13 @@ export const getPanelCloud = async (panelId) => {
   return response.content.panel;
 };
 
-export const sharePanelCloud = async (panelId, panel) => {
+export const sharePanelCloud = (panelId, panel) => {
   const url = `${OPTS.cloud.url}/sharePanel`;
-  const identifier = (await chrome.identity.getProfileUserInfo()).id;
 
   const body = {
     id: panelId,
     content: {
-      owner: identifier,
+      owner: OPTS.cloud.userId,
       panel,
     },
   };

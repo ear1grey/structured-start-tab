@@ -12,7 +12,6 @@ export function downloadJson({ name, data }) {
 
 export function loadFile({ accept = '.json' } = {}) {
   return new Promise((resolve) => {
-    console.log('loadFile');
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = accept;

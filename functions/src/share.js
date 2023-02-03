@@ -30,7 +30,6 @@ export const getPanel = (req, res) => {
 };
 
 export const sharePanel = (req, res) => {
-  console.log('start');
   const { id, content } = req.body;
 
   admin.firestore().collection('shared').doc(id).get().then(doc => {
@@ -38,7 +37,6 @@ export const sharePanel = (req, res) => {
       admin.firestore().collection('shared').doc(id).set(content).then(() => {
         res.status(201).send('Panel shared');
       }).catch(error => {
-        console.log('errorA', error);
         res.send({ error });
       });
     } else {
@@ -49,7 +47,6 @@ export const sharePanel = (req, res) => {
       });
     }
   }).catch(error => {
-    console.log('errorB', error);
     res.status(500).send({ error });
   });
 };

@@ -637,7 +637,7 @@ const prepareSectionActions = () => {
     document.querySelector('#feedback').style.display = 'none';
   }
 
-  if (!OPTS.cloud.enabled) {
+  if (!OPTS.cloud.enabled || !OPTS.cloud.url) {
     document.querySelector('#forceCloudSync').style.display = 'none';
   }
 

@@ -326,6 +326,9 @@
   "cloud_warn": {
     "message": "Attention: cette fonctionnalité utilise votre identifiant Google et les données seront stockées sur les serveurs de Google. Si votre identifiant Google est compromis, vos données le seront également."
   },
+  "cloud_panel_code": {
+    "message": "Panel code"
+  },
   "title_agenda_nb": {
     "message": "Nombre de mots à afficher dans le titre de l'événement"
   },
