@@ -41,6 +41,9 @@
   "cancel": {
     "message": "Cancel"
   },
+  "delete": {
+    "message": "Delete"
+  },
   "edit_panel": {
     "message": "Editing Panel"
   },
@@ -305,6 +308,9 @@
   "cloud": {
     "message": "Cloud storage"
   },
+  "cloud_userId": {
+    "message": "User Id"
+  },
   "cloud_enabled": {
     "message": "Use cloud storage"
   },
@@ -320,11 +326,17 @@
   "cloud_syncPrivateStatus": {
     "message": "Sync panel private status"
   },
-  "cloud_warn": {
+  "cloud_warn_enable": {
     "message": "Warning: this feature uses your Google Id and the data will be stored on Google servers. If your Google Id is compromised, your data will be compromised too."
+  },
+  "cloud_warn_id_change": {
+    "message": "Warning: changing the user Id may result in data loss."
   },
   "cloud_panel_code": {
     "message": "Panel code"
+  },
+  "cloud_delete_shared_panels": {
+    "message": "Delete all shared panels"
   },
   "panel_export_file": {
     "message": "Export panel to file"

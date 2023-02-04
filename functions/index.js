@@ -15,3 +15,4 @@ export const syncPage = functions.https.onRequest(sync.syncPage);
 export const getAllPanels = functions.https.onRequest(share.getAllPanels);
 export const getPanel = functions.https.onRequest(share.getPanel);
 export const sharePanel = functions.https.onRequest(share.sharePanel);
+export const deleteAllSharedPanels = functions.https.onRequest(share.deleteAllPanels);

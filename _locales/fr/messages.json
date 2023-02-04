@@ -41,6 +41,9 @@
   "cancel": {
     "message": "Annuler"
   },
+  "delete": {
+    "message": "Supprimer"
+  },
   "edit_panel": {
     "message": "Editer le panneau"
   },
@@ -308,6 +311,9 @@
   "cloud": {
     "message": "Stockage en ligne"
   },
+  "cloud_userId": {
+    "message": "Identifiant utilisateur"
+  },
   "cloud_enabled": {
     "message": "Utiliser le stockage en nuage"
   },
@@ -323,11 +329,17 @@
   "cloud_syncPrivateStatus": {
     "message": "Statut privé du panneau de synchronisation"
   },
-  "cloud_warn": {
+  "cloud_warn_enable": {
     "message": "Attention: cette fonctionnalité utilise votre identifiant Google et les données seront stockées sur les serveurs de Google. Si votre identifiant Google est compromis, vos données le seront également."
+  },
+  "cloud_warn_id_change": {
+    "message": "Attention: la modification de l'identifiant de l'utilisateur peut entraîner une perte de données."
   },
   "cloud_panel_code": {
     "message": "Panel code"
+  },
+  "cloud_delete_shared_panels": {
+    "message": "Supprimer tous les panneaux partagés"
   },
   "panel_export_file": {
     "message": "Exporter le panneau"

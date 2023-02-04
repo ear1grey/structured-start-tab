@@ -400,6 +400,7 @@ export function addSpinner(element) {
   element.prepend(spinner);
 }
 
-export function removeSpinner(element) {
+export function removeSpinner(element, display) {
   element.querySelectorAll('#spinner').forEach(e => e.remove());
+  if (display) element.style.display = display;
 }

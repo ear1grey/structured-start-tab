@@ -108,3 +108,8 @@ export const sharePanelCloud = (panelId, panel) => {
 
   return makeRequest(url, 'POST', body);
 };
+
+export const deleteAllSharedPanels = () => {
+  const url = `${OPTS.cloud.url}/deleteAllSharedPanels?owner=${OPTS.cloud.userId}`;
+  return makeRequest(url, 'DELETE');
+};
