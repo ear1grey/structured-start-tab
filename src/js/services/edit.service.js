@@ -109,6 +109,7 @@ export function editPanel(element) {
     cloudActions = [
       {
         name: 'cloud-import',
+        title: chrome.i18n.getMessage('panel_import_cloud'),
         icon: 'cloud-download',
         event: ({ dialog }) => {
           if (dialog.shadow.querySelector('#cloud-import-code')) {
@@ -152,6 +153,7 @@ export function editPanel(element) {
       },
       {
         name: 'cloud-export',
+        title: chrome.i18n.getMessage('panel_export_cloud'),
         icon: 'cloud-upload',
         event: async ({ dialog }) => {
           dialog.setLoading(true);
@@ -169,6 +171,7 @@ export function editPanel(element) {
     customActions: [
       {
         name: 'export',
+        title: chrome.i18n.getMessage('panel_export_file'),
         icon: 'file-code',
         event: () => {
           const json = domToJson({ children: [element] })[0];
@@ -177,6 +180,7 @@ export function editPanel(element) {
       },
       {
         name: 'file-import',
+        title: chrome.i18n.getMessage('panel_import_file'),
         icon: 'file-download',
         event: ({ dialog }) => {
           io.loadFile().then((content) => {

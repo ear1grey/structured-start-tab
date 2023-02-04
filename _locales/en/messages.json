@@ -326,6 +326,18 @@
   "cloud_panel_code": {
     "message": "Panel code"
   },
+  "panel_export_file": {
+    "message": "Export panel to file"
+  },
+  "panel_import_file": {
+    "message": "Import panel from file"
+  },
+  "panel_export_cloud": {
+    "message": "Export panel to cloud"
+  },
+  "panel_import_cloud": {
+    "message": "Import panel from cloud"
+  },
   "title_agenda_nb": {
     "message": "Number of words to be displayed from the event title"
   },
