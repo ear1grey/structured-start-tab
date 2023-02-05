@@ -323,6 +323,9 @@
   "cloud_autoAdd": {
     "message": "Ajouter automatiquement de nouveaux panneaux"
   },
+  "cloud_autoDelete": {
+    "message": "Supprimer automatiquement les panneaux supprimés"
+  },
   "cloud_syncFoldedStatus": {
     "message": "État plié du panneau de synchronisation"
   },

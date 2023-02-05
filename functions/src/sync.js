@@ -46,59 +46,6 @@ const pushPage = (id, content, res) => {
   });
 };
 
-/**
- * @param {*} incoming - the incoming page to save
- * @param {*} cloud - the page currently saved in the cloud
- * @param {*} options - options for the sync
- */
-const getSyncAction = (incoming, cloud, { autoAdd = false, syncFold = true, syncPrivate = true } = {}) => {
-  if ((incoming == null && cloud == null) || !Array.isArray(incoming)) return 'none';
-
-  // clean-up content
-  incoming = incoming.filter(elem => elem.id !== 'trash');
-  cloud = cloud.filter(elem => elem.id !== 'trash');
-
-  // if the lengths are different and we can't auto add, we have a conflict
-  if (incoming.length < cloud.length || (incoming.length > cloud.length && !autoAdd)) return 'conflict';
-
-  // TODO: push only new elements and not the whole page
-
-  for (const incomingElement of incoming.filter(elem => elem.id !== 'trash')) {
-    const cloudElement = cloud.find(elem => elem.ident === incomingElement.ident);
-    if (!cloudElement) {
-      if (autoAdd) return 'push';
-      return 'conflict';
-    }
-
-    const contentAction = getSyncAction(incomingElement.content, cloudElement.content, { autoAdd, syncFold, syncPrivate });
-    if (contentAction !== 'none') return contentAction;
-
-    if (incomingElement.backgroundColour !== cloudElement.backgroundColour ||
-      incomingElement.textColour !== cloudElement.textColour ||
-      incomingElement.type !== cloudElement.type ||
-
-      // panel only properties
-      incomingElement.direction !== cloudElement.direction ||
-      incomingElement.grow !== cloudElement.grow ||
-      incomingElement.header !== cloudElement.header ||
-      incomingElement.id !== cloudElement.id ||
-      incomingElement.singleLineDisplay !== cloudElement.singleLineDisplay ||
-      incomingElement.textColour !== cloudElement.textColour ||
-      incomingElement.type !== cloudElement.type ||
-      // optional panel properties
-      (syncFold ? incomingElement.folded !== cloudElement.folded : false) ||
-      (syncPrivate ? incomingElement.private !== cloudElement.private : false) ||
-
-      // link only properties
-      incomingElement.name !== cloudElement.name ||
-      incomingElement.url !== cloudElement.url) {
-      return 'push';
-    }
-  }
-
-  return 'none';
-};
-
 export const getPage = async (req, res) => {
   const id = req.query.id;
   const { status, content } = await getPageByUserId(id);
@@ -126,25 +73,121 @@ export const syncPage = async (req, res) => {
   const id = req.body.id;
   const incomingContent = req.body.content;
 
-  const { status, content } = await getPageByUserId(id);
+  const { status: cloudStatus, content: cloudContent } = await getPageByUserId(id);
 
-  if (status === 404) { // if we don't have a page, we create one
+  if (cloudStatus === 404) { // if we don't have a page, we create one
     pushPage(id, incomingContent, res);
     return;
-  } else if (status !== 200) {
-    res.status(status).send(content);
+  } else if (cloudStatus !== 200) {
+    res.status(cloudStatus).send(cloudContent);
     return;
   }
 
-  const syncAction = getSyncAction(JSON.parse(incomingContent.page), JSON.parse(content.page), incomingContent.options);
-  switch (syncAction) {
-    case 'push':
-      pushPage(id, incomingContent, res);
-      return;
-    case 'conflict':
-      res.status(409).send(content); // return the current saved content to be dealt with on the client side
-      return;
-    default:
-      res.status(200).send(content);
+  const newPage = [];
+  const conflictIdents = [];
+  const updatedElements = [];
+  const cloudPage = JSON.parse(cloudContent.page);
+  buildResultingPage(cloudPage, JSON.parse(incomingContent.page), incomingContent.options, newPage, conflictIdents, updatedElements);
+
+  if (conflictIdents.length > 0) {
+    res.status(409).send({ conflicts: conflictIdents, version: cloudContent.version, cloudPage: cloudContent.page });
+  } else if (updatedElements.length > 0) {
+    pushPage(id, { version: incomingContent.version, page: JSON.stringify(newPage) }, res);
+  } else {
+    res.status(200).send(cloudContent);
+  }
+};
+
+const elementBasePropertiesEqual = (incomingElement, cloudElement, { syncFold, syncPrivate }) => {
+  return incomingElement.backgroundColour === cloudElement.backgroundColour &&
+    incomingElement.textColour === cloudElement.textColour &&
+    incomingElement.type === cloudElement.type &&
+
+    // panel only properties
+    incomingElement.direction === cloudElement.direction &&
+    incomingElement.header === cloudElement.header &&
+    incomingElement.id === cloudElement.id &&
+    incomingElement.singleLineDisplay === cloudElement.singleLineDisplay &&
+    incomingElement.textColour === cloudElement.textColour &&
+    incomingElement.type === cloudElement.type &&
+    // optional panel properties
+    (syncFold ? incomingElement.folded === cloudElement.folded : true) &&
+    (syncPrivate ? incomingElement.private === cloudElement.private : true) &&
+    // link only properties
+    incomingElement.name === cloudElement.name &&
+    incomingElement.url === cloudElement.url;
+};
+
+const buildResultingPage = (
+  cloudObject, incomingObject, { autoAdd = false, autoDelete = false, syncFold = true, syncPrivate = true } = {}, resultPage, conflictIdents, updatedElements) => {
+  // clean-up content!!
+  if (Array.isArray(incomingObject)) incomingObject = incomingObject.filter(elem => elem.id !== 'trash');
+  if (Array.isArray(cloudObject)) cloudObject = cloudObject.filter(elem => elem.id !== 'trash');
+
+  // If they are both arrays, check all the elements
+  if (Array.isArray(incomingObject) && Array.isArray(cloudObject)) {
+    // Go through all the elements of the incoming page
+    for (const incomingElement of incomingObject) {
+      const cloudElementIndex = cloudObject.findIndex(elem => elem.ident === incomingElement.ident);
+      const cloudElement = cloudElementIndex !== -1 ? cloudObject[cloudElementIndex] : null;
+
+
+      if (!cloudElement) { // Cloud element not found
+        if (!autoAdd) {
+          conflictIdents.push(incomingElement.ident);
+          continue;
+        }
+        resultPage.push(incomingElement);
+        updatedElements.push(incomingElement);
+      } else { // Cloud element found
+        cloudObject.splice(cloudElementIndex, 1);
+
+        if (!elementBasePropertiesEqual(incomingElement, cloudElement, { syncFold, syncPrivate })) {
+          conflictIdents.push(incomingElement.ident);
+          continue;
+        }
+
+        const newElement = { ...cloudElement };
+        if (newElement.content) newElement.content = []; // Don't automatically add the content already present
+        if (incomingElement.content) {
+          const contentConflictIdents = [];
+          buildResultingPage(cloudElement.content, incomingElement.content, { autoAdd, autoDelete, syncFold, syncPrivate }, newElement.content, contentConflictIdents, updatedElements);
+          if (contentConflictIdents.length > 0) {
+            for (const contentConflictIdent of contentConflictIdents) {
+              conflictIdents.push(contentConflictIdent);
+            }
+            continue;
+          }
+        }
+        resultPage.push(newElement);
+      }
+    }
+
+    // Elements that are left in the cloudObject but are not present in the incomingObject
+    if (cloudObject.length > 0) {
+      if (autoDelete) {
+        updatedElements.push(...cloudObject);
+      } else {
+        for (const cloudElement of cloudObject) {
+          if (cloudElement.content == null) {
+            conflictIdents.push(cloudElement.ident);
+          }
+        }
+      }
+    }
+  } else { // If they are not both arrays, check the base properties
+    if (!elementBasePropertiesEqual(incomingObject, cloudObject, { syncFold, syncPrivate })) {
+      conflictIdents.push(incomingObject.ident);
+    }
+    if (incomingObject.content) {
+      const contentConflictIdents = [];
+      buildResultingPage(cloudObject.content, incomingObject.content, { autoAdd, autoDelete, syncFold, syncPrivate }, resultPage);
+      if (contentConflictIdents.length > 0) {
+        for (const contentConflictIdent of contentConflictIdents) {
+          conflictIdents.push(contentConflictIdent);
+        }
+      }
+    }
+    resultPage.push(cloudObject);
   }
 };

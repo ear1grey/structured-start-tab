@@ -320,6 +320,9 @@
   "cloud_autoAdd": {
     "message": "Automatically add new panels"
   },
+  "cloud_autoDelete": {
+    "message": "Automatically delete panels"
+  },
   "cloud_syncFoldedStatus": {
     "message": "Sync panel folded status"
   },

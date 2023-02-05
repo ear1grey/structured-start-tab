@@ -52,6 +52,7 @@ export const syncPageCloud = async (showMergeResolution = false) => {
       version: OPTS.cloud.version,
       options: {
         autoAdd: OPTS.cloud.autoAdd,
+        autoDelete: OPTS.cloud.autoDelete,
         syncFold: OPTS.cloud.syncFoldStatus,
         syncPrivate: OPTS.cloud.syncPrivateStatus,
       },
@@ -70,7 +71,7 @@ export const syncPageCloud = async (showMergeResolution = false) => {
       OPTS.cloud.hasConflict = true;
 
       if (showMergeResolution) {
-        OPTS.onlineJson = JSON.parse(response.content.page);
+        OPTS.onlineJson = JSON.parse(response.content.cloudPage);
         OPTS.onlinePageVersion = response.content.version;
         write();
         document.querySelector('#mergeConflictResolver').style.display = 'block';

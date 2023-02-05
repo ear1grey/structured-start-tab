@@ -40,6 +40,7 @@ export const OPTS = {
     url: '',
 
     autoAdd: false,
+    autoDelete: false,
     syncFoldStatus: false,
     syncPrivateStatus: false,
   },

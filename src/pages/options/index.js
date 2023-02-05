@@ -77,6 +77,7 @@ function updatePrefsWithPage() {
   getCheckBox('cloud.enabled');
   getText('cloud.url');
   getCheckBox('cloud.autoAdd');
+  getCheckBox('cloud.autoDelete');
   getCheckBox('cloud.syncFoldStatus');
   getCheckBox('cloud.syncPrivateStatus');
 }
@@ -105,6 +106,7 @@ function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'cloud.enabled');
   setText(prefs, 'cloud.url');
   setCheckBox(prefs, 'cloud.autoAdd');
+  setCheckBox(prefs, 'cloud.autoDelete');
   setCheckBox(prefs, 'cloud.syncFoldStatus');
   setCheckBox(prefs, 'cloud.syncPrivateStatus');
 
@@ -213,6 +215,7 @@ function createPageWithPrefs(prefs) {
     ]);
     create(cloud, 'text', { id: 'cloud.url' }, chrome.i18n.getMessage('cloud_url'));
     create(cloud, 'checkbox', { id: 'cloud.autoAdd' }, chrome.i18n.getMessage('cloud_autoAdd'), false);
+    create(cloud, 'checkbox', { id: 'cloud.autoDelete' }, chrome.i18n.getMessage('cloud_autoDelete'), false);
     create(cloud, 'checkbox', { id: 'cloud.syncFoldStatus' }, chrome.i18n.getMessage('cloud_syncFoldedStatus'), false);
     create(cloud, 'checkbox', { id: 'cloud.syncPrivateStatus' }, chrome.i18n.getMessage('cloud_syncPrivateStatus'), false);
     create(cloud, 'button', { btnText: chrome.i18n.getMessage('delete') }, chrome.i18n.getMessage('cloud_delete_shared_panels'), null, false, [
