@@ -1,5 +1,6 @@
 import { OPTS, write } from '../lib/options.js';
 import { makeRequest } from './api.service.js';
+import { jsonToDom } from './parser.service.js';
 
 export const savePageCloud = async (object) => {
   const url = `${OPTS.cloud.url}/savePage`;
@@ -17,7 +18,7 @@ export const savePageCloud = async (object) => {
   return await makeRequest(url, 'POST', body);
 };
 
-export const syncPageCloud = async (showMergeResolution = false, ignoreConflict = false) => {
+export const syncPageCloud = async ({ window = null, ignoreConflict = false } = {}) => {
   if (!OPTS.cloud.enabled || (OPTS.cloud.hasConflict && !ignoreConflict)) return;
 
   if (OPTS.json == null || OPTS.json.length === 0) {
@@ -50,15 +51,18 @@ export const syncPageCloud = async (showMergeResolution = false, ignoreConflict 
 
   switch (response.status) {
     case 200:
+      OPTS.cloud.version = response.content.version;
+      OPTS.cloud.hasConflict = false;
+      break;
     case 201:
       OPTS.cloud.version = response.content.version;
+      OPTS.cloud.hasConflict = false;
+      OPTS.json = JSON.parse(response.content.page);
+      jsonToDom(window, OPTS.json);
       break;
     case 409:
       OPTS.cloud.hasConflict = true;
-      if (showMergeResolution) {
-        // TODO: show elements with conflict (response.conflicts)
-        console.log('Conflict detected', response.conflicts);
-
+      if (window) {
         OPTS.cloud.conflictData = {
           cloudJson: JSON.parse(response.content.cloudPage),
           cloudPageVersion: response.content.version,

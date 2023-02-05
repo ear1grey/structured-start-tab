@@ -36,7 +36,7 @@ const pushPage = (id, content, res) => {
       });
     } else {
       admin.firestore().collection('pages').doc(id).update(content).then(() => {
-        res.status(201).send({ version: content.version });
+        res.status(201).send({ cloudPage: content.page, cloudVersion: content.version });
       }).catch(error => {
         res.status(500).send({ error });
       });
@@ -92,7 +92,7 @@ export const syncPage = async (req, res) => {
   if (conflictIdents.length > 0) {
     res.status(409).send({ conflicts: conflictIdents, version: cloudContent.version, cloudPage: cloudContent.page });
   } else if (updatedElements.length > 0) {
-    pushPage(id, { version: incomingContent.version, page: JSON.stringify(newPage) }, res);
+    pushPage(id, { version: cloudContent.version, page: JSON.stringify(newPage) }, res);
   } else {
     res.status(200).send(cloudContent);
   }

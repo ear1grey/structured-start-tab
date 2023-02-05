@@ -621,7 +621,7 @@ const prepareSectionActions = () => {
   }
 
   document.querySelector('#forceCloudSync a').addEventListener('click', () => {
-    syncPageCloud(true);
+    syncPageCloud({ window: els.main });
   });
 };
 
@@ -658,7 +658,7 @@ async function prepareAll() {
 
   prepareSectionActions();
 
-  if (OPTS.cloud.enabled && OPTS.cloud.hasConflict) { syncPageCloud(true, true); }
+  if (OPTS.cloud.enabled && OPTS.cloud.hasConflict) { syncPageCloud({ window: els.main, ignoreConflict: true }); }
 }
 
 
