@@ -131,20 +131,20 @@ const buildResultingPage = (
       const cloudElementIndex = cloudObject.findIndex(elem => elem.ident === incomingElement.ident);
       const cloudElement = cloudElementIndex !== -1 ? cloudObject[cloudElementIndex] : null;
 
-
       if (!cloudElement) { // Cloud element not found
         if (!autoAdd) {
           conflictIdents.push(incomingElement.ident);
           continue;
         }
+
         resultPage.push(incomingElement);
         updatedElements.push(incomingElement);
       } else { // Cloud element found
         cloudObject.splice(cloudElementIndex, 1);
 
+        // Check if the panel properties are different
         if (!elementBasePropertiesEqual(incomingElement, cloudElement, { syncFold, syncPrivate })) {
           conflictIdents.push(incomingElement.ident);
-          continue;
         }
 
         const newElement = { ...cloudElement };
@@ -156,7 +156,6 @@ const buildResultingPage = (
             for (const contentConflictIdent of contentConflictIdents) {
               conflictIdents.push(contentConflictIdent);
             }
-            continue;
           }
         }
         resultPage.push(newElement);

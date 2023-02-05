@@ -10,7 +10,7 @@ import * as util from './lib/util.js';
 import * as ui from './services/ui.service.js';
 
 import { domToJson, jsonToDom } from './services/parser.service.js';
-import { getPageCloud, syncPageCloud } from './services/cloud.service.js';
+import { syncPageCloud } from './services/cloud.service.js';
 
 import { OPTS } from './lib/options.js';
 import { prepareDrag } from './services/drag.service.js';
@@ -605,27 +605,6 @@ function migrateLinks() {
   }
 }
 
-async function loadPageCloud() {
-  if (!OPTS.cloud.hasConflict) return;
-
-  const [onlinePage, onlinePageVersion] = await getPageCloud();
-
-  const parsedPage = JSON.parse(onlinePage);
-
-  const isEqual = util.isContentEqual(parsedPage, OPTS.json);
-
-  if (!isEqual) {
-    OPTS.onlineJson = parsedPage;
-    OPTS.onlinePageVersion = onlinePageVersion;
-    saveChanges();
-    document.querySelector('#mergeConflictResolver').style.display = 'block';
-  } else {
-    OPTS.cloud.version = onlinePageVersion + 1;
-    OPTS.cloud.hasConflict = false;
-    options.write();
-  }
-}
-
 const prepareSectionActions = () => {
   // Merge conflict resolver trigger
   document.querySelector('#mergeConflictResolver').addEventListener('click', () => {
@@ -679,7 +658,7 @@ async function prepareAll() {
 
   prepareSectionActions();
 
-  if (OPTS.cloud.enabled) { await loadPageCloud(); }
+  if (OPTS.cloud.enabled && OPTS.cloud.hasConflict) { syncPageCloud(true, true); }
 }
 
 

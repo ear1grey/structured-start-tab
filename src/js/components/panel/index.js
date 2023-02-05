@@ -21,7 +21,9 @@ class PanelComponent extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['background-color', 'text-color', 'direction', 'single-line-display', 'private', 'header', 'folded', 'grow', 'blur'];
+    return [
+      'background-color', 'text-color', 'direction', 'single-line-display', 'private', 'header', 'folded', 'grow', 'blur', 'temp-bg-colour', 'temp-text-colour',
+    ];
   }
 
   // Getters & setters
@@ -30,10 +32,18 @@ class PanelComponent extends HTMLElement {
   get ident() { return this.getAttribute('ident'); }
 
   // Exclamation mark used to identify if the value is default or not
-  get backgroundColour() { return this.getAttribute('background-color') || '!#00000019'; }
+  get backgroundColour() {
+    return this.tempBackgroundColour
+      ? this.tempBackgroundColour
+      : this.getAttribute('background-color') || '!#00000019';
+  }
+
   set backgroundColour(color) {
     this.setAttribute('background-color', color.slice(0, 1) + color.slice(1).replace('!', ''));
   }
+
+  get tempBackgroundColour() { return this.getAttribute('temp-bg-colour'); }
+  set tempBackgroundColour(color) { this.setAttribute('temp-bg-colour', color); }
 
   get textColour() { return this.getAttribute('text-color') || '!#ddddddaN'; }
   set textColour(color) {
@@ -91,8 +101,14 @@ class PanelComponent extends HTMLElement {
     }
   }
 
+  // Methods
   toggleFold() {
     this.folded = !this.folded;
+  }
+
+  removeTemps() {
+    this.removeAttribute('temp-bg-colour');
+    this.removeAttribute('temp-text-colour');
   }
 
   // Event handlers
@@ -186,6 +202,9 @@ class PanelComponent extends HTMLElement {
         break;
       case 'blur':
         this.onBlurChange();
+        break;
+      case 'temp-bg-colour':
+        this.onBackgroundColourChange();
         break;
     }
   }

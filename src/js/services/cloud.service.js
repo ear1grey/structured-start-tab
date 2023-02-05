@@ -1,38 +1,8 @@
 import { OPTS, write } from '../lib/options.js';
-
 import { makeRequest } from './api.service.js';
 
-export const getPageCloud = async () => {
-  const url = `${OPTS.cloud.url}/getPage?id=${OPTS.cloud.userId}`;
-
-  const response = await makeRequest(url, 'GET');
-
-  // If there is no page available yet, don't load
-  if ((response.status === 404 && response.content?.error) || response.status === 204) {
-    return;
-  }
-
-  return [response.content.page, response.content.version];
-};
-
-export const savePageCloud = async (object) => {
-  const url = `${OPTS.cloud.url}/savePage`;
-
-  const body = {
-    id: OPTS.cloud.userId,
-    content: {
-      page: JSON.stringify(
-        object
-          .filter(panel => panel.id !== 'trash')), // make sure to exclude the trash panel
-      version: OPTS.cloud.version,
-    },
-  };
-
-  return await makeRequest(url, 'POST', body);
-};
-
-export const syncPageCloud = async (showMergeResolution = false) => {
-  if (!OPTS.cloud.enabled || OPTS.cloud.hasConflict) return;
+export const syncPageCloud = async (showMergeResolution = false, ignoreConflict = false) => {
+  if (!OPTS.cloud.enabled || (OPTS.cloud.hasConflict && !ignoreConflict)) return;
 
   if (OPTS.json == null || OPTS.json.length === 0) {
     console.warn('No page to save');
@@ -69,10 +39,16 @@ export const syncPageCloud = async (showMergeResolution = false) => {
       break;
     case 409:
       OPTS.cloud.hasConflict = true;
-
       if (showMergeResolution) {
-        OPTS.onlineJson = JSON.parse(response.content.cloudPage);
-        OPTS.onlinePageVersion = response.content.version;
+        // TODO: show elements with conflict (response.conflicts)
+        console.log('Conflict detected', response.conflicts);
+
+        OPTS.cloud.conflictData = {
+          cloudJson: JSON.parse(response.content.cloudPage),
+          cloudPageVersion: response.content.version,
+          conflictingElements: response.content.conflicts,
+        };
+
         write();
         document.querySelector('#mergeConflictResolver').style.display = 'block';
       }
