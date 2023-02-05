@@ -53,6 +53,9 @@ export function editLink(element) {
       allowEmptyUrl: OPTS.allowEmptyUrl,
     },
   });
+
+  // Make sure that links are always draggable
+  element.setAttribute('draggable', 'true');
 }
 
 function editPanelBase({ element, title, customActions = [], extraProperties = [], additionalCallback = null }) {
@@ -135,6 +138,7 @@ export function editPanel(element) {
                   element.replaceWith(newElement);
 
                   dialog.isVisible = false;
+                  saveChanges();
                 }
                 dialog.setLoading(false);
               })

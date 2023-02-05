@@ -1,6 +1,22 @@
 import { OPTS, write } from '../lib/options.js';
 import { makeRequest } from './api.service.js';
 
+export const savePageCloud = async (object) => {
+  const url = `${OPTS.cloud.url}/savePage`;
+
+  const body = {
+    id: OPTS.cloud.userId,
+    content: {
+      page: JSON.stringify(
+        object
+          .filter(panel => panel.id !== 'trash')), // make sure to exclude the trash panel
+      version: OPTS.cloud.version,
+    },
+  };
+
+  return await makeRequest(url, 'POST', body);
+};
+
 export const syncPageCloud = async (showMergeResolution = false, ignoreConflict = false) => {
   if (!OPTS.cloud.enabled || (OPTS.cloud.hasConflict && !ignoreConflict)) return;
 

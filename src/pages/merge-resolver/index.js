@@ -56,6 +56,14 @@ const prepareElements = async () => {
       element.tempBackgroundColour = newBackgroundColour;
     }
   });
+
+  // Sync scrolls
+  els.left.addEventListener('scroll', () => {
+    els.right.scrollTop = els.left.scrollTop;
+  });
+  els.right.addEventListener('scroll', () => {
+    els.left.scrollTop = els.right.scrollTop;
+  });
 };
 
 const disableAllButtons = () => {
