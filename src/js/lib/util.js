@@ -404,3 +404,13 @@ export function removeSpinner(element, display) {
   element.querySelectorAll('#spinner').forEach(e => e.remove());
   if (display) element.style.display = display;
 }
+
+export function loadAsync(path) {
+  return new Promise((resolve) => {
+    fetch(path)
+      .then(stream => stream.text())
+      .then(text => {
+        resolve(text);
+      });
+  });
+}
