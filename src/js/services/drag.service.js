@@ -1,8 +1,10 @@
-import { OPTS } from '../../js/lib/options.js';
 import * as util from '../lib/util.js';
 import * as toast from '../lib/toast.js';
-import { saveChanges, editStart } from '../index.js';
 import * as tooltip from '../lib/tooltip.js';
+
+import { OPTS } from '../../js/lib/options.js';
+import { saveChanges } from '../index.js';
+import { editLink, editPanel, editAgenda } from './edit.service.js';
 
 let dragging;
 let els;
@@ -100,7 +102,7 @@ function dragOver(e) {
   }
 
   const target = e.target;
-  if (target === els.toolbar || els.toolbar?.contains(target) || target === els.bin || target.id.includes('agenda')) {
+  if (target === els.toolbar || els.toolbar?.contains(target) || target === els.bin || eventPathInvalid(e)) {
     e.preventDefault();
     dragging.dummy?.remove();
     if (target === els.bin) { els.bin.classList.add('over'); }
@@ -149,14 +151,18 @@ function dragDrop(e) {
       saveChanges();
       toast.html('locked', chrome.i18n.getMessage('locked_moved_to_trash'));
     }
-  } else if (e.target === els.toolbar || els.toolbar?.contains(e.target)) {
+  } else if (e.target === els.toolbar || // Invalid drop elements
+      els.toolbar?.contains(e.target) ||
+      eventPathInvalid(e) ||
+      e.target.id.includes('bookmark') // can't drop on bookmarks
+  ) {
     util.replaceElementInOriginalPosition();
+    dragging.dummy.remove();
+    dragging.dummy = null;
   } else {
     if (!dragging.startedOnThisPage) {
       extractDataFromDrop(e);
     }
-    // handle all cases
-    // Not pushing the changes here because it can cause too many requests being sent. Instead, rely on scheduled saves
     saveChanges();
   }
 }
@@ -164,7 +170,14 @@ function dragDrop(e) {
 function dragEnd() {
   try {
     if (!dragging || !dragging.el.classList.contains('dragging')) {
-      if (OPTS.editOnNewDrop && dragging.el.classList.contains('new') && dragging.dummy && els.main) { editStart(dragging.el); }
+      if (OPTS.editOnNewDrop && dragging.el.classList.contains('new') && dragging.dummy && els.main) {
+        // trigger edit window
+        if (dragging.el.tagName === 'A') {
+          editLink(dragging.el);
+        } else if (dragging.el.id.startsWith('agenda')) {
+          editAgenda(dragging.el);
+        } else { editPanel(dragging.el); }
+      }
       return;
     }
     if (OPTS.lock) {
@@ -222,4 +235,10 @@ function extractDataFromDrop(e) {
   } else {
     dragging.el.remove();
   }
+}
+
+function eventPathInvalid(e) {
+  const path = (e.path || (e.composedPath && e.composedPath()));
+  const invalidIds = ['agenda', 'bookmark', 'sidebar'];
+  return path.some(elem => invalidIds.some(id => elem.id?.includes(id)));
 }

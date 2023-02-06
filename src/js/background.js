@@ -87,7 +87,7 @@ function menuInstaller() {
 
   // Update agendas every 10 minutes
   chrome.alarms.create('agendaUpdate', {
-    periodInMinutes: 15,
+    periodInMinutes: 10,
   });
 
   // Save page to the cloud every 10 minutes

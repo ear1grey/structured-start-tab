@@ -1,5 +1,6 @@
 @import url("../../style/vars.css");
 @import url("../../style/toast.css");
+@import url("../../style/animations.css");
 
 body {
   background: var(--bg-light);

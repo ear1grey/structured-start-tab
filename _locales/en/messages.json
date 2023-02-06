@@ -41,6 +41,9 @@
   "cancel": {
     "message": "Cancel"
   },
+  "delete": {
+    "message": "Delete"
+  },
   "edit_panel": {
     "message": "Editing Panel"
   },
@@ -209,6 +212,9 @@
   "editOnNewDrop": {
     "message": "Open edit dialogue after create and drop new panel/link"
   },
+  "allowEmptyUrl": {
+    "message": "Allow empty URL to be saved for links"
+  },
   "top_sites_panel": {
     "message": "Top sites"
   },
@@ -302,6 +308,9 @@
   "cloud": {
     "message": "Cloud storage"
   },
+  "cloud_userId": {
+    "message": "User Id"
+  },
   "cloud_enabled": {
     "message": "Use cloud storage"
   },
@@ -311,14 +320,38 @@
   "cloud_autoAdd": {
     "message": "Automatically add new panels"
   },
+  "cloud_autoDelete": {
+    "message": "Automatically delete panels"
+  },
   "cloud_syncFoldedStatus": {
     "message": "Sync panel folded status"
   },
   "cloud_syncPrivateStatus": {
     "message": "Sync panel private status"
   },
-  "cloud_warn": {
+  "cloud_warn_enable": {
     "message": "Warning: this feature uses your Google Id and the data will be stored on Google servers. If your Google Id is compromised, your data will be compromised too."
+  },
+  "cloud_warn_id_change": {
+    "message": "Warning: changing the user Id may result in data loss."
+  },
+  "cloud_panel_code": {
+    "message": "Panel code"
+  },
+  "cloud_delete_shared_panels": {
+    "message": "Delete all shared panels"
+  },
+  "panel_export_file": {
+    "message": "Export panel to file"
+  },
+  "panel_import_file": {
+    "message": "Import panel from file"
+  },
+  "panel_export_cloud": {
+    "message": "Export panel to cloud"
+  },
+  "panel_import_cloud": {
+    "message": "Import panel from cloud"
   },
   "title_agenda_nb": {
     "message": "Number of words to be displayed from the event title"

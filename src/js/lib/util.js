@@ -6,6 +6,18 @@ export function prepareCSSVariables(OPTS) {
   document.documentElement.style.setProperty('--page-font-size', `${OPTS.fontsize}%`);
   document.documentElement.classList.toggle('use-custom-scrollbar', OPTS.useCustomScrollbar);
 }
+
+export function getAllBySelector(element, selector) {
+  const elements = [...element.querySelectorAll(selector)];
+  for (const child of element.children) {
+    elements.push(...getAllBySelector(child, selector));
+  }
+  if (element.shadowRoot) {
+    elements.push(...getAllBySelector(element.shadowRoot, selector));
+  }
+  return [...new Set(elements)];
+}
+
 export function localizeHtml(doc) {
   doc.querySelectorAll('[data-locale]').forEach(elem => {
     const messageKey = elem.getAttribute('data-locale');
@@ -75,11 +87,13 @@ function hex(x) {
   return ('0' + parseInt(x).toString(16)).slice(-2);
 }
 
-export function createExampleLink(text = chrome.i18n.getMessage('example'), href = 'http://example.org') {
+export function createExampleLink(text = chrome.i18n.getMessage('example'), href = '') {
   const a = document.createElement('a');
-  a.href = href;
+  if (href) {
+    a.href = href;
+    setFavicon(a, href);
+  }
   a.textContent = text;
-  setFavicon(a, href);
   addAnchorListeners(a);
   return a;
 }
@@ -379,8 +393,14 @@ export function addSpinner(element) {
   element.style.alignItems = 'center';
   // create the spinner element
   const spinner = document.createElement('p');
+  spinner.id = 'spinner';
   spinner.textContent = '⏳';
   spinner.style.marginRight = '0.5em';
   spinElement(spinner);
   element.prepend(spinner);
+}
+
+export function removeSpinner(element, display) {
+  element.querySelectorAll('#spinner').forEach(e => e.remove());
+  if (display) element.style.display = display;
 }

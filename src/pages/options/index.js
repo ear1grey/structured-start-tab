@@ -3,9 +3,14 @@
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
 import * as toast from '../../js/lib/toast.js';
 import * as util from '../../js/lib/util.js';
-import { OPTS } from '../../js/lib/options.js';
 import * as options from '../../js/lib/options.js';
+import * as io from '../../js/services/io.service.js';
+
+import { OPTS } from '../../js/lib/options.js';
 import { htmlStringToJson } from '../../js/services/parser.service.js';
+import { getAgendasFromObject } from '../../js/services/agenda.service.js';
+import { deleteAllSharedPanels } from '../../js/services/cloud.service.js';
+
 
 function setCheckBox(prefs, what) {
   const elem = document.getElementById(what);
@@ -57,6 +62,7 @@ function updatePrefsWithPage() {
   getCheckBox('proportionalSections');
   getCheckBox('useCustomScrollbar');
   getCheckBox('editOnNewDrop');
+  getCheckBox('allowEmptyUrl');
   getCheckBox('showLocationAgenda');
   getCheckBox('showEndDateAgenda');
   getValue('showToast');
@@ -67,9 +73,11 @@ function updatePrefsWithPage() {
   getValue('titleAgendaNb');
 
   // Cloud
+  getText('cloud.userId');
   getCheckBox('cloud.enabled');
   getText('cloud.url');
   getCheckBox('cloud.autoAdd');
+  getCheckBox('cloud.autoDelete');
   getCheckBox('cloud.syncFoldStatus');
   getCheckBox('cloud.syncPrivateStatus');
 }
@@ -83,6 +91,7 @@ function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'proportionalSections');
   setCheckBox(prefs, 'useCustomScrollbar');
   setCheckBox(prefs, 'editOnNewDrop');
+  setCheckBox(prefs, 'allowEmptyUrl');
   setCheckBox(prefs, 'showLocationAgenda');
   setCheckBox(prefs, 'showEndDateAgenda');
   setValue(prefs, 'showToast');
@@ -93,9 +102,11 @@ function updatePageWithPrefs(prefs) {
   setValue(prefs, 'titleAgendaNb');
 
   // Cloud
+  setText(prefs, 'cloud.userId');
   setCheckBox(prefs, 'cloud.enabled');
   setText(prefs, 'cloud.url');
   setCheckBox(prefs, 'cloud.autoAdd');
+  setCheckBox(prefs, 'cloud.autoDelete');
   setCheckBox(prefs, 'cloud.syncFoldStatus');
   setCheckBox(prefs, 'cloud.syncPrivateStatus');
 
@@ -109,15 +120,18 @@ function updatePageWithPrefs(prefs) {
   * @param attrs - to be added to the input element (e.g. max, min)
   * @param txt - text for the label
   */
-function create(where, type, attrs, txt, defaultValue, readonly, onInputEvent) {
+function create(where, type, attrs, txt, defaultValue, readonly, customEvents = []) {
   const elem = util.cloneTemplate('#template_' + type);
   where.append(elem);
   const elemInDoc = where.lastElementChild;
   if (elemInDoc) {
-    if (attrs.id) {
-      elemInDoc.setAttribute('for', attrs.id);
+    if (attrs.id) elemInDoc.setAttribute('for', attrs.id);
+    if (attrs.btnText) {
+      elemInDoc.querySelector('button').textContent = attrs.btnText;
+      delete attrs.btnText;
     }
-    const input = elemInDoc.querySelector('[name=input]');
+
+    const input = elemInDoc.querySelector('[name=input], button');
     if (input) {
       for (const [attr, val] of Object.entries(attrs)) {
         input.setAttribute(attr, val);
@@ -139,10 +153,13 @@ function create(where, type, attrs, txt, defaultValue, readonly, onInputEvent) {
         }
       }
     }
-    elemInDoc.addEventListener('input', (e) => {
-      saveOptions();
-      if (onInputEvent != null) { onInputEvent(e); }
-    });
+
+    for (const { event, handler } of customEvents) {
+      input.addEventListener(event, handler);
+    }
+
+    // Make sure content is saved when the content changes
+    elemInDoc.addEventListener('input', saveOptions);
   }
   return elemInDoc;
 }
@@ -170,62 +187,105 @@ function createPageWithPrefs(prefs) {
     create(layout, 'range', { id: 'fontsize', max: '150', min: '50', step: '10' }, chrome.i18n.getMessage('fontsize'));
     create(layout, 'checkbox', { id: 'useCustomScrollbar' }, chrome.i18n.getMessage('useCustomScrollbar'));
     create(layout, 'checkbox', { id: 'editOnNewDrop' }, chrome.i18n.getMessage('editOnNewDrop'));
+    create(layout, 'checkbox', { id: 'allowEmptyUrl' }, chrome.i18n.getMessage('allowEmptyUrl'));
     create(agenda, 'number', { id: 'agendaNb' }, chrome.i18n.getMessage('agenda_nb'));
     create(agenda, 'number', { id: 'titleAgendaNb' }, chrome.i18n.getMessage('title_agenda_nb'));
     create(agenda, 'checkbox', { id: 'showLocationAgenda' }, chrome.i18n.getMessage('showLocationAgenda'));
     create(agenda, 'checkbox', { id: 'showEndDateAgenda' }, chrome.i18n.getMessage('showEndDateAgenda'));
     create(configureShortcut, 'show', { id: 'textConfigure' }, chrome.i18n.getMessage('configure_shortcut'));
     // Cloud
-    create(cloud, 'checkbox', { id: 'cloud.enabled' }, chrome.i18n.getMessage('cloud_enabled'), false, false, (e) => {
-      if (e.target.checked) {
-        alert(chrome.i18n.getMessage('cloud_warn'));
-      }
-    });
+    create(cloud, 'text', { id: 'cloud.userId' }, chrome.i18n.getMessage('cloud_userId'), null, false, [
+      {
+        // Alert when the input box is clicked
+        event: 'click',
+        handler: () => {
+          alert(chrome.i18n.getMessage('cloud_warn_id_change'));
+        },
+      },
+    ]);
+    create(cloud, 'checkbox', { id: 'cloud.enabled' }, chrome.i18n.getMessage('cloud_enabled'), false, false, [
+      {
+        event: 'change',
+        handler: (e) => {
+          if (e.target.checked) {
+            alert(chrome.i18n.getMessage('cloud_warn_enable'));
+          }
+        },
+      },
+    ]);
     create(cloud, 'text', { id: 'cloud.url' }, chrome.i18n.getMessage('cloud_url'));
     create(cloud, 'checkbox', { id: 'cloud.autoAdd' }, chrome.i18n.getMessage('cloud_autoAdd'), false);
+    create(cloud, 'checkbox', { id: 'cloud.autoDelete' }, chrome.i18n.getMessage('cloud_autoDelete'), false);
     create(cloud, 'checkbox', { id: 'cloud.syncFoldStatus' }, chrome.i18n.getMessage('cloud_syncFoldedStatus'), false);
     create(cloud, 'checkbox', { id: 'cloud.syncPrivateStatus' }, chrome.i18n.getMessage('cloud_syncPrivateStatus'), false);
+    create(cloud, 'button', { btnText: chrome.i18n.getMessage('delete') }, chrome.i18n.getMessage('cloud_delete_shared_panels'), null, false, [
+      {
+        event: 'click',
+        handler: async (e) => {
+          try {
+            util.addSpinner(e.target);
+            await deleteAllSharedPanels();
+          } finally {
+            util.removeSpinner(e.target, 'block');
+          }
+        },
+      },
+    ]);
   }
   updatePageWithPrefs(prefs);
 }
 function exportStartTab() {
   const now = (new Date()).toISOString().slice(0, 10).replace(/-/g, '_');
-
-  const json = JSON.stringify(OPTS.json);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `sst_backup_${now}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  io.downloadJson({
+    name: `sst_backup_${now}.json`,
+    data: OPTS.json,
+  });
 }
 function importStartTab() {
-  util.simulateClick('#fileupload');
+  io.loadFile().then((file) => {
+    importLoadedFile(file);
+  });
 }
 function importLoadedFile(file) {
-  if (file.target && typeof file.target.result === 'string') {
+  if (file) {
     OPTS.jsonBackup = [...OPTS.json];
 
     // Keep support for old backups in HTML format
-    if (file.target.result.includes('<section')) {
-      OPTS.json = htmlStringToJson(file.target.result);
+    if (file.includes('<section')) {
+      OPTS.json = htmlStringToJson(file);
     } else {
       try {
-        OPTS.json = JSON.parse(file.target.result);
+        OPTS.json = JSON.parse(file);
       } catch (e) {
         alert('Invalid file');
         return;
       }
     }
 
+    // Create an agenda object for each agenda found in the imported file
+    const agendas = [];
+    getAgendasFromObject(OPTS.json, agendas);
+    if (agendas.length > 0) {
+      OPTS.agendas = [];
+      for (let i = 0; i < agendas.length; i++) {
+        OPTS.agendas.push({
+          agendaUrl: chrome.i18n.getMessage('default_agenda_link'),
+          events: [],
+          email: '',
+        });
+      }
+    }
+
     saveOptions();
   }
 }
+
 function upload(file) {
   if (file) {
     const reader = new FileReader();
-    reader.addEventListener('load', importLoadedFile);
+    reader.addEventListener('load', (file) => {
+      if (typeof file?.target?.result === 'string') { importLoadedFile(file.target.result); }
+    });
     reader.readAsText(file);
   }
 }
@@ -236,12 +296,7 @@ function uploadFile(e) {
     upload(file);
   }
 }
-function uploadFiles(e) {
-  e.preventDefault();
-  const target = e.target;
-  const file = target.files && target.files[0];
-  upload(file);
-}
+
 function resetStartTab() {
   const backup = confirm(chrome.i18n.getMessage('suggest_backup'));
   if (backup) {
@@ -251,6 +306,7 @@ function resetStartTab() {
   OPTS.json = htmlStringToJson(chrome.i18n.getMessage('default_message'));
   options.write();
 }
+
 function prepareListeners() {
   // ! ensures that if any of these elems don't exist a NPE is thrown.
   document.getElementById('export').addEventListener('click', exportStartTab);
@@ -259,8 +315,6 @@ function prepareListeners() {
   const importDropZone = document.getElementById('importdropzone');
   importDropZone.addEventListener('dragover', e => e.preventDefault());
   importDropZone.addEventListener('drop', uploadFile);
-  const fileupload = document.getElementById('fileupload');
-  fileupload.addEventListener('change', uploadFiles, false);
   chrome.runtime.onMessage.addListener(receiveBackgroundMessages);
 }
 export async function loadOptions() {
