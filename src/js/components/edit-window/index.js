@@ -1,5 +1,5 @@
 import * as ui from '../../services/ui.service.js';
-import { localizeHtml, addSpinner, removeSpinner, loadAsync } from '../../lib/util.js';
+import { localizeHtml, addSpinner, removeSpinner, loadAsync, defineComponent } from '../../lib/util.js';
 
 const getTemplate = loadAsync('/src/js/components/edit-window/index.html');
 const getStyle = loadAsync('/src/js/components/edit-window/index.css');
@@ -242,5 +242,5 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
     }
   }
 
-  customElements.define('edit-window', EditWindow);
+  defineComponent('edit-window', EditWindow);
 });

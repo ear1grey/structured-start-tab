@@ -414,3 +414,7 @@ export function loadAsync(path) {
       });
   });
 }
+
+export function defineComponent(name, classDef) {
+  if (customElements.get(name) == null) { customElements.define(name, classDef); }
+}

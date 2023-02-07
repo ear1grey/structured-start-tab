@@ -1,6 +1,6 @@
 // TODO: import all components from a common file?
 import './components/agenda-item/index.js';
-import './components/panel/index.js';
+import { loadPanelDefinition } from './components/panel/index.js';
 import './components/edit-window/index.js';
 
 import * as options from './lib/options.js';
@@ -637,6 +637,7 @@ async function prepareAll() {
   prepareBackgroundListener();
 
   await options.load();
+  await loadPanelDefinition();
   els = util.prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
 
   if (els.main == null) return;

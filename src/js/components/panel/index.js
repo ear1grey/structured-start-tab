@@ -1,8 +1,10 @@
-fetch('/src/js/components/panel/index.css') // Load CSS
-  .then(stream => stream.text())
-  .then(css => {
-    define(css);
-  });
+import { defineComponent } from '../../lib/util.js';
+
+export async function loadPanelDefinition() {
+  const res = await fetch('/src/js/components/panel/index.css');
+  const css = await res.text();
+  define(css);
+}
 
 const define = (css) => {
   class PanelComponent extends HTMLElement {
@@ -216,5 +218,5 @@ const define = (css) => {
     }
   }
 
-  customElements.define('sst-panel', PanelComponent);
+  defineComponent('sst-panel', PanelComponent);
 };
