@@ -25,9 +25,21 @@ export const OPTS = {
   showEndDateAgenda: true,
   // StringOpts
   backup: '',
-  json: {},
+  json: [],
   linkStats: {},
   agendas: [],
+  // Cloud sync settings
+  cloud: {
+    version: 0,
+    hasConflict: false,
+
+    enabled: false,
+    url: '',
+
+    autoAdd: false,
+    syncFoldStatus: false,
+    syncPrivateStatus: false,
+  },
 };
 
 const settingKey = 'structured-start-tab';
@@ -47,6 +59,7 @@ export function load() {
     });
   });
 }
+
 export function write() {
   return new Promise(resolve => {
     chrome.storage.local.set({ [settingKey]: OPTS }, () => {

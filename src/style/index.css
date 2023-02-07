@@ -298,12 +298,12 @@ section section {
   width: min-content;
 }
 
-section sst-panel::part(panel) {
+section>sst-panel::part(panel) {
   flex-direction: column;
   border-radius: var(--small);
 }
 
-section sst-panel[folded]::part(panel) {
+section>sst-panel[folded]::part(panel) {
   width: min-content;
 }
 
@@ -583,6 +583,20 @@ footer {
   }
 }
 
+@keyframes spin-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin-animation 1s infinite linear;
+}
+
 dialog {
   background: var(--bg-mid);
   color: var(--fg-mid);
@@ -597,10 +611,14 @@ color-switch {
   flex-grow: 1;
 }
 
-section#feedback {
+section.extra-action {
   flex: unset;
 }
 
-section#feedback a {
+section.extra-action a {
   margin: .5em;
+}
+
+#mergeConflictResolver {
+  display: none;
 }

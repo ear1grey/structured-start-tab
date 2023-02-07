@@ -104,6 +104,12 @@
   "showToast": {
     "message": "Durée (en secondes) d'affichage de chaque commentaire. Si vous mettez cette valeur à zéro, les messages seront désactivés."
   },
+  "showFeedback": {
+    "message": "Afficher le bouton de commentaires sur la page d'accueil."
+  },
+  "feedback": {
+    "message": "<p>Les commentaires peuvent être fournis en utilisant les liens suivants: <ul><li><a href=\"https://github.com/ear1grey/structured-start-tab/issues\">GitHub</a></li><li><a href=\"https://www.facebook.com/structuredstarttab/\">Facebook</a></li></ul></p>"
+  },
   "lock": {
     "message": "Verrouiller la page.  Lorsqu'elle est verrouillée, aucun glisser-déposer ne peut avoir lieu et aucun nouveau lien ne peut être ajouté."
   },
@@ -296,6 +302,27 @@
   "configure_shortcut": {
     "message": "<ul><li><a href=\"https://obie.ai/blog/how-to-add-and-remove-custom-keyboard-shortcuts-and-hotkeys-for-a-chrome-extension-in-5-seconds-flat/\">Chrome</a></li><li><a href=\"https://support.mozilla.org/fr/kb/gerer-raccourcis-extensions-firefox\">Firefox</a></li></ul>"
   },
+  "cloud": {
+    "message": "Stockage en ligne"
+  },
+  "cloud_enabled": {
+    "message": "Utiliser le stockage en nuage"
+  },
+  "cloud_url": {
+    "message": "URL de stockage"
+  },
+  "cloud_autoAdd": {
+    "message": "Ajouter automatiquement de nouveaux panneaux"
+  },
+  "cloud_syncFoldedStatus": {
+    "message": "État plié du panneau de synchronisation"
+  },
+  "cloud_syncPrivateStatus": {
+    "message": "Statut privé du panneau de synchronisation"
+  },
+  "cloud_warn": {
+    "message": "Attention: cette fonctionnalité utilise votre identifiant Google et les données seront stockées sur les serveurs de Google. Si votre identifiant Google est compromis, vos données le seront également."
+  },
   "title_agenda_nb": {
     "message": "Nombre de mots à afficher dans le titre de l'événement"
   },
@@ -331,5 +358,14 @@
   },
   "placeholder_panel_email_agenda": {
     "message": "L'email de l'agenda"
+  },
+  "action_merge_conflict": {
+    "message": "Conflit de fusion"
+  },
+  "action_feedback": {
+    "message": "Commentaires"
+  },
+  "action_cloud_sync": {
+    "message": "Synchronisation cloud"
   }
 }

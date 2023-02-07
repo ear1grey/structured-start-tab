@@ -1,29 +1,35 @@
-import * as util from './lib/util.js';
-import { OPTS } from './lib/options.js';
-import * as options from './lib/options.js';
-import * as toast from './lib/toast.js';
-import * as tooltip from './lib/tooltip.js';
-import { updateAgendaBackground } from './background.js';
-import { domToJson, jsonToDom } from './services/parser.service.js';
-
 // TODO: import all components from a common file?
 import './components/agenda-item/index.js';
 import './components/panel/index.js';
+
+import * as options from './lib/options.js';
+import * as toast from './lib/toast.js';
+import * as tooltip from './lib/tooltip.js';
+import * as util from './lib/util.js';
+
+import { domToJson, jsonToDom } from './services/parser.service.js';
+import { getPageCloud, syncPageCloud } from './services/cloud.service.js';
+
+import { OPTS } from './lib/options.js';
+import { prepareDrag } from './services/drag.service.js';
+import { updateAgendaBackground } from './services/agenda.service.js';
 
 const oneDay = 1000 * 60 * 60 * 24;
 const fourDays = oneDay * 4;
 const twoWeeks = oneDay * 14;
 let dialog;
 let els;
-let dragging;
+
 function setValue(where, what, open = false) {
   const elem = document.querySelector(where);
   elem.value = what ?? '';
   if (open) { elem.dataset.open = 'true'; }
 }
+
 function getValue(where) {
   return document.querySelector(where).value;
 }
+
 function setColorValue(where, what) {
   const elem = document.querySelector(where);
   if (what[0] === '!') {
@@ -34,12 +40,14 @@ function setColorValue(where, what) {
     elem.open = true;
   }
 }
+
 function getColorValue(where) {
   const elem = document.querySelector(where);
   const color = elem.value;
   const open = elem.open ? '' : '!';
   return open + color;
 }
+
 function linkClicked(e) {
   if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
     if (e.shiftKey) {
@@ -50,6 +58,7 @@ function linkClicked(e) {
     }
   }
 }
+
 function updateClickCount(a) {
   const link = a.getAttribute('href');
   if (!link) { return; }
@@ -60,26 +69,34 @@ function updateClickCount(a) {
   }
   options.write();
 }
-function toHex(x, m = 1) {
-  return ('0' + parseInt(String(m * x), 10).toString(16)).slice(-2);
+
+function toHex(x, scale = 1) {
+  // We need to scale the value to 0-255
+  x = Math.round(x * scale);
+  if (isNaN(x)) { return '00'; }
+  return x.toString(16).padStart(2, '0');
 }
+
 function translateColor(rgba) {
   const parts = rgba.split('(')[1].split(')')[0].split(',');
   const converted = [
     toHex(Number(parts[0])),
     toHex(Number(parts[1])),
     toHex(Number(parts[2])),
-    toHex(Number(parts[3]), 255),
+    toHex(Number(parts[3] || '255'), 255),
   ];
-  const result = '#' + converted.join('');
+  let result = '#' + converted.join('');
+  if (result.includes('#ffffff')) result = '!' + result;
+
   return result;
 }
-function editStart(elem) {
+
+export function editStart(elem) {
   els.edit.textContent = ''; // reset
   const style = window.getComputedStyle(elem);
 
-  let bgcol = elem.dataset.bg ? elem.dataset.bg : '!' + translateColor(style.backgroundColor);
-  let fgcol = elem.dataset.fg ? elem.dataset.fg : '!' + translateColor(style.color);
+  let bgcol = elem.dataset.bg ? elem.dataset.bg : translateColor(style.backgroundColor);
+  let fgcol = elem.dataset.fg ? elem.dataset.fg : translateColor(style.color);
 
   if (elem instanceof HTMLAnchorElement) {
     cloneToDialog('#template_edit_link');
@@ -134,10 +151,12 @@ function editStart(elem) {
   document.querySelector('#editcancel').addEventListener('click', editCancel);
   els.editname = document.querySelector('#editname');
 }
+
 function editCancel() {
   toast.html('editcancelled', chrome.i18n.getMessage('edit_cancelled'));
   closeDialog();
 }
+
 function closeDialog() {
   dialog.close();
   dialog.remove();
@@ -238,7 +257,9 @@ function editOk() {
   delete els.editing;
 }
 
-function saveChanges(makeBackup = true) {
+export function saveChanges(makeBackup = true) {
+  if (els.main == null) return;
+
   if (els.main.classList.contains('heatmap')) {
     toggleHeatMap();
   }
@@ -252,7 +273,7 @@ function saveChanges(makeBackup = true) {
   prepareListeners();
 
   util.prepareCSSVariables(OPTS);
-  prepareDynamicFlex(els.main);
+  util.prepareDynamicFlex(els.main);
   prepareBookmarks(OPTS, els.bookmarksnav);
 }
 
@@ -261,7 +282,7 @@ function detectKeydown(e) {
     util.simulateClick('#editok');
   }
   if (e.code === 'KeyZ' && (e.metaKey || e.ctrlKey)) {
-    if (OPTS.backup) {
+    if (OPTS.jsonBackup) {
       const copy = [...OPTS.json];
       OPTS.json = [...OPTS.jsonBackup];
       OPTS.jsonBackup = copy;
@@ -276,6 +297,7 @@ function detectKeydown(e) {
     }
   }
 }
+
 function toggleHeatMap() {
   const links = els.main.querySelectorAll('a');
   const numbers = [];
@@ -308,6 +330,7 @@ function toggleHeatMap() {
     changeBookmarksToHeatmap();
   }
 }
+
 function changeBookmarksToHeatmap() {
   els.bookmarksnav.classList.toggle('heatmapLegend');
   if (els.bookmarksnav.classList.contains('heatmapLegend')) {
@@ -322,27 +345,22 @@ function changeBookmarksToHeatmap() {
     prepareBookmarks(OPTS, els.bookmarksnav);
   }
 }
+
 function getColorHeatMap(value, max) {
   const h = (1.0 - (value / max)) * 240;
   return 'hsl(' + String(h) + ', 100%, 50%)';
 }
-function createExampleLink(text = chrome.i18n.getMessage('example'), href = 'http://example.org') {
-  const a = document.createElement('a');
-  a.href = href;
-  a.textContent = text;
-  util.setFavicon(a, href);
-  addAnchorListeners(a);
-  return a;
-}
+
 function addLinkListener() {
   addLink();
 }
+
 function addLink(target) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
-  const a = createExampleLink();
+  const a = util.createExampleLink();
   if (target) {
     if (target.tagName === 'SECTION') {
       target.lastElementChild?.append(a);
@@ -356,33 +374,19 @@ function addLink(target) {
   toast.html('addlink', chrome.i18n.getMessage('toast_link_add'));
   flash(a, 'highlight');
 }
-function createPanel(target, animation = true, after = true) {
-  const panel = document.createElement('sst-panel');
-  panel.setAttribute('draggable', 'true');
 
-  if (after) target.append(panel);
-  else target.prepend(panel);
-
-  if (animation) {
-    panel.scrollIntoView({ behavior: 'smooth' });
-    toast.html('addpanel', chrome.i18n.getMessage('add_panel_auto'));
-    panel.classList.add('flash');
-    panel.addEventListener('animationend', () => { panel.classList.remove('flash'); });
-  }
-
-  return panel;
-}
 function addPanel() {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
-  return createPanel(els.main);
+  return util.createPanel(els.main);
 }
+
 function addTopSitesPanel() {
   let panel = els.main.querySelector('#topsites');
   if (!panel) {
-    panel = createPanel(els.main);
+    panel = util.createPanel(els.main);
     panel.id = 'topsites';
     panel.firstElementChild.textContent = chrome.i18n.getMessage('top_sites_panel');
   }
@@ -396,6 +400,7 @@ function addTopSitesPanel() {
   panel.scrollIntoView({ behavior: 'smooth' });
   flash(panel, 'highlight');
 }
+
 function updateTopSites() {
   const panel = els.main.querySelector('#topsites');
   if (!panel) { return; }
@@ -405,15 +410,16 @@ function updateTopSites() {
   }
   chrome.topSites.get((data) => {
     for (const link of data) {
-      const a = createExampleLink(link.title, link.url);
+      const a = util.createExampleLink(link.title, link.url);
       panel.lastElementChild?.append(a);
     }
   });
 }
+
 function toogleBookmarksPanel() {
   let panel = els.main.querySelector('#bookmarksPanel');
   if (!panel) {
-    panel = createPanel(els.main);
+    panel = util.createPanel(els.main);
     panel.id = 'bookmarksPanel';
     panel.firstElementChild.textContent = chrome.i18n.getMessage('bookmarks');
   }
@@ -430,6 +436,7 @@ function toogleBookmarksPanel() {
   panel.scrollIntoView({ behavior: 'smooth' });
   flash(panel, 'highlight');
 }
+
 async function updateBookmarksPanel() {
   const rootPanel = els.main.querySelector('#bookmarksPanel');
   if (!rootPanel) { return; }
@@ -438,20 +445,22 @@ async function updateBookmarksPanel() {
   });
   inDepthBookmarkTree(tree[0], rootPanel);
 }
+
 function inDepthBookmarkTree(toTreat, parentPanel) {
   if (toTreat.children) {
-    const panel = createPanel(els.main);
+    const panel = util.createPanel(els.main);
     parentPanel.lastElementChild.append(panel);
     panel.firstElementChild.textContent = toTreat.title;
     for (const a of toTreat.children) {
       inDepthBookmarkTree(a, panel);
     }
   } else {
-    parentPanel.lastElementChild.append(createExampleLink(toTreat.title, toTreat.url));
+    parentPanel.lastElementChild.append(util.createExampleLink(toTreat.title, toTreat.url));
   }
 }
+
 function addAgenda() {
-  const panel = createPanel(els.main, false);
+  const panel = util.createPanel(els.main, false);
   panel.id = 'agenda-' + String(OPTS.agendas.length);
   panel.header = chrome.i18n.getMessage('agenda');
   panel.direction = 'vertical';
@@ -475,7 +484,6 @@ async function updateAgenda(updateAgendas = true) {
   }
 }
 
-
 function displayNewAgenda(index, agenda) {
   const rootPanel = getAllBySelector(els.main, '#agenda-' + String(index))[0]?._panel;
   if (!rootPanel) { return; }
@@ -490,6 +498,7 @@ function displayNewAgenda(index, agenda) {
     rootPanel.querySelector('nav').append(agendaItem);
   }
 }
+
 function duplicatePanel(keepLinks) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
@@ -511,6 +520,7 @@ function duplicatePanel(keepLinks) {
   dupe.addEventListener('contextmenu', saveElmContextClicked);
   toast.html('locked', chrome.i18n.getMessage('duplicate_panel'));
 }
+
 /**
  * Accept an array of things that are either containers or links
  * inject in the section template
@@ -524,14 +534,14 @@ export function buildBookmarks(OPTS, data, target, count) {
   for (const x of data) {
     if (count === 0) { break; }
     if (!x.url) { continue; } // skip folders
-    const indoc = OPTS.hideBookmarksInPage && document.querySelector(`[href="${x.url}"]`);
-    if (indoc || (x.dateAdded && x.dateAdded < Date.now() - twoWeeks)) {
+    const indoc = OPTS.hideBookmarksInPage && getAllBySelector(els.main, `[href="${x.url}"]`);
+    if (indoc.length > 0 || (x.dateAdded && x.dateAdded < Date.now() - twoWeeks)) {
       // bookmark is already in doc, or its older
       // than three weeks, so skip it.
       // TODO make this an option?
     } else {
       count--;
-      const a = createExampleLink(x.title, x.url);
+      const a = util.createExampleLink(x.title, x.url);
       a.id = window.btoa(String(Date.now() * Math.random())).slice(-8).toLowerCase();
       if (x.dateAdded && x.dateAdded > Date.now() - fourDays) {
         a.classList.add('fresh');
@@ -540,366 +550,13 @@ export function buildBookmarks(OPTS, data, target, count) {
     }
   }
 }
-// TODO this can be done with a single listener and check the target
-function addAnchorListeners(a) {
-  a.addEventListener('click', linkClicked);
-}
-/* For a given elem, if it's not a container element, return its parent. */
-function findNav(elem) {
-  let result;
-  switch (elem.tagName) {
-    case 'SST-PANEL':
-      result = elem.shadowRoot.querySelector('nav');
-      break;
-    case 'SECTION':
-      result = elem.children[1];
-      break;
-    case 'H1':
-      result = elem.nextElementSibling;
-      break;
-    case 'NAV':
-      result = elem;
-      break;
-    case 'A':
-      result = elem.parentElement;
-      break;
-    case 'MAIN':
-      result = elem;
-      break;
-    case 'IMG':
-      result = elem.parentElement?.parentElement;
-      break;
-    case 'AGENDA-ITEM':
-      result = elem.parentElement;
-      break;
-  }
-  if (result) {
-    return result;
-  }
-  throw new Error("can't safely choose container");
-}
-/**
- * recursively search up-tree to find the first parent that
- * uses display: flex;
- */
-function findParentWithFlex(elem) {
-  if (elem === document.body) { return elem; }
-  const style = window.getComputedStyle(elem);
-  const display = style.getPropertyValue('display');
-  return (display === 'flex') ? elem : findParentWithFlex(elem.parentElement);
-}
 
-function findTarget(e) {
-  if (e.path[0].tagName === 'A') return e.path[0];
-  return e.target.tagName === 'SST-PANEL' ? e.path.find(x => x.tagName === 'SST-PANEL') : e.target;
-}
 
-/**
- * When called, and passed an event this function will find the
- * first parent that has a flex direction (row or column) and
- * accordingly select width or height charactaristics of the target.
- * The mouse X or Y position within the target are then compared
- * to the target's width or height.  if the mouse is in the first
- * half of the element, 'beforebegin' is returned, otherwise 'afterend'
- */
-function calculatePositionWithinTarget(e) {
-  const target = e.target;
-  const parentWithFlex = findParentWithFlex(target.parentElement.parentElement);
-  const style = window.getComputedStyle(parentWithFlex);
-  const flexDir = style.getPropertyValue('flex-direction');
-  const parentRect = target.getBoundingClientRect();
-  let width, position;
-  if (flexDir === 'row') {
-    width = parentRect.width;
-    position = e.clientX - parentRect.x;
-  } else {
-    width = parentRect.height;
-    position = e.clientY - parentRect.y;
-  }
-  return (position * 2 < width) ? 'beforebegin' : 'afterend';
-}
-
-function isElementContained(parentElement, childElement) {
-  if (parentElement.contains(childElement)) { return true; }
-  if (parentElement === childElement) { return true; }
-
-  // check the shadow dom recursively
-  if (parentElement.shadowRoot) {
-    const shadowChildren = parentElement.shadowRoot.querySelectorAll('*');
-    for (const child of shadowChildren) {
-      if (isElementContained(child, childElement)) { return true; }
-    }
-  }
-
-  return false;
-}
-
-/*
- * add a placeholder element to the position where the
- * current thing would be dropped
- */
-function moveElement(e) {
-  const tgt = findTarget(e);
-  if (!dragging || dragging.el === tgt) { return; } // can't drop on self
-  if (tgt.id.includes('agenda')) { return; } // can't drop on agenda
-  const nav = findNav(tgt);
-  const position = tgt === dragging.el.nextElementSibling ? 'afterend' : 'beforebegin';
-  if (dragging.el.tagName === 'A') {
-    if (tgt.tagName === 'H1') {
-      return nav.prepend(dragging.el);
-    }
-    if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
-    return nav.prepend(dragging.el);
-  }
-  if (dragging.el.tagName === 'SECTION') {
-    // can't drop *inside* self
-    if (dragging.el.contains(tgt) || dragging.el.shadow?.contains(tgt)) { return; }
-
-    // dropping on a heading inserted before that heading's parent
-    if (tgt.tagName === 'H1') {
-      const beforeOrAfter = calculatePositionWithinTarget(e);
-      return tgt.parentElement.insertAdjacentElement(beforeOrAfter, dragging.el);
-    }
-    if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
-    if (tgt.tagName === 'MAIN') { return nav.append(dragging.el); }
-    if (nav.children.length === 0) { return nav.prepend(dragging.el); }
-  }
-  if (dragging.el.tagName === 'SST-PANEL') {
-    // can't drop *inside* self
-    if (isElementContained(dragging.el, tgt)) { return; }
-
-    // dropping on a heading inserted before that heading's parent
-    if (tgt.tagName === 'H1') {
-      const closestTarget = findTarget(e);
-
-      if (dragging.el.contains(closestTarget)) return;
-
-      const beforeOrAfter = calculatePositionWithinTarget(e);
-      return closestTarget.insertAdjacentElement(beforeOrAfter, dragging.el);
-    }
-    if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
-    if (tgt.tagName === 'MAIN') { return nav.append(dragging.el); }
-    if (nav.children.length === 0) { return nav.prepend(dragging.el); }
-  }
-}
-function checkDragIsWithin(target, preferred) {
-  if (target === preferred) {
-    return true;
-  }
-  if (target.parentElement) {
-    return checkDragIsWithin(target.parentElement, preferred);
-  }
-  return false;
-}
-function replaceElementInOriginalPosition() {
-  if (!dragging || !dragging.parent) { return; }
-  if (dragging.sibling && dragging.el !== dragging.sibling) {
-    dragging.parent.insertBefore(dragging.el, dragging.sibling);
-  } else {
-    dragging.parent.append(dragging.el);
-  }
-}
-function dragEnter() {
-  if (!dragging) {
-    dragging = {
-      el: createExampleLink('💧'),
-    };
-  }
-  dragging.el.classList.add('dragging');
-}
-/* respond when a drag begins */
-function dragStart(e) {
-  if (OPTS.lock) {
-    toast.html('locked', chrome.i18n.getMessage('locked'));
-    return;
-  }
-  els.body.classList.add('dragOngoing');
-  if (els.body.classList.contains('editing')) { return; }
-  let target = e.target.tagName === 'SST-PANEL' ? e.path[0] : e.target;
-  if (target.tagName === 'IMG') {
-    target = target.parentElement;
-
-    // Alternatively, don't allow dragging of images at all
-    // e.stopPropagation();
-    // e.preventDefault();
-    // return;
-  }
-
-  let el, dummy;
-  // Dummy used when dragging from the toolbar
-  if (target.classList.contains('new')) {
-    if (target.id === 'addlink') {
-      dummy = createExampleLink();
-      dummy.classList.add('dragging');
-      dummy.classList.add('new');
-      el = dummy;
-      toast.html('addlink', chrome.i18n.getMessage('add_link'));
-    } else {
-      dummy = createPanel(els.main);
-      dummy.classList.add('dragging');
-      dummy.classList.add('new');
-      el = dummy;
-      toast.html('addpanel', chrome.i18n.getMessage('add_panel'));
-    }
-  } else {
-    el = target;
-    el.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.dropEffect = 'move';
-    toast.html('moving', chrome.i18n.getMessage('moving'));
-  }
-  dragging = {
-    el,
-    dummy,
-    parent: target.parentElement,
-    sibling: target.nextElementSibling,
-    startedOnThisPage: true,
-  };
-}
 function flash(elem, cls = 'flash') {
   elem.classList.add(cls);
   elem.addEventListener('animationend', () => { elem.classList.remove(cls); });
 }
 
-/* respond if dropping here is ok */
-function dragOver(e) {
-  if (!dragging) { return; }
-  if (OPTS.lock) {
-    toast.html('locked', chrome.i18n.getMessage('locked'));
-    return;
-  }
-  const target = e.target;
-
-  if (target === els.bin || target.id.includes('agenda')) {
-    els.bin.classList.add('over');
-    e.preventDefault();
-    dragging.dummy?.remove();
-    return;
-  } else {
-    els.bin.classList.remove('over');
-  }
-  if (checkDragIsWithin(target, els.main)) {
-    e.preventDefault();
-    if (!els.toolbar.contains(target)) {
-      moveElement(e);
-    }
-  } else {
-    // when outside the drop zone, temporary moves are undone,
-    // real dragged element returns to its original spot
-    // and dummy drag element is added to main so it's visible
-    if (dragging.parent === els.toolbarnav) {
-      els.main.append(dragging.el);
-    } else {
-      replaceElementInOriginalPosition();
-    }
-    if (e.target === els.bin) { // gotta allow bin drops too
-      e.preventDefault();
-      tooltip.reposition(e, 'Drop trash here.');
-    }
-  }
-  prepareDynamicFlex(els.main);
-}
-function extractDataFromDrop(e) {
-  if (!dragging || !(dragging.el instanceof HTMLAnchorElement)) { return; }
-  const html = e.dataTransfer.getData('text/html');
-  const plainText = e.dataTransfer.getData('text/plain');
-  let url, text;
-  if (html) {
-    const parser = new DOMParser();
-    const tdoc = parser.parseFromString(html, 'text/html');
-    const link = tdoc.querySelector('a');
-    if (link) {
-      url = link.href;
-      text = link.textContent;
-    }
-  } else {
-    try {
-      const u = new URL(plainText);
-      url = u.toString();
-      text = url;
-    } catch (e) {
-      toast.html('notlink', chrome.i18n.getMessage('not_link'));
-    }
-  }
-  if (url) {
-    dragging.el.href = url;
-    util.setFavicon(dragging.el, url);
-    dragging.el.textContent = text || '';
-  } else {
-    dragging.el.remove();
-  }
-}
-
-function dragDrop(e) {
-  if (!dragging) { return; }
-  if (OPTS.lock) {
-    toast.html('locked', chrome.i18n.getMessage('locked'));
-    return;
-  }
-  let target = e.target;
-  while (target && target !== els.main) {
-    if (target.id.includes('topsites') || target.id.includes('bookmarksPanel')) {
-      toast.html('impossible', chrome.i18n.getMessage('impossible_drop'));
-      return;
-    }
-    target = target.parentElement;
-  }
-  e.stopPropagation();
-  e.preventDefault();
-  dragging.el.classList.remove('dragging');
-  dragging.el.classList.remove('fresh');
-
-  if (e.target === els.bin) {
-    // when we drop into the bin from the toolbar, remove the element from the screen directly
-    if (dragging.dummy) {
-      dragging.dummy.remove();
-      dragging.dummy = null;
-    } else {
-      els.trash = els.main.querySelector('#trash') || util.cloneTemplateToTarget('#template_trash', els.main);
-      els.trash.lastElementChild?.append(dragging.el);
-      saveChanges();
-      toast.html('locked', chrome.i18n.getMessage('locked_moved_to_trash'));
-    }
-  } else {
-    if (!dragging.startedOnThisPage) {
-      extractDataFromDrop(e);
-    }
-    // handle all cases
-    saveChanges();
-  }
-}
-
-function dragEnd() {
-  try {
-    if (!dragging || !dragging.el.classList.contains('dragging')) {
-      if (OPTS.editOnNewDrop && dragging.el.classList.contains('new') && dragging.dummy) { editStart(dragging.el); }
-      return;
-    }
-    if (OPTS.lock) {
-      toast.html('locked', chrome.i18n.getMessage('locked'));
-      return;
-    }
-
-    els.body.classList.remove('dragOngoing');
-    els.bin.classList.remove('over');
-
-    dragging.el.classList.remove('fresh');
-
-    if (dragging.dummy) {
-      dragging.dummy.remove();
-    } else {
-      replaceElementInOriginalPosition();
-    }
-
-    dragging.el.classList.remove('dragging');
-
-    dragging = undefined;
-    tooltip.hide();
-    toast.html('cancel', chrome.i18n.getMessage('drag_cancel'));
-  } finally {
-    dragging?.el.classList.remove('new');
-  }
-}
 export async function prepareBookmarks(OPTS, target) {
   if (OPTS.showBookmarksSidebar) {
     const count = OPTS.showBookmarksLimit;
@@ -911,11 +568,13 @@ export async function prepareBookmarks(OPTS, target) {
   showBookmarks(OPTS.showBookmarksSidebar);
   document.querySelector('#sidebar').style.setProperty('visibility', 'visible');
 }
+
 function toggleBookmarks() {
   OPTS.showBookmarksSidebar = !OPTS.showBookmarksSidebar;
   prepareBookmarks(OPTS, els.bookmarksnav);
   saveChanges();
 }
+
 function showBookmarks(visible = true) {
   if (visible) {
     document.documentElement.style.removeProperty('--bookmark-width');
@@ -929,24 +588,12 @@ function showBookmarks(visible = true) {
     document.documentElement.style.setProperty('--bookmark-border', '0em');
   }
 }
-/* Create an object that can be safely used to refer to elements
- * in the dom. similar to window.id but without the risk of
- * clashing variable names and with the bonus of being able
- * to use a comma separated list of CSS selectors
- */
-function prepareElements(selectors = '[id]') {
-  const el = {};
-  const elems = document.querySelectorAll(selectors);
-  elems.forEach(e => {
-    el[e.id ? e.id : e.tagName.toLowerCase()] = e;
-  });
-  return el;
-}
 
 function findEventFirstSection(e) {
-  for (let i = 0; i < e.path.length; i++) {
-    if (e.path[i].tagName === 'SECTION') {
-      return e.path[i];
+  const path = e.path || (e.composedPath && e.composedPath());
+  for (let i = 0; i < path.length; i++) {
+    if (path[i].tagName === 'SECTION') {
+      return path[i];
     }
   }
 
@@ -967,7 +614,7 @@ function toggleFold(e) {
   }
 
   // This is why shadow root needs to be open
-  const target = findTarget(e);
+  const target = util.findTarget(e);
 
   if (!(target instanceof HTMLElement)) { return; }
   if (els.body.classList.contains('editing')) { return; }
@@ -982,14 +629,16 @@ function toggleFold(e) {
     foldMe.classList.toggle('folded');
     target?.toggleFold?.();
   }
-  prepareDynamicFlex(els.main);
+
+  if (els.main != null) { util.prepareDynamicFlex(els.main); }
 
   saveChanges();
 }
+
 function editSection(e) {
   if (!e.shiftKey) return;
 
-  const target = findTarget(e);
+  const target = util.findTarget(e);
   if (target.tagName === 'A') {
     return;
   }
@@ -997,6 +646,8 @@ function editSection(e) {
   if (els.body.classList.contains('editing')) { return; }
 
   const elementToEdit = findEventFirstSection(e);
+
+  if (els.main == null) return;
 
   if (elementToEdit.id.includes('agenda')) {
     editStart(elementToEdit);
@@ -1006,8 +657,9 @@ function editSection(e) {
     editStart(elementToEdit);
   }
 }
+
 /** add a fold button to the page if necessary */
-function prepareFoldables(selectors = 'main') {
+export function prepareFoldables(selectors = 'main') {
   const elems = [...document.querySelectorAll(selectors)];
   elems.forEach(e => e.addEventListener('dblclick', toggleFold));
   elems.forEach(e => e.addEventListener('click', editSection));
@@ -1027,12 +679,13 @@ function getAllBySelector(element, selector) {
 function prepareListeners() {
   const anchors = getAllBySelector(els.main, 'a');
   for (const a of anchors) {
-    addAnchorListeners(a);
+    util.addAnchorListeners(a, linkClicked);
   }
   document.addEventListener('keydown', detectKeydown);
   els.addlink.addEventListener('click', addLinkListener);
   els.addpanel.addEventListener('click', addPanel);
 }
+
 function prepareContent() {
   // clean page
   while (els.main.firstElementChild) {
@@ -1057,6 +710,7 @@ function prepareContent() {
 
   prepareListeners();
 }
+
 function toggleTrash() {
   // ensure trash is the last thing on the screen
   els.trash = els.main.querySelector('#trash') || util.cloneTemplateToTarget('#template_trash', els.main);
@@ -1068,6 +722,7 @@ function toggleTrash() {
     els.main.scrollIntoView({ behavior: 'smooth' });
   }
 }
+
 function clearDialog() {
   while (dialog?.firstElementChild) {
     dialog.firstElementChild.remove();
@@ -1090,6 +745,7 @@ function cloneToDialog(selector) {
   clearDialog();
   dialog.append(clone);
 }
+
 function prepareTrash() {
   els.trash = els.trash || document.querySelector('#trash');
   if (!els.trash) {
@@ -1099,64 +755,14 @@ function prepareTrash() {
   els.trash.classList.add('invisible');
   els.bin.addEventListener('click', toggleTrash);
 }
-/*
- * make all links within a doc draggable
- */
-export function prepareDrag() {
-  document.addEventListener('dragstart', dragStart);
-  document.addEventListener('dragover', dragOver);
-  document.addEventListener('drop', dragDrop);
-  document.addEventListener('dragend', dragEnd);
-  document.addEventListener('dragenter', dragEnter);
 
-  /* Clear all pending new elements that could have been left in the trash or incorrect drag.
-  Only clear when the user is not dragging as panels/links need the .new class whilst being dragged. */
-  if (!dragging) {
-    for (const element of document.querySelectorAll('.new')) {
-    // skip elements in the nav bar
-      if (element.parentElement.id === 'toolbarnav') continue;
-      element.remove();
-    }
-  }
-}
-function prepareDynamicFlex(where) {
-  if (OPTS.proportionalSections) {
-    const topLevelSections = where.querySelectorAll(':scope > sst-panel, :scope > section, :scope > a');
-    for (const child of topLevelSections) {
-      calculateDynamicFlex(child);
-    }
-  } else {
-    const elems = els.main.querySelectorAll('[data-size]');
-    elems.forEach(el => { el.removeAttribute('data-size'); });
-  }
-}
-function calculateDynamicFlex(where) {
-  let total = 0;
-  if (where._content) {
-    for (const child of where._content.children) {
-      if (child.tagName === 'SST-PANEL') {
-        if (child.folded) {
-          total += 1;
-        } else {
-          total += Math.max(1, calculateDynamicFlex(child));
-        }
-      }
-      if (child.tagName === 'A') {
-        total += 1;
-      }
-    }
-  }
-  if (where.tagName === 'SST-PANEL') {
-    where.grow = String(total > 0 ? total : 1);
-  }
-  return total;
-}
 function emptyTrash() {
   delete els.trash;
   document.querySelector('#trash')?.remove();
   prepareTrash();
-  saveChanges(false);
+  saveChanges();
 }
+
 function lock() {
   OPTS.lock = !OPTS.lock;
   if (OPTS.lock) {
@@ -1165,6 +771,7 @@ function lock() {
     toast.html('locked', chrome.i18n.getMessage('lock_off'));
   }
 }
+
 function togglePresentation() {
   const panels = getAllBySelector(els.main, '[private]');
 
@@ -1174,6 +781,7 @@ function togglePresentation() {
     panel.blur = isPrivateOn;
   }
 }
+
 function receiveBackgroundMessages(m) {
   switch (m.item) {
     case 'emptytrash':
@@ -1210,7 +818,7 @@ function receiveBackgroundMessages(m) {
       addLink(els.contextClicked);
       break;
     case 'addPanel':
-      createPanel(els.contextClicked, true, false);
+      util.createPanel(els.contextClicked, true, false);
       break;
     case 'lock':
       lock();
@@ -1221,6 +829,7 @@ function receiveBackgroundMessages(m) {
     default: break;
   }
 }
+
 function saveElmContextClicked(e) {
   e.stopPropagation();
   const target = findSection(e.target);
@@ -1230,6 +839,7 @@ function saveElmContextClicked(e) {
     els.contextClicked = els.main;
   }
 }
+
 function prepareBackgroundListener() {
   chrome.runtime.onMessage.addListener(receiveBackgroundMessages);
 }
@@ -1238,7 +848,7 @@ function prepareMain() {
   prepareContent();
   prepareDrag();
   prepareFoldables();
-  prepareDynamicFlex(els.main);
+  util.prepareDynamicFlex(els.main);
   prepareContextPanelEventListener();
 }
 
@@ -1272,14 +882,60 @@ function migrateLinks() {
     delete o.dataset.locale;
   }
 }
+
+async function loadPageCloud() {
+  if (!OPTS.cloud.hasConflict) return;
+
+  const [onlinePage, onlinePageVersion] = await getPageCloud();
+
+  const parsedPage = JSON.parse(onlinePage);
+
+  const isEqual = util.isContentEqual(parsedPage, OPTS.json);
+
+  if (!isEqual) {
+    OPTS.onlineJson = parsedPage;
+    OPTS.onlinePageVersion = onlinePageVersion;
+    saveChanges();
+    document.querySelector('#mergeConflictResolver').style.display = 'block';
+  } else {
+    OPTS.cloud.version = onlinePageVersion + 1;
+    OPTS.cloud.hasConflict = false;
+    options.write();
+  }
+}
+
+const prepareSectionActions = () => {
+  // Merge conflict resolver trigger
+  document.querySelector('#mergeConflictResolver').addEventListener('click', () => {
+    window.location.href = './pages/merge-resolver/index.html';
+  });
+
+  // Feedback button should always be visible when in beta
+  if (!OPTS.showFeedback && !util.isBeta()) {
+    document.querySelector('#feedback').style.display = 'none';
+  }
+
+  if (!OPTS.cloud.enabled) {
+    document.querySelector('#forceCloudSync').style.display = 'none';
+  }
+
+  document.querySelector('#forceCloudSync a').addEventListener('click', () => {
+    syncPageCloud();
+  });
+};
+
 async function prepareAll() {
+  prepareBackgroundListener();
+
   await options.load();
-  els = prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
+  els = util.prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
+
+  if (els.main == null) return;
+
   prepareBookmarks(OPTS, els.bookmarksnav);
   util.prepareCSSVariables(OPTS);
   prepareMain();
   prepareTrash();
-  prepareBackgroundListener();
   toast.prepare();
   toast.popup(`Structured Start Tab v${chrome.runtime.getManifest().version}`);
   toast.popup(chrome.i18n.getMessage('popup_toggle_sidebar'));
@@ -1290,9 +946,10 @@ async function prepareAll() {
   updateAgenda();
   util.localizeHtml(document);
 
-  // Feedback button should always be visible when in beta
-  if (!OPTS.showFeedback && !util.isBeta()) {
-    document.querySelector('#feedback').style.display = 'none';
-  }
+  prepareSectionActions();
+
+  if (OPTS.cloud.enabled) { await loadPageCloud(); }
 }
+
+
 window.addEventListener('DOMContentLoaded', prepareAll);

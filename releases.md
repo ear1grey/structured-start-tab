@@ -2,13 +2,17 @@
 
 Every release for the foreseeable future will be an alpha level release.  This means you can expect an evolving and improving feature set, and also bugs.
 
-# Current Beta Release
-* 1.10.1.1 [JSON pages, Component Panels & bug fixes](https://github.com/ear1grey/structured-start-tab/milestone/22?closed=1)
+## Current Beta Release
 
-# Current Stable Release
+* 1.11.0.0 [Cloud Sync](https://github.com/ear1grey/structured-start-tab/milestone/23?closed=1)
+
+## Current Stable Release
+
 * 1.10.0 [Migration to MV3](https://github.com/ear1grey/structured-start-tab/milestone/20?closed=1)
 
-## Previous Releases
+### Previous Releases
+
+* 1.10.1.1 [JSON pages, Component Panels & bug fixes](https://github.com/ear1grey/structured-start-tab/milestone/22?closed=1)
 * 1.9.1 [Preparation for manifest V3](https://github.com/ear1grey/structured-start-tab/milestone/21?closed=1)
 * 1.9.0 New calendar panel
 * 1.8.3 Quick fix for not-editing bug (hangover from i18n conversion)

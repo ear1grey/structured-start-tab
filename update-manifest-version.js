@@ -22,9 +22,9 @@ let pageTitle = 'Structured Start Tab';
 // Add beta definitions
 if (pkgData.version.split('.').length > 3) { // beta version should be structured as X.Y.Z.B whilst release version is X.Y.Z
   pkgData.name += '-beta';
-  manData.name += ' (beta)';
+  manData.name += manData.name.endsWith(' (Beta)') ? '' : ' (Beta)';
   pkgData.description += ' (beta)';
-  manData.description += ' (beta)';
+  manData.description += manData.description.endsWith(' (beta)') ? '' : ' (beta)';
 
   pageTitle += ' (beta)';
 }

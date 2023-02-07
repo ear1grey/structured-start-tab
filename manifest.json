@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "version": "1.10.1.1",
+  "version": "1.11.0.0",
   "name": "Structured Start Tab (Beta)",
-  "description": "Show a structured page when a new tab is opened.",
+  "description": "Show a structured page when a new tab is opened. (beta)",
   "author": "Rich Boakes",
   "default_locale": "en",
   "permissions": [
@@ -12,10 +12,14 @@
     "favicon",
     "contextMenus",
     "topSites",
-    "alarms"
+    "alarms",
+    "identity",
+    "identity.email"
   ],
   "host_permissions": [
-    "https://calendar.google.com/calendar/*"
+    "https://calendar.google.com/calendar/*",
+    "http://127.0.0.1:5001/*",
+    "*://*.cloudfunctions.net/*"
   ],
   "background": {
     "service_worker": "src/js/background.js",
@@ -35,7 +39,7 @@
     "newtab": "src/index.html"
   },
   "options_ui": {
-    "page": "src/options-page.html"
+    "page": "src/pages/options/index.html"
   },
   "web_accessible_resources": [
     {

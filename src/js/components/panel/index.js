@@ -17,7 +17,7 @@ class PanelComponent extends HTMLElement {
     this._panel.append(this._header, this._content);
     this.shadow.append(this._panel);
 
-    attachStyleSheet(this.shadow, 'js/components/panel/index.css');
+    attachStyleSheet(this.shadow, '/src/js/components/panel/index.css');
   }
 
   static get observedAttributes() {

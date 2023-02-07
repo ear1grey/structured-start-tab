@@ -1,28 +1,49 @@
 // or chrome.storage.sync
 // load default option values from a file
 // these defaults are replaced  thereafter if it's possible to initial values here are app defaults
-import * as toast from './lib/toast.js';
-import * as util from './lib/util.js';
-import { OPTS } from './lib/options.js';
-import * as options from './lib/options.js';
-import { htmlStringToJson } from './services/parser.service.js';
+import * as toast from '../../js/lib/toast.js';
+import * as util from '../../js/lib/util.js';
+import { OPTS } from '../../js/lib/options.js';
+import * as options from '../../js/lib/options.js';
+import { htmlStringToJson } from '../../js/services/parser.service.js';
 
 function setCheckBox(prefs, what) {
   const elem = document.getElementById(what);
-  elem.checked = prefs[what];
+  elem.checked = deepGet(prefs, what);
 }
 function getCheckBox(what) {
   const elem = document.getElementById(what);
-  OPTS[what] = elem.checked;
+  deepSet(OPTS, what, elem.checked);
 }
+
 function setValue(prefs, what, defaultValue = 0) {
   const elem = document.getElementById(what);
-  elem.valueAsNumber = prefs[what] || defaultValue;
+  elem.valueAsNumber = deepGet(prefs, what) || defaultValue;
 }
 function getValue(what) {
   const elem = document.getElementById(what);
-  OPTS[what] = elem.valueAsNumber;
+  deepSet(OPTS, what, elem.valueAsNumber);
 }
+
+function setText(prefs, what) {
+  const elem = document.getElementById(what);
+  elem.value = deepGet(prefs, what);
+}
+function getText(what) {
+  const elem = document.getElementById(what);
+  deepSet(OPTS, what, elem.value);
+}
+
+function deepGet(obj, path) {
+  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+}
+function deepSet(obj, path, value) {
+  const parts = path.split('.');
+  const last = parts.pop();
+  const target = parts.reduce((acc, part) => acc[part], obj);
+  target[last] = value;
+}
+
 // incorporate the latest values of the page into
 // the OPTS object that gets stored.
 function updatePrefsWithPage() {
@@ -44,6 +65,13 @@ function updatePrefsWithPage() {
   getValue('fontsize');
   getValue('agendaNb');
   getValue('titleAgendaNb');
+
+  // Cloud
+  getCheckBox('cloud.enabled');
+  getText('cloud.url');
+  getCheckBox('cloud.autoAdd');
+  getCheckBox('cloud.syncFoldStatus');
+  getCheckBox('cloud.syncPrivateStatus');
 }
 function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'lock');
@@ -64,6 +92,14 @@ function updatePageWithPrefs(prefs) {
   setValue(prefs, 'agendaNb');
   setValue(prefs, 'titleAgendaNb');
 
+  // Cloud
+  setCheckBox(prefs, 'cloud.enabled');
+  setText(prefs, 'cloud.url');
+  setCheckBox(prefs, 'cloud.autoAdd');
+  setCheckBox(prefs, 'cloud.syncFoldStatus');
+  setCheckBox(prefs, 'cloud.syncPrivateStatus');
+
+  // Defaults
   if (!util.isBeta()) { setCheckBox(prefs, 'showFeedback'); }
 }
 /**
@@ -73,7 +109,7 @@ function updatePageWithPrefs(prefs) {
   * @param attrs - to be added to the input element (e.g. max, min)
   * @param txt - text for the label
   */
-function create(where, type, attrs, txt, defaultValue, readonly) {
+function create(where, type, attrs, txt, defaultValue, readonly, onInputEvent) {
   const elem = util.cloneTemplate('#template_' + type);
   where.append(elem);
   const elemInDoc = where.lastElementChild;
@@ -103,7 +139,10 @@ function create(where, type, attrs, txt, defaultValue, readonly) {
         }
       }
     }
-    elemInDoc.addEventListener('input', saveOptions);
+    elemInDoc.addEventListener('input', (e) => {
+      saveOptions();
+      if (onInputEvent != null) { onInputEvent(e); }
+    });
   }
   return elemInDoc;
 }
@@ -115,6 +154,7 @@ function createPageWithPrefs(prefs) {
     const feed = create(settings, 'section', {}, chrome.i18n.getMessage('messages'));
     const agenda = create(settings, 'section', {}, chrome.i18n.getMessage('agenda'));
     const configureShortcut = create(settings, 'section', {}, chrome.i18n.getMessage('configure_shortcut_title'));
+    const cloud = create(settings, 'section', {}, chrome.i18n.getMessage('cloud'));
     create(book, 'checkbox', { id: 'showBookmarksSidebar' }, chrome.i18n.getMessage('showBookmarksSidebar'));
     create(book, 'checkbox', { id: 'hideBookmarksInPage' }, chrome.i18n.getMessage('hideBookmarksInPage'));
     create(book, 'number', { id: 'showBookmarksLimit' }, chrome.i18n.getMessage('showBookmarksLimit'));
@@ -135,6 +175,16 @@ function createPageWithPrefs(prefs) {
     create(agenda, 'checkbox', { id: 'showLocationAgenda' }, chrome.i18n.getMessage('showLocationAgenda'));
     create(agenda, 'checkbox', { id: 'showEndDateAgenda' }, chrome.i18n.getMessage('showEndDateAgenda'));
     create(configureShortcut, 'show', { id: 'textConfigure' }, chrome.i18n.getMessage('configure_shortcut'));
+    // Cloud
+    create(cloud, 'checkbox', { id: 'cloud.enabled' }, chrome.i18n.getMessage('cloud_enabled'), false, false, (e) => {
+      if (e.target.checked) {
+        alert(chrome.i18n.getMessage('cloud_warn'));
+      }
+    });
+    create(cloud, 'text', { id: 'cloud.url' }, chrome.i18n.getMessage('cloud_url'));
+    create(cloud, 'checkbox', { id: 'cloud.autoAdd' }, chrome.i18n.getMessage('cloud_autoAdd'), false);
+    create(cloud, 'checkbox', { id: 'cloud.syncFoldStatus' }, chrome.i18n.getMessage('cloud_syncFoldedStatus'), false);
+    create(cloud, 'checkbox', { id: 'cloud.syncPrivateStatus' }, chrome.i18n.getMessage('cloud_syncPrivateStatus'), false);
   }
   updatePageWithPrefs(prefs);
 }

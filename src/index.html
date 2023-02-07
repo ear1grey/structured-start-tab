@@ -1,6 +1,6 @@
 <!doctype html>
 <meta charset="utf-8">
-<title>Structured Start Tab</title>
+<title>Structured Start Tab (beta)</title>
 <link rel="stylesheet" href="style/index.css">
 
 <main>
@@ -15,7 +15,7 @@
         data-info="New link: click or drag.">Add link</a>
       <a class="new" draggable="true" data-locale="data_info_add_panel" id=addpanel
         data-info="New panel: click or drag.">Add panel</a>
-      <a id=options draggable="false" data-locale="data_info_options" href="options-page.html"
+      <a id=options draggable="false" data-locale="data_info_options" href="pages/options/index.html"
         data-info="Open the options page.">Options</a>
       <a id=bin data-locale="data_info_trash"
         data-info="Click to toggle the trash section open or closed.  Drag links or panels here to move them to the trash.">Trash</a>
@@ -28,8 +28,17 @@
     </nav>
   </section>
 
-  <section id="feedback" draggable="false">
-    <a draggable="false" href="https://github.com/ear1grey/structured-start-tab/issues">Feedback</a>
+  <section id="mergeConflictResolver" draggable="false" class="extra-action">
+    <a draggable="false" data-locale="action_merge_conflict">Merge conflict</a>
+  </section>
+
+  <section id="forceCloudSync" draggable="false" class="extra-action">
+    <a draggable="false" data-locale="action_cloud_sync">Cloud Sync</a>
+  </section>
+
+  <section id="feedback" draggable="false" class="extra-action">
+    <a draggable="false" href="https://github.com/ear1grey/structured-start-tab/issues"
+      data-locale="action_feedback">Feedback</a>
   </section>
 
 </aside>
@@ -199,4 +208,15 @@
   <p data-locale="less_visited">Less visited</p>
   <span id=blueHsl></span>
   <p data-locale="not_visited">Not visited</p>
+</template>
+
+<template id="template_merge_resolver">
+  <div id="merge_resolver">
+    <header>Merge resolver</header>
+    <section>
+      <main id="merge_resolver_current"></main>
+      <main id="merge_resolver_new"></main>
+    </section>
+    <footer></footer>
+  </div>
 </template>
