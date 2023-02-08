@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
   "version": "1.11.0.1",
+  "version_name": "1.11.0-beta",
   "name": "Structured Start Tab (Beta)",
   "description": "Show a structured page when a new tab is opened. (beta)",
   "author": "Rich Boakes",
@@ -74,6 +75,5 @@
       },
       "description": "Toggle presentation mode"
     }
-  },
-  "version_name": "1.11.0-beta"
+  }
 }

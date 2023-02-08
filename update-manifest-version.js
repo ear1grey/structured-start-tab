@@ -23,8 +23,6 @@ manData.version = version;
 manData.version_name = version;
 manData.name = pkgData.description;
 
-// Version info
-
 // Add beta definitions
 if (type === 'beta') { // beta version should end with -beta
   // package details
