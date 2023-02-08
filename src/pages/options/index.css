@@ -59,8 +59,12 @@ label {
   align-items: center;
 }
 
-label>input {
-  width: auto;
+label>input,
+label>select {
+  width: 80%;
+  padding: 0.2rem;
+  border: none;
+  border-radius: 0.2rem;
 }
 
 label>input[type=number] {
@@ -117,10 +121,13 @@ input[type="file"] {
   visibility: hidden;
 }
 
-button:hover {
+button:hover:not(:disabled) {
   filter: brightness(150%);
 }
 
+button:disabled {
+  filter: brightness(75%);
+}
 
 section,
 footer {

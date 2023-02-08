@@ -39,10 +39,10 @@ export const OPTS = {
     enabled: false,
     url: '',
 
-    autoAdd: false,
-    autoDelete: false,
+    syncMode: 'manual',
     syncFoldStatus: false,
     syncPrivateStatus: false,
+    newChanges: false,
   },
 };
 
@@ -51,7 +51,7 @@ const settingKey = 'structured-start-tab';
 export function load() {
   return new Promise(resolve => {
     chrome.storage.local.get([settingKey], async (result) => {
-      Object.assign(OPTS, result[settingKey]);
+      deepAssign(OPTS, result[settingKey]);
 
       // If the user has no cloud id, generate one
       if (!OPTS.cloud.userId) {
@@ -68,6 +68,22 @@ export function load() {
       resolve();
     });
   });
+}
+
+function deepAssign(target, source) {
+  if (Array.isArray(source)) {
+    return source;
+  }
+
+  for (const key of Object.keys(source)) {
+    if (source[key] instanceof Object) {
+      if (!target[key]) target[key] = {};
+      Object.assign(source[key], deepAssign(target[key], source[key]));
+    }
+  }
+
+  Object.assign(target || {}, source);
+  return target;
 }
 
 export function write() {

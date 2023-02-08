@@ -38,8 +38,8 @@ export const syncPageCloud = async ({ window = null, ignoreConflict = false } = 
           .filter(panel => !idsToIgnore.includes(panel.id))), // make sure to exclude the trash panel
       version: OPTS.cloud.version,
       options: {
-        autoAdd: OPTS.cloud.autoAdd,
-        autoDelete: OPTS.cloud.autoDelete,
+        newChanges: OPTS.cloud.newChanges,
+        syncMode: OPTS.cloud.syncMode,
         syncFold: OPTS.cloud.syncFoldStatus,
         syncPrivate: OPTS.cloud.syncPrivateStatus,
       },
@@ -53,11 +53,13 @@ export const syncPageCloud = async ({ window = null, ignoreConflict = false } = 
     case 200:
       OPTS.cloud.version = response.content.version;
       OPTS.cloud.hasConflict = false;
+      OPTS.cloud.newChanges = false;
       break;
     case 201:
       OPTS.cloud.version = response.content.version;
       OPTS.cloud.hasConflict = false;
-      OPTS.json = JSON.parse(response.content.page);
+      OPTS.cloud.newChanges = false;
+      OPTS.json = JSON.parse(response.content.cloudPage);
       jsonToDom(window, OPTS.json);
       break;
     case 409:
@@ -69,7 +71,6 @@ export const syncPageCloud = async ({ window = null, ignoreConflict = false } = 
           conflictingElements: response.content.conflicts,
         };
 
-        write();
         document.querySelector('#mergeConflictResolver').style.display = 'block';
       }
 

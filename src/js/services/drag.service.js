@@ -148,7 +148,7 @@ function dragDrop(e) {
     } else {
       els.trash = els.main.querySelector('#trash') || util.cloneTemplateToTarget('#template_trash', els.main);
       els.trash.lastElementChild?.append(dragging.el);
-      saveChanges();
+      saveChanges({ newChanges: true });
       toast.html('locked', chrome.i18n.getMessage('locked_moved_to_trash'));
     }
   } else if (e.target === els.toolbar || // Invalid drop elements
@@ -163,7 +163,7 @@ function dragDrop(e) {
     if (!dragging.startedOnThisPage) {
       extractDataFromDrop(e);
     }
-    saveChanges();
+    saveChanges({ newChanges: true });
   }
 }
 

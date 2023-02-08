@@ -221,7 +221,7 @@ const define = (template, css) => {
 
     setLoading(value) {
       if (value) addSpinner(this.$title);
-      else removeSpinner(this.$title);
+      else removeSpinner({ element: this.$title });
 
       this.shadow.querySelectorAll('button, a').forEach(el => {
         if (value) {

@@ -378,16 +378,18 @@ export function isContentEqual(a, b) {
     });
 }
 
-export function spinElement(element, duration = 0) {
+function spinElement({ element, duration = 0, disable = false } = {}) {
   element.classList.add('spin');
   if (duration > 0) {
     setTimeout(() => {
       element.classList.remove('spin');
+      if (disable) element.disabled = false;
     }, duration);
   }
 }
 
-export function addSpinner(element) {
+export function addSpinner(element, disable) {
+  if (disable) element.disabled = true;
   // set element properties for better styling
   element.style.display = 'flex';
   element.style.alignItems = 'center';
@@ -396,11 +398,12 @@ export function addSpinner(element) {
   spinner.id = 'spinner';
   spinner.textContent = '⏳';
   spinner.style.marginRight = '0.5em';
-  spinElement(spinner);
+  spinElement({ element: spinner, disable });
   element.prepend(spinner);
 }
 
-export function removeSpinner(element, display) {
+export function removeSpinner({ element, display, enable } = {}) {
   element.querySelectorAll('#spinner').forEach(e => e.remove());
   if (display) element.style.display = display;
+  if (enable) element.disabled = false;
 }

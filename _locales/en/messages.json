@@ -44,6 +44,9 @@
   "delete": {
     "message": "Delete"
   },
+  "remove": {
+    "message": "Remove"
+  },
   "edit_panel": {
     "message": "Editing Panel"
   },
@@ -317,12 +320,6 @@
   "cloud_url": {
     "message": "Storage URL"
   },
-  "cloud_autoAdd": {
-    "message": "Automatically add new panels"
-  },
-  "cloud_autoDelete": {
-    "message": "Automatically delete panels"
-  },
   "cloud_syncFoldedStatus": {
     "message": "Sync panel folded status"
   },
@@ -333,13 +330,16 @@
     "message": "Warning: this feature uses your Google Id and the data will be stored on Google servers. If your Google Id is compromised, your data will be compromised too."
   },
   "cloud_warn_id_change": {
-    "message": "Warning: changing the user Id may result in data loss."
+    "message": "Warning: changing the user Id may result in data loss. Make sure that you have a backup of your data before changing the user Id."
   },
   "cloud_panel_code": {
     "message": "Panel code"
   },
-  "cloud_delete_shared_panels": {
-    "message": "Delete all shared panels"
+  "cloud_remove_shared_panels": {
+    "message": "Unpublish panels from the cloud"
+  },
+  "cloud_sync_mode": {
+    "message": "Sync mode"
   },
   "panel_export_file": {
     "message": "Export panel to file"

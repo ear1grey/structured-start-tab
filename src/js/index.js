@@ -51,15 +51,15 @@ function prepareFavicons() {
   }
 }
 
-export function saveChanges(makeBackup = true) {
+export function saveChanges({ makeBackup = true, newChanges = false } = {}) {
   if (els.main == null) return;
 
   if (els.main.classList.contains('heatmap')) {
     toggleHeatMap();
   }
-  if (makeBackup) {
-    OPTS.jsonBackup = [...OPTS.json];
-  }
+
+  if (makeBackup) OPTS.jsonBackup = [...OPTS.json];
+  OPTS.cloud.newChanges = OPTS.cloud.newChanges || newChanges;
 
   OPTS.json = domToJson(els.main);
   options.write();
@@ -401,7 +401,7 @@ function toggleFold(e) {
 
   if (els.main != null) { util.prepareDynamicFlex(els.main); }
 
-  saveChanges();
+  saveChanges({ newChanges: true });
 }
 
 function editSection(e) {

@@ -195,6 +195,11 @@ const jsonElementToDom = (element, newId = false) => {
 };
 
 const jsonToDom = (parentElement, content) => {
+  // remove all children
+  while (parentElement.firstChild) {
+    parentElement.removeChild(parentElement.firstChild);
+  }
+
   for (const element of content) {
     switch (element.type) {
       case 'section': {
