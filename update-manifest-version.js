@@ -14,17 +14,27 @@ const manData = JSON.parse(manRaw);
 const htmlRaw = readFileSync(htmlPath, 'utf8');
 
 // Defaults
-manData.version = pkgData.version;
 pkgData.name = 'structured-start-tab';
 pkgData.description = 'Structured Start Tab';
 let pageTitle = 'Structured Start Tab';
 
+const [version, type] = pkgData.version.split('-');
+manData.version = version;
+manData.version_name = version;
+manData.name = pkgData.description;
+
+// Version info
+
 // Add beta definitions
-if (pkgData.version.split('.').length > 3) { // beta version should be structured as X.Y.Z.B whilst release version is X.Y.Z
+if (type === 'beta') { // beta version should end with -beta
+  // package details
   pkgData.name += '-beta';
-  manData.name += manData.name.endsWith(' (Beta)') ? '' : ' (Beta)';
   pkgData.description += ' (beta)';
-  manData.description += manData.description.endsWith(' (beta)') ? '' : ' (beta)';
+
+  // manifest details
+  manData.version_name += '-beta';
+  manData.version = `${manData.version}.1`;
+  manData.name += manData.name.endsWith(' (Beta)') ? '' : ' (Beta)';
 
   pageTitle += ' (beta)';
 }
