@@ -1,31 +1,18 @@
 import * as ui from '../../services/ui.service.js';
-import { localizeHtml, addSpinner, removeSpinner } from '../../lib/util.js';
+import { localizeHtml, addSpinner, removeSpinner, loadAsync, defineComponent } from '../../lib/util.js';
 
-fetch('/src/js/components/edit-window/index.html') // Load HTML
-  .then(stream => stream.text())
-  .then(text =>
-    fetch('/src/js/components/edit-window/index.css') // Locs CSS
-      .then(stream => stream.text())
-      .then(css => {
-        define(text, css);
-      }),
-  );
+const getTemplate = loadAsync('/src/js/components/edit-window/index.html');
+const getStyle = loadAsync('/src/js/components/edit-window/index.css');
 
-const define = (template, css) => {
-  // load css from file
-  const link = document.createElement('link');
-  link.setAttribute('rel', 'stylesheet');
-  link.setAttribute('href', 'js/components/edit-window/index.css');
-
+Promise.all([getTemplate, getStyle]).then(([template, style]) => {
   class EditWindow extends HTMLElement {
     constructor() {
       super();
 
       this.shadow = this.attachShadow({ mode: 'open' });
-      this.shadow.appendChild(link);
 
       // For now this is the only way to load the css only once (not using @import)
-      this.shadow.innerHTML = `<style>${css}</style> ${template}`;
+      this.shadow.innerHTML = `<style>${style}</style> ${template}`;
 
       // Event listeners
       this.$cancelBtn.addEventListener('click', () => {
@@ -255,5 +242,5 @@ const define = (template, css) => {
     }
   }
 
-  customElements.define('edit-window', EditWindow);
-};
+  defineComponent('edit-window', EditWindow);
+});

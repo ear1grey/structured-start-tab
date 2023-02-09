@@ -1,7 +1,7 @@
 import { OPTS } from '../../js/lib/options.js';
 import * as options from '../../js/lib/options.js';
 import { jsonToDom, domToJson } from '../../js/services/parser.service.js';
-import '../../js/components/panel/index.js';
+import { loadPanelDefinition } from '../../js/components/panel/index.js';
 import { prepareCSSVariables, addSpinner, getAllBySelector } from '../../js/lib/util.js';
 import { prepareDrag } from '../../js/services/drag.service.js';
 import { prepareFoldables } from '../../js/index.js';
@@ -11,6 +11,7 @@ let els;
 const allElements = [];
 
 const prepareElements = async () => {
+  await loadPanelDefinition();
   await options.load();
   prepareCSSVariables(OPTS);
   prepareDrag();

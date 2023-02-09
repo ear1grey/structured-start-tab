@@ -407,3 +407,17 @@ export function removeSpinner({ element, display, enable } = {}) {
   if (display) element.style.display = display;
   if (enable) element.disabled = false;
 }
+
+export function loadAsync(path) {
+  return new Promise((resolve) => {
+    fetch(path)
+      .then(stream => stream.text())
+      .then(text => {
+        resolve(text);
+      });
+  });
+}
+
+export function defineComponent(name, classDef) {
+  if (customElements.get(name) == null) { customElements.define(name, classDef); }
+}
