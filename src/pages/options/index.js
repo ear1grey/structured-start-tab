@@ -39,6 +39,15 @@ function getText(what) {
   deepSet(OPTS, what, elem.value);
 }
 
+function setDropdown(prefs, what, defaultValue = 0) {
+  const elem = document.getElementById(what);
+  elem.value = deepGet(prefs, what) || defaultValue;
+}
+function getDropdown(what) {
+  const elem = document.getElementById(what);
+  deepSet(OPTS, what, elem.value);
+}
+
 function deepGet(obj, path) {
   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 }
@@ -76,10 +85,9 @@ function updatePrefsWithPage() {
   getText('cloud.userId');
   getCheckBox('cloud.enabled');
   getText('cloud.url');
-  getCheckBox('cloud.autoAdd');
-  getCheckBox('cloud.autoDelete');
   getCheckBox('cloud.syncFoldStatus');
   getCheckBox('cloud.syncPrivateStatus');
+  getDropdown('cloud.syncMode');
 }
 function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'lock');
@@ -105,10 +113,9 @@ function updatePageWithPrefs(prefs) {
   setText(prefs, 'cloud.userId');
   setCheckBox(prefs, 'cloud.enabled');
   setText(prefs, 'cloud.url');
-  setCheckBox(prefs, 'cloud.autoAdd');
-  setCheckBox(prefs, 'cloud.autoDelete');
   setCheckBox(prefs, 'cloud.syncFoldStatus');
   setCheckBox(prefs, 'cloud.syncPrivateStatus');
+  setDropdown(prefs, 'cloud.syncMode');
 
   // Defaults
   if (!util.isBeta()) { setCheckBox(prefs, 'showFeedback'); }
@@ -126,14 +133,13 @@ function create(where, type, attrs, txt, defaultValue, readonly, customEvents = 
   const elemInDoc = where.lastElementChild;
   if (elemInDoc) {
     if (attrs.id) elemInDoc.setAttribute('for', attrs.id);
-    if (attrs.btnText) {
-      elemInDoc.querySelector('button').textContent = attrs.btnText;
-      delete attrs.btnText;
-    }
+    if (attrs.btnText) elemInDoc.querySelector('button').textContent = attrs.btnText;
 
-    const input = elemInDoc.querySelector('[name=input], button');
+    const input = elemInDoc.querySelector('[name=input], button, select');
     if (input) {
       for (const [attr, val] of Object.entries(attrs)) {
+        // Skip attributes that are not for the input element
+        if (['options', 'btnText'].includes(attr)) continue;
         input.setAttribute(attr, val);
       }
 
@@ -151,6 +157,17 @@ function create(where, type, attrs, txt, defaultValue, readonly, customEvents = 
         } else {
           txtElem.textContent = txt;
         }
+      }
+    }
+
+    // Add options to dropdown
+    if (type === 'dropdown') {
+      const select = elemInDoc.querySelector('select');
+      for (const option of attrs.options) {
+        const opt = document.createElement('option');
+        opt.value = option.value;
+        opt.textContent = option.name;
+        select.appendChild(opt);
       }
     }
 
@@ -214,23 +231,29 @@ function createPageWithPrefs(prefs) {
       },
     ]);
     create(cloud, 'text', { id: 'cloud.url' }, chrome.i18n.getMessage('cloud_url'));
-    create(cloud, 'checkbox', { id: 'cloud.autoAdd' }, chrome.i18n.getMessage('cloud_autoAdd'), false);
-    create(cloud, 'checkbox', { id: 'cloud.autoDelete' }, chrome.i18n.getMessage('cloud_autoDelete'), false);
     create(cloud, 'checkbox', { id: 'cloud.syncFoldStatus' }, chrome.i18n.getMessage('cloud_syncFoldedStatus'), false);
     create(cloud, 'checkbox', { id: 'cloud.syncPrivateStatus' }, chrome.i18n.getMessage('cloud_syncPrivateStatus'), false);
-    create(cloud, 'button', { btnText: chrome.i18n.getMessage('delete') }, chrome.i18n.getMessage('cloud_delete_shared_panels'), null, false, [
+    create(cloud, 'button', { btnText: chrome.i18n.getMessage('remove') }, chrome.i18n.getMessage('cloud_remove_shared_panels'), null, false, [
       {
         event: 'click',
         handler: async (e) => {
           try {
-            util.addSpinner(e.target);
+            util.addSpinner(e.target, true);
             await deleteAllSharedPanels();
           } finally {
-            util.removeSpinner(e.target, 'block');
+            util.removeSpinner({ element: e.target, display: 'block', enable: true });
           }
         },
       },
     ]);
+    create(cloud, 'dropdown', {
+      id: 'cloud.syncMode',
+      options: [
+        { name: 'Manual', value: 'manual' },
+        { name: 'Auto add', value: 'autoAdd' },
+        { name: 'Auto delete', value: 'autoDelete' },
+      ],
+    }, chrome.i18n.getMessage('cloud_sync_mode'));
   }
   updatePageWithPrefs(prefs);
 }

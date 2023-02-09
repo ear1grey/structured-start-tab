@@ -51,15 +51,15 @@ function prepareFavicons() {
   }
 }
 
-export function saveChanges(makeBackup = true) {
+export function saveChanges({ makeBackup = true, newChanges = false } = {}) {
   if (els.main == null) return;
 
   if (els.main.classList.contains('heatmap')) {
     toggleHeatMap();
   }
-  if (makeBackup) {
-    OPTS.jsonBackup = [...OPTS.json];
-  }
+
+  if (makeBackup) OPTS.jsonBackup = [...OPTS.json];
+  OPTS.cloud.newChanges = OPTS.cloud.newChanges || newChanges;
 
   OPTS.json = domToJson(els.main);
   options.write();
@@ -170,6 +170,7 @@ function addLink(target) {
     els.main.append(a);
   }
   a.scrollIntoView({ behavior: 'smooth' });
+  a.draggable = true;
   toast.html('addlink', chrome.i18n.getMessage('toast_link_add'));
   ui.flash(a, 'highlight');
 }
@@ -401,7 +402,7 @@ function toggleFold(e) {
 
   if (els.main != null) { util.prepareDynamicFlex(els.main); }
 
-  saveChanges();
+  saveChanges({ newChanges: true });
 }
 
 function editSection(e) {
@@ -587,11 +588,6 @@ function migrateLinks() {
   for (const o of els.main.querySelectorAll('a[data-href]')) {
     o.href = o.dataset.href;
     delete o.dataset.href;
-  }
-  /* anchors are draggable anyway and should not have the attr set
-     * this was erroneously done before 1.6 */
-  for (const o of els.main.querySelectorAll('a[draggable]')) {
-    o.removeAttribute('draggable');
   }
   /* Ensure no highlights are hanging around there's a small
      * chance they can be saved before they timeout */

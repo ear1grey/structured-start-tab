@@ -208,7 +208,7 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
 
     setLoading(value) {
       if (value) addSpinner(this.$title);
-      else removeSpinner(this.$title);
+      else removeSpinner({ element: this.$title });
 
       this.shadow.querySelectorAll('button, a').forEach(el => {
         if (value) {

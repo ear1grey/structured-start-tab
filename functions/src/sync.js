@@ -119,7 +119,7 @@ const elementBasePropertiesEqual = (incomingElement, cloudElement, { syncFold, s
 };
 
 const buildResultingPage = (
-  cloudObject, incomingObject, { autoAdd = false, autoDelete = false, syncFold = true, syncPrivate = true } = {}, resultPage, conflictIdents, updatedElements) => {
+  cloudObject, incomingObject, { newChanges = false, syncMode = 'manual', syncFold = true, syncPrivate = true } = {}, resultPage, conflictIdents, updatedElements) => {
   // clean-up content!!
   if (Array.isArray(incomingObject)) incomingObject = incomingObject.filter(elem => elem.id !== 'trash');
   if (Array.isArray(cloudObject)) cloudObject = cloudObject.filter(elem => elem.id !== 'trash');
@@ -132,13 +132,15 @@ const buildResultingPage = (
       const cloudElement = cloudElementIndex !== -1 ? cloudObject[cloudElementIndex] : null;
 
       if (!cloudElement) { // Cloud element not found
-        if (!autoAdd) {
+        if ((!newChanges && syncMode === 'autoAdd') || syncMode === 'manual') {
           conflictIdents.push(incomingElement.ident);
+        } else if (!newChanges && syncMode === 'autoDelete') {
+          updatedElements.push(incomingElement);
           continue;
+        } else {
+          resultPage.push(incomingElement);
+          updatedElements.push(incomingElement);
         }
-
-        resultPage.push(incomingElement);
-        updatedElements.push(incomingElement);
       } else { // Cloud element found
         cloudObject.splice(cloudElementIndex, 1);
 
@@ -151,7 +153,7 @@ const buildResultingPage = (
         if (newElement.content) newElement.content = []; // Don't automatically add the content already present
         if (incomingElement.content) {
           const contentConflictIdents = [];
-          buildResultingPage(cloudElement.content, incomingElement.content, { autoAdd, autoDelete, syncFold, syncPrivate }, newElement.content, contentConflictIdents, updatedElements);
+          buildResultingPage(cloudElement.content, incomingElement.content, { newChanges, syncMode, syncFold, syncPrivate }, newElement.content, contentConflictIdents, updatedElements);
           if (contentConflictIdents.length > 0) {
             for (const contentConflictIdent of contentConflictIdents) {
               conflictIdents.push(contentConflictIdent);
@@ -164,7 +166,10 @@ const buildResultingPage = (
 
     // Elements that are left in the cloudObject but are not present in the incomingObject
     if (cloudObject.length > 0) {
-      if (autoDelete) {
+      if (syncMode === 'autoDelete' && newChanges) { // We are pushing our page and we want to sync deletions
+        updatedElements.push(...cloudObject);
+      } else if (syncMode === 'autoAdd' && !newChanges) {
+        resultPage.push(...cloudObject);
         updatedElements.push(...cloudObject);
       } else {
         for (const cloudElement of cloudObject) {
@@ -180,7 +185,7 @@ const buildResultingPage = (
     }
     if (incomingObject.content) {
       const contentConflictIdents = [];
-      buildResultingPage(cloudObject.content, incomingObject.content, { autoAdd, autoDelete, syncFold, syncPrivate }, resultPage);
+      buildResultingPage(cloudObject.content, incomingObject.content, { syncMode, syncFold, syncPrivate }, resultPage);
       if (contentConflictIdents.length > 0) {
         for (const contentConflictIdent of contentConflictIdents) {
           conflictIdents.push(contentConflictIdent);

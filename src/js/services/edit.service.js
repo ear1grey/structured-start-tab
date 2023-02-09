@@ -40,7 +40,7 @@ export function editLink(element) {
       element.setAttribute('style', styleString);
 
       // Complete
-      saveChanges();
+      saveChanges({ newChanges: true });
       ui.flash(element);
     },
     properties: [
@@ -81,7 +81,7 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
       }
 
       // Complete
-      saveChanges();
+      saveChanges({ newChanges: true });
       ui.flash(element);
     },
     properties: [
@@ -138,7 +138,7 @@ export function editPanel(element) {
                   element.replaceWith(newElement);
 
                   dialog.isVisible = false;
-                  saveChanges();
+                  saveChanges({ newChanges: true });
                 }
                 dialog.setLoading(false);
               })
