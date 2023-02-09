@@ -54,6 +54,11 @@ export const syncPageCloud = async () => {
         OPTS.json
           .filter(panel => !idsToIgnore.includes(panel.id))), // make sure to exclude the trash panel
       version: OPTS.cloud.version,
+      options: {
+        autoAdd: OPTS.cloud.autoAdd,
+        syncFold: OPTS.cloud.syncFoldStatus,
+        syncPrivate: OPTS.cloud.syncPrivateStatus,
+      },
     },
   };
 
