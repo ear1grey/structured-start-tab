@@ -92,6 +92,11 @@ function translateColor(rgba) {
 }
 
 export function editStart(elem) {
+  if (elem.parentNode == null) {
+    elem.remove();
+    return;
+  }
+
   els.edit.textContent = ''; // reset
   const style = window.getComputedStyle(elem);
 
@@ -198,7 +203,6 @@ function addRemoveClassList(toCheck, toAdd, toRemove) {
 function editOk() {
   if (els.editing instanceof HTMLAnchorElement) {
     els.editing.textContent = getValue('#editname');
-    els.editing.draggable = true;
     const url = getValue('#editurl');
     if (url) {
       els.editing.href = getValue('#editurl');
@@ -394,6 +398,7 @@ function addLink(target) {
     els.main.append(a);
   }
   a.scrollIntoView({ behavior: 'smooth' });
+  a.draggable = true;
   toast.html('addlink', chrome.i18n.getMessage('toast_link_add'));
   flash(a, 'highlight');
 }
@@ -508,7 +513,7 @@ async function updateAgenda(updateAgendas = true) {
 }
 
 function displayNewAgenda(index, agenda) {
-  const rootPanel = getAllBySelector(els.main, '#agenda-' + String(index))[0]?._panel;
+  const rootPanel = util.getAllBySelector(els.main, '#agenda-' + String(index))[0]?._panel;
   if (!rootPanel) { return; }
   while (rootPanel.lastElementChild.firstChild) {
     rootPanel.lastElementChild.removeChild(rootPanel.lastElementChild.lastChild);
@@ -557,7 +562,7 @@ export function buildBookmarks(OPTS, data, target, count) {
   for (const x of data) {
     if (count === 0) { break; }
     if (!x.url) { continue; } // skip folders
-    const indoc = OPTS.hideBookmarksInPage && getAllBySelector(els.main, `[href="${x.url}"]`);
+    const indoc = OPTS.hideBookmarksInPage && util.getAllBySelector(els.main, `[href="${x.url}"]`);
     if (indoc.length > 0 || (x.dateAdded && x.dateAdded < Date.now() - twoWeeks)) {
       // bookmark is already in doc, or its older
       // than three weeks, so skip it.
@@ -688,19 +693,8 @@ export function prepareFoldables(selectors = 'main') {
   elems.forEach(e => e.addEventListener('click', editSection));
 }
 
-function getAllBySelector(element, selector) {
-  const elements = [...element.querySelectorAll(selector)];
-  for (const child of element.children) {
-    elements.push(...getAllBySelector(child, selector));
-  }
-  if (element.shadowRoot) {
-    elements.push(...getAllBySelector(element.shadowRoot, selector));
-  }
-  return elements;
-}
-
 function prepareListeners() {
-  const anchors = getAllBySelector(els.main, 'a');
+  const anchors = util.getAllBySelector(els.main, 'a');
   for (const a of anchors) {
     util.addAnchorListeners(a, linkClicked);
   }
@@ -796,7 +790,7 @@ function lock() {
 }
 
 function togglePresentation() {
-  const panels = getAllBySelector(els.main, '[private]');
+  const panels = util.getAllBySelector(els.main, '[private]');
 
   els.main.classList.toggle('private-on');
   const isPrivateOn = els.main.classList.contains('private-on');
@@ -889,11 +883,6 @@ function migrateLinks() {
     o.href = o.dataset.href;
     delete o.dataset.href;
   }
-  /* anchors are draggable anyway and should not have the attr set
-     * this was erroneously done before 1.6 */
-  for (const o of els.main.querySelectorAll('a[draggable]')) {
-    o.removeAttribute('draggable');
-  }
   /* Ensure no highlights are hanging around there's a small
      * chance they can be saved before they timeout */
   for (const o of els.main.querySelectorAll('.highlight')) {
@@ -955,6 +944,8 @@ async function prepareAll() {
 
   if (els.main == null) return;
 
+  if (OPTS.cloud.enabled) { await loadPageCloud(); }
+
   prepareBookmarks(OPTS, els.bookmarksnav);
   util.prepareCSSVariables(OPTS);
   prepareMain();
@@ -970,8 +961,6 @@ async function prepareAll() {
   util.localizeHtml(document);
 
   prepareSectionActions();
-
-  if (OPTS.cloud.enabled) { await loadPageCloud(); }
 }
 
 
