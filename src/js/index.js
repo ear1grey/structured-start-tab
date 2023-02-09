@@ -54,6 +54,11 @@ function prepareFavicons() {
 export function saveChanges({ makeBackup = true, newChanges = false } = {}) {
   if (els.main == null) return;
 
+  if (elem.parentNode == null) {
+    elem.remove();
+    return;
+  }
+
   if (els.main.classList.contains('heatmap')) {
     toggleHeatMap();
   }
@@ -170,6 +175,7 @@ function addLink(target) {
     els.main.append(a);
   }
   a.scrollIntoView({ behavior: 'smooth' });
+  a.draggable = true;
   toast.html('addlink', chrome.i18n.getMessage('toast_link_add'));
   ui.flash(a, 'highlight');
 }
@@ -588,11 +594,6 @@ function migrateLinks() {
     o.href = o.dataset.href;
     delete o.dataset.href;
   }
-  /* anchors are draggable anyway and should not have the attr set
-     * this was erroneously done before 1.6 */
-  for (const o of els.main.querySelectorAll('a[draggable]')) {
-    o.removeAttribute('draggable');
-  }
   /* Ensure no highlights are hanging around there's a small
      * chance they can be saved before they timeout */
   for (const o of els.main.querySelectorAll('.highlight')) {
@@ -640,6 +641,8 @@ async function prepareAll() {
   els = util.prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
 
   if (els.main == null) return;
+
+  if (OPTS.cloud.enabled) { await util.loadPageCloud(); }
 
   prepareBookmarks(OPTS, els.bookmarksnav);
   util.prepareCSSVariables(OPTS);
