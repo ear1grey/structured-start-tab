@@ -41,6 +41,12 @@
   "cancel": {
     "message": "Annuler"
   },
+  "delete": {
+    "message": "Supprimer"
+  },
+  "remove": {
+    "message": "Retirer"
+  },
   "edit_panel": {
     "message": "Editer le panneau"
   },
@@ -308,14 +314,14 @@
   "cloud": {
     "message": "Stockage en ligne"
   },
+  "cloud_userId": {
+    "message": "Identifiant utilisateur"
+  },
   "cloud_enabled": {
     "message": "Utiliser le stockage en nuage"
   },
   "cloud_url": {
     "message": "URL de stockage"
-  },
-  "cloud_autoAdd": {
-    "message": "Ajouter automatiquement de nouveaux panneaux"
   },
   "cloud_syncFoldedStatus": {
     "message": "État plié du panneau de synchronisation"
@@ -323,8 +329,32 @@
   "cloud_syncPrivateStatus": {
     "message": "Statut privé du panneau de synchronisation"
   },
-  "cloud_warn": {
+  "cloud_warn_enable": {
     "message": "Attention: cette fonctionnalité utilise votre identifiant Google et les données seront stockées sur les serveurs de Google. Si votre identifiant Google est compromis, vos données le seront également."
+  },
+  "cloud_warn_id_change": {
+    "message": "Attention: la modification de l'identifiant de l'utilisateur peut entraîner une perte de données. Assurez-vous d'avoir une sauvegarde de vos données avant de modifier l'ID utilisateur."
+  },
+  "cloud_panel_code": {
+    "message": "Panel code"
+  },
+  "cloud_remove_shared_panels": {
+    "message": "Annuler la publication des panneaux du cloud"
+  },
+  "cloud_sync_mode": {
+    "message": "Mode de synchronisation"
+  },
+  "panel_export_file": {
+    "message": "Exporter le panneau"
+  },
+  "panel_import_file": {
+    "message": "Importer un panneau"
+  },
+  "panel_export_cloud": {
+    "message": "Exporter le panneau vers le cloud"
+  },
+  "panel_import_cloud": {
+    "message": "Importer un panneau depuis le cloud"
   },
   "title_agenda_nb": {
     "message": "Nombre de mots à afficher dans le titre de l'événement"

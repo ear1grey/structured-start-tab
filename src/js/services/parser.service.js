@@ -96,7 +96,110 @@ const domToJson = (parentElement) => {
   return jsonContent;
 };
 
+// TODO: check if this can be used in `jsonToDom` function
+const jsonElementToDom = (element, newId = false) => {
+  switch (element.type) {
+    case 'section': {
+      const section = document.createElement('section');
+
+      // Add properties
+      section.id = element.id;
+      section.setAttribute('ident', newId ? newUuid() : element.ident);
+      section.style.backgroundColor = element.backgroundColour?.includes('rgba') ? rgbaToHex(element.backgroundColour) : element.backgroundColour;
+      section.style.color = element.textColour;
+      section.style.flexGrow = element.grow;
+      if (element.direction === 'vertical') { section.classList.add('vertical'); }
+      if (element.singleLineDisplay) { section.classList.add('flex-disabled'); }
+      if (element.private) { section.classList.add('private'); }
+      if (element.folded) { section.classList.add('folded'); }
+      if (element.invisible) { section.classList.add('invisible'); }
+
+      // Set header
+      const header = document.createElement('h1');
+      header.textContent = element.header;
+      section.appendChild(header);
+
+      // Set content
+      const nav = document.createElement('nav');
+      for (const innerElement of element.content) {
+        const domInnerElement = jsonElementToDom(innerElement, newId);
+        nav.appendChild(domInnerElement);
+      }
+      section.appendChild(nav);
+
+      return section;
+    }
+    case 'sst-panel': {
+      const panel = document.createElement('sst-panel');
+
+      // Add properties
+      panel.id = element.id;
+      panel.setAttribute('ident', newId ? newUuid() : element.ident);
+      panel.backgroundColour = element.backgroundColour;
+      panel.textColour = element.textColour;
+      panel.direction = element.direction;
+      panel.singleLineDisplay = element.singleLineDisplay;
+      panel.private = element.private;
+      panel.header = element.header;
+      panel.folded = element.folded;
+      panel.grow = element.grow;
+      if (element.invisible) { panel.classList.add('invisible'); }
+
+      // Set content
+      for (const innerElement of element.content) {
+        const domInnerElement = jsonElementToDom(innerElement, newId);
+        panel.content.appendChild(domInnerElement);
+      }
+
+      return panel;
+    }
+    case 'link': {
+      const link = document.createElement('a');
+      link.setAttribute('ident', newId ? newUuid() : element.ident);
+      // Add properties
+      link.style.backgroundColor = element.backgroundColour;
+      link.style.color = element.textColour;
+      link.textContent = element.name;
+      if (element.url) {
+        link.setAttribute('href', element.url);
+        setFavicon(link, element.url);
+      }
+
+      return link;
+    }
+    case 'text': {
+      const text = document.createElement('p');
+      text.setAttribute('ident', newId ? newUuid() : element.ident);
+      text.innerHTML = element.content;
+
+      return text;
+    }
+    case 'list': {
+      const list = document.createElement('ul');
+      list.setAttribute('ident', newId ? newUuid() : element.ident);
+      for (const innerElement of element.content) {
+        const domInnerElement = jsonElementToDom(innerElement, newId);
+        list.appendChild(domInnerElement);
+      }
+
+      return list;
+    }
+    case 'listItem': {
+      const listItem = document.createElement('li');
+      listItem.setAttribute('ident', newId ? newUuid() : element.ident);
+      listItem.innerHTML = element.content;
+
+      return listItem;
+    }
+  }
+};
+
 const jsonToDom = (parentElement, content) => {
+  // remove all children
+  while (parentElement.firstChild) {
+    parentElement.removeChild(parentElement.firstChild);
+  }
+
   for (const element of content) {
     switch (element.type) {
       case 'section': {
@@ -209,4 +312,5 @@ export {
   htmlStringToJson,
 
   jsonToDom,
+  jsonElementToDom,
 };

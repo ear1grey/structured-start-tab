@@ -1,4 +1,5 @@
 import { htmlStringToJson } from '../services/parser.service.js';
+import { newUuid } from './util.js';
 
 // default options - these are reverted to
 // if there are no options in the browser's sync store.
@@ -31,15 +32,17 @@ export const OPTS = {
   agendas: [],
   // Cloud sync settings
   cloud: {
+    userId: null,
     version: 0,
     hasConflict: false,
 
     enabled: false,
     url: '',
 
-    autoAdd: false,
+    syncMode: 'manual',
     syncFoldStatus: false,
     syncPrivateStatus: false,
+    newChanges: false,
   },
 };
 
@@ -47,8 +50,18 @@ const settingKey = 'structured-start-tab';
 
 export function load() {
   return new Promise(resolve => {
-    chrome.storage.local.get([settingKey], (result) => {
-      Object.assign(OPTS, result[settingKey]);
+    chrome.storage.local.get([settingKey], async (result) => {
+      if (!result[settingKey]) {
+        result[settingKey] = {};
+      }
+
+      deepAssign(OPTS, result[settingKey]);
+
+      // If the user has no cloud id, generate one
+      if (!OPTS.cloud.userId) {
+        const chromeUserId = (await chrome?.identity?.getProfileUserInfo())?.id;
+        OPTS.cloud.userId = chromeUserId || newUuid();
+      }
 
       // if the json obj is empty, it means that is the first time the extension is installed or it is migrated from <1.10.0
       if (!OPTS.json || Object.keys(OPTS.json).length === 0) {
@@ -59,6 +72,22 @@ export function load() {
       resolve();
     });
   });
+}
+
+function deepAssign(target, source) {
+  if (Array.isArray(source)) {
+    return source;
+  }
+
+  for (const key of Object.keys(source)) {
+    if (source[key] instanceof Object) {
+      if (!target[key]) target[key] = {};
+      Object.assign(source[key], deepAssign(target[key], source[key]));
+    }
+  }
+
+  Object.assign(target || {}, source);
+  return target;
 }
 
 export function write() {

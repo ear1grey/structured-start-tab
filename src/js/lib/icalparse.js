@@ -1,6 +1,6 @@
 import * as options from './options.js';
 import { OPTS } from './options.js';
-export async function parseIcs(content, i, email) {
+export async function parseIcs(content, agenda, email) {
   const lines = content.split('\r\n');
   const index = [];
   const indexEnd = [];
@@ -32,7 +32,10 @@ export async function parseIcs(content, i, email) {
     return a.utcDate - b.utcDate;
   });
   await options.load();
-  OPTS.agendas[i].events = events;
+  agenda.events = events;
+  for (const storedAgenda of OPTS.agendas) {
+    if (storedAgenda.agendaId === agenda.agendaId) { storedAgenda.events = events; }
+  }
   options.write();
 }
 function getEventInfo(strEvent, timeZone, email) {
