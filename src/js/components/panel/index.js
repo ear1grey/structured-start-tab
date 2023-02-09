@@ -59,7 +59,7 @@ class PanelComponent extends HTMLElement {
     }
   }
 
-  get header() { return this.getAttribute('header') || this._panel.firstChild.textContent; }
+  get header() { return this.getAttribute('header') == null ? this._panel.firstChild.textContent : this.getAttribute('header'); }
   set header(header) { this.setAttribute('header', header); }
 
   get folded() { return this.hasAttribute('folded'); }

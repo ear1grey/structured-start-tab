@@ -23,6 +23,7 @@ export const OPTS = {
   savePanelStatusLocked: false,
   showLocationAgenda: true,
   showEndDateAgenda: true,
+  allowEmptyUrl: true,
   // StringOpts
   backup: '',
   json: [],

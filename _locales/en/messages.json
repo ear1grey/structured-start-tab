@@ -209,6 +209,9 @@
   "editOnNewDrop": {
     "message": "Open edit dialogue after create and drop new panel/link"
   },
+  "allowEmptyUrl": {
+    "message": "Allow empty URL to be saved for links"
+  },
   "top_sites_panel": {
     "message": "Top sites"
   },
