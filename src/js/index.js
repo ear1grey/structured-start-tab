@@ -54,11 +54,6 @@ function prepareFavicons() {
 export function saveChanges({ makeBackup = true, newChanges = false } = {}) {
   if (els.main == null) return;
 
-  if (elem.parentNode == null) {
-    elem.remove();
-    return;
-  }
-
   if (els.main.classList.contains('heatmap')) {
     toggleHeatMap();
   }
@@ -641,8 +636,6 @@ async function prepareAll() {
   els = util.prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
 
   if (els.main == null) return;
-
-  if (OPTS.cloud.enabled) { await util.loadPageCloud(); }
 
   prepareBookmarks(OPTS, els.bookmarksnav);
   util.prepareCSSVariables(OPTS);

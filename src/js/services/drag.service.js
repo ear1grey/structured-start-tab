@@ -28,11 +28,6 @@ export function prepareDrag() {
       element.remove();
     }
   }
-
-  // Make all <a> elements draggable - not all <a> elements may have a link
-  util.getAllBySelector(els.main, 'a').forEach((a) => {
-    a.draggable = true;
-  });
 }
 
 function dragEnter() {

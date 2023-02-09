@@ -51,6 +51,10 @@ const settingKey = 'structured-start-tab';
 export function load() {
   return new Promise(resolve => {
     chrome.storage.local.get([settingKey], async (result) => {
+      if (!result[settingKey]) {
+        result[settingKey] = {};
+      }
+
       deepAssign(OPTS, result[settingKey]);
 
       // If the user has no cloud id, generate one
