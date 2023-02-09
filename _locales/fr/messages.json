@@ -212,6 +212,9 @@
   "editOnNewDrop": {
     "message": "Ouvrez le dialogue d'édition après avoir créé et déposé un nouveau panneau/lien."
   },
+  "allowEmptyUrl": {
+    "message": "Autoriser l'enregistrement d'URL vides pour les liens"
+  },
   "top_sites_panel": {
     "message": "Top sites"
   },

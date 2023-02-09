@@ -154,6 +154,14 @@ export function editStart(elem) {
 
 function editCancel() {
   toast.html('editcancelled', chrome.i18n.getMessage('edit_cancelled'));
+
+  if (els.editing instanceof HTMLAnchorElement) {
+    if (!getValue('#editurl') && !OPTS.allowEmptyUrl) {
+      els.editing.remove();
+      saveChanges();
+    }
+  }
+
   closeDialog();
 }
 
@@ -190,8 +198,18 @@ function addRemoveClassList(toCheck, toAdd, toRemove) {
 function editOk() {
   if (els.editing instanceof HTMLAnchorElement) {
     els.editing.textContent = getValue('#editname');
-    els.editing.href = getValue('#editurl');
-    util.setFavicon(els.editing, getValue('#editurl'));
+    els.editing.draggable = true;
+    const url = getValue('#editurl');
+    if (url) {
+      els.editing.href = getValue('#editurl');
+      util.setFavicon(els.editing, getValue('#editurl'));
+    } else {
+      if (!OPTS.allowEmptyUrl) {
+        wiggleElement(document.querySelector('#editurl'));
+        return;
+      }
+      els.editing.removeAttribute('href');
+    }
   } else {
     if (els.editing.tagName === 'SECTION') { // Legacy support
       els.editing.firstElementChild.textContent = getValue('#editname');
@@ -275,6 +293,11 @@ export function saveChanges(makeBackup = true) {
   util.prepareCSSVariables(OPTS);
   util.prepareDynamicFlex(els.main);
   prepareBookmarks(OPTS, els.bookmarksnav);
+}
+
+function wiggleElement(el) {
+  el.classList.add('wiggle');
+  setTimeout(() => el.classList.remove('wiggle'), 500);
 }
 
 function detectKeydown(e) {
