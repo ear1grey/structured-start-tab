@@ -1,5 +1,6 @@
 import * as ui from '../../services/ui.service.js';
 import { localizeHtml, addSpinner, removeSpinner, loadAsync, defineComponent } from '../../lib/util.js';
+import { iconsDictionary } from '../../../img/svg/index.js';
 
 const getTemplate = loadAsync('/src/js/components/edit-window/index.html');
 const getStyle = loadAsync('/src/js/components/edit-window/index.css');
@@ -100,14 +101,10 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
         actionElement.id = action.name;
         actionElement.title = action.title || action.name;
         actionElement.classList.add('custom-action');
-        if (action.icon) {
-          // import svg icon locally
-          fetch(`/src/img/icons/${action.icon}.svg`)
-            .then(stream => stream.text())
-            .then(text => {
-              actionElement.innerHTML = text;
-              actionElement.classList.add('icon');
-            });
+        if (action.icon && iconsDictionary[action.icon]) {
+          // Load from SVGs dictionary to prevent multiple requests
+          actionElement.appendChild(iconsDictionary[action.icon]?.cloneNode(true));
+          actionElement.classList.add('icon');
         } else {
           actionElement.textContent = action.name;
         }
