@@ -53,7 +53,7 @@ const prepareElements = async () => {
     if (element.tagName === 'A') {
       element.setAttribute('originalBackground', element.style.backgroundColor);
       element.style.backgroundColor = newBackgroundColour;
-    } else if (element.tagName === 'SST-PANEL') {
+    } else if (element.tagName === 'SST-PANEL' || element.tagName === 'SST-LINK') {
       element.tempBackgroundColour = newBackgroundColour;
     }
   });
@@ -77,7 +77,7 @@ const save = async (pick) => {
   allElements.forEach((element) => {
     if (element.tagName === 'A') {
       element.style.backgroundColor = element.getAttribute('originalBackground');
-    } else if (element.tagName === 'SST-PANEL') {
+    } else if (element.tagName === 'SST-PANEL' || element.tagName === 'SST-LINK') {
       element.removeTemps();
     }
   });

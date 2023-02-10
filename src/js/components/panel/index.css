@@ -90,12 +90,24 @@ a {
   flex-grow: 1;
 }
 
-a[href] {
+sst-link {
+  border: solid transparent thin;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+a[href],
+sst-link[href] {
   cursor: pointer;
 }
 
 
-a:hover {
+a:hover,
+sst-link:hover {
   border-color: var(--fg-light);
 }
 
@@ -158,7 +170,7 @@ sst-panel::part(panel) sst-panel::part(panel) {
 section sst-panel::part(content) {
   flex-wrap: wrap;
   margin: var(--tiny);
-  gap: 0.05rem
+  gap: 0.25rem
 }
 
 .single-line-display nav {
