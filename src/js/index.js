@@ -398,7 +398,7 @@ function toggleFold(e) {
 
     return;
   }
-  if (foldMe?.tagName === 'SECTION') {
+  if (foldMe?.tagName === 'SECTION' || target?.tagName === 'SST-PANEL') {
     foldMe.classList.toggle('folded');
     target?.toggleFold?.();
   }
