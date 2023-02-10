@@ -20,7 +20,7 @@
 
 body {
   display: grid;
-  grid-template-columns: calc(100vw - var(--bookmark-width)) var(--bookmark-width);
+  grid-template-columns: var(--main-grid-template-columns);
   grid-template-rows: auto;
   grid-template-areas: "main sidebar";
   height: 100vh;

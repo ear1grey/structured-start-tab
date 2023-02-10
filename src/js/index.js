@@ -362,6 +362,9 @@ function showBookmarks(visible = true) {
     document.documentElement.style.removeProperty('--bookmark-margin');
     document.documentElement.style.removeProperty('--bookmark-padding');
     document.documentElement.style.removeProperty('--bookmark-border');
+
+    // Only set the grid if we're showing the sidebar
+    document.documentElement.style.setProperty('--main-grid-template-columns', 'calc(100vw - var(--bookmark-width)) var(--bookmark-width)');
   } else {
     document.documentElement.style.setProperty('--bookmark-width', '0em');
     document.documentElement.style.setProperty('--bookmark-margin', '0em');
