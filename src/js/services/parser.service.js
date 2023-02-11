@@ -1,4 +1,4 @@
-import { rgbaToHex, newUuid } from '../lib/util.js';
+import { setFavicon, rgbaToHex, newUuid } from '../lib/util.js';
 
 const findIdent = (element) => {
   if (element.getAttribute('ident')) {
@@ -61,17 +61,6 @@ const domToJson = (parentElement) => {
             backgroundColour: child.style.backgroundColor,
             textColour: child.style.color,
             name: child.textContent,
-            url: child.href,
-          });
-        break;
-      case 'SST-LINK':
-        jsonContent.push(
-          {
-            ident: findIdent(child),
-            type: 'sst-link',
-            backgroundColour: child.backgroundColour,
-            textColour: child.textColour,
-            name: child.name,
             url: child.href,
           });
         break;
@@ -164,23 +153,19 @@ const jsonElementToDom = (element, newId = false) => {
 
       return panel;
     }
-    case 'sst-link':
     case 'link': {
-      const link = document.createElement('sst-link');
+      const link = document.createElement('a');
       link.setAttribute('ident', newId ? newUuid() : element.ident);
-      return link;
-      // const link = document.createElement('a');
-      // link.setAttribute('ident', newId ? newUuid() : element.ident);
-      // // Add properties
-      // link.style.backgroundColor = element.backgroundColour;
-      // link.style.color = element.textColour;
-      // link.textContent = element.name;
-      // if (element.url) {
-      //   link.setAttribute('href', element.url);
-      //   setFavicon(link, element.url);
-      // }
+      // Add properties
+      link.style.backgroundColor = element.backgroundColour;
+      link.style.color = element.textColour;
+      link.textContent = element.name;
+      if (element.url) {
+        link.setAttribute('href', element.url);
+        setFavicon(link, element.url);
+      }
 
-      // return link;
+      return link;
     }
     case 'text': {
       const text = document.createElement('p');
@@ -267,14 +252,18 @@ const jsonToDom = (parentElement, content) => {
         appendItemWithDefaults(parentElement, panel);
         break;
       }
-      case 'sst-link':
       case 'link': {
-        const link = document.createElement('sst-link');
+        const link = document.createElement('a');
         link.setAttribute('ident', element.ident);
-        link.name = element.name;
-        link.backgroundColour = element.backgroundColour;
-        link.textColour = element.textColour;
-        if (element.url) link.href = element.url;
+        // Add properties
+        link.style.backgroundColor = element.backgroundColour;
+        link.style.color = element.textColour;
+        link.textContent = element.name;
+        if (element.url) {
+          link.setAttribute('href', element.url);
+          setFavicon(link, element.url);
+        }
+
         appendItemWithDefaults(parentElement, link);
         break;
       }

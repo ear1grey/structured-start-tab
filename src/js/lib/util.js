@@ -88,9 +88,12 @@ function hex(x) {
 }
 
 export function createExampleLink(text = chrome.i18n.getMessage('example'), href = '') {
-  const a = document.createElement('sst-link');
-  if (href) a.url = href;
-  a.name = text;
+  const a = document.createElement('a');
+  if (href) {
+    a.href = href;
+    setFavicon(a, href);
+  }
+  a.textContent = text;
   addAnchorListeners(a);
   return a;
 }
@@ -128,11 +131,11 @@ export function moveElement(e, dragging) {
   const nav = findNav(tgt);
   const position = tgt === dragging.el.nextElementSibling ? 'afterend' : 'beforebegin';
 
-  if (dragging.el.tagName === 'A' || dragging.el.tagName === 'SST-LINK') {
+  if (dragging.el.tagName === 'A') {
     if (tgt.tagName === 'H1') {
       return nav.prepend(dragging.el);
     }
-    if (tgt.tagName === 'A' || tgt.tagName === 'SST-LINK') { return tgt.insertAdjacentElement(position, dragging.el); }
+    if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
     return nav.prepend(dragging.el);
   }
 
@@ -167,7 +170,7 @@ export function moveElement(e, dragging) {
       return closestTarget.insertAdjacentElement(beforeOrAfter, dragging.el);
     }
 
-    if (tgt.tagName === 'A' || tgt.tagName === 'SST-LINK') { return tgt.insertAdjacentElement(position, dragging.el); }
+    if (tgt.tagName === 'A') { return tgt.insertAdjacentElement(position, dragging.el); }
     if (tgt.tagName === 'MAIN') { return appendElement(nav, dragging.el); }
 
     return appendElement(nav, dragging.el, true);
@@ -223,9 +226,10 @@ export function calculateDynamicFlex(where) {
   return total;
 }
 
-export function findTarget(e) {
+export function findTarget(e, returnFirst = false) {
   const path = e.path || (e.composedPath && e.composedPath());
-  return ['SST-PANEL', 'SST-LINK', 'IMG'].includes(e.target.tagName) ? path.find(x => ['SST-PANEL', 'SST-LINK'].includes(x.tagName)) : e.target;
+  if (path[0].tagName === 'A' || returnFirst) return path[0];
+  return e.target.tagName === 'SST-PANEL' ? path.find(x => x.tagName === 'SST-PANEL') : e.target;
 }
 
 /**
@@ -294,9 +298,6 @@ function findNav(elem) {
       result = elem.nextElementSibling;
       break;
     case 'NAV':
-      result = elem;
-      break;
-    case 'SST-LINK':
       result = elem;
       break;
     case 'A':

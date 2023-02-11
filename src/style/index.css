@@ -467,16 +467,6 @@ main a {
   cursor: pointer;
 }
 
-sst-link {
-  border: solid transparent thin;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  overflow: hidden;
-  flex-grow: 1;
-}
-
 #bookmarksnav a {
   flex-grow: 0;
   flex-shrink: 0;
@@ -494,14 +484,14 @@ a:focus {
   outline: none;
 }
 
-a:hover,
-sst-link:hover {
+a:hover {
   border-color: var(--fg-light);
 }
 
 a:active {
   transform: scale(0.95);
 }
+
 
 a.metamouseover:not(.dragging),
 main.editing a:hover:not(.dragging) {

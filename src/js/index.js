@@ -1,7 +1,6 @@
 // TODO: import all components from a common file?
 import './components/agenda-item/index.js';
 import { loadPanelDefinition } from './components/panel/index.js';
-import { loadLinkDefinition } from './components/link/index.js';
 import './components/edit-window/index.js';
 
 import * as options from './lib/options.js';
@@ -413,7 +412,7 @@ function editSection(e) {
   if (!e.shiftKey) return;
 
   const target = util.findTarget(e);
-  if (target.tagName === 'A' || target.tagName === 'SST-LINK') return;
+  if (target.tagName === 'A') return;
 
   if (target.id.startsWith('agenda')) {
     editAgenda(target);
@@ -428,9 +427,9 @@ export function prepareFoldables() {
 }
 
 function prepareListeners() {
-  const anchors = util.getAllBySelector(els.main, 'sst-link');
-  for (const link of anchors) {
-    util.addAnchorListeners(link.$link, linkClicked);
+  const anchors = util.getAllBySelector(els.main, 'a');
+  for (const a of anchors) {
+    util.addAnchorListeners(a, linkClicked);
   }
   document.addEventListener('keydown', detectKeydown);
   els.addlink.addEventListener('click', addLinkListener);
@@ -637,7 +636,7 @@ async function prepareAll() {
   prepareBackgroundListener();
 
   await options.load();
-  await Promise.all([loadPanelDefinition(), loadLinkDefinition()]);
+  await loadPanelDefinition();
   els = util.prepareElements('[id], body, main, footer, #trash, #toolbar, #toast');
 
   if (els.main == null) return;
