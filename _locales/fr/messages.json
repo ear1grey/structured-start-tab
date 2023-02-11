@@ -278,6 +278,12 @@
   "vertical": {
     "message": "Vertical"
   },
+  "single_line": {
+    "message": "Une seule igne"
+  },
+  "multi_line": {
+    "message": "Multi ligne"
+  },
   "agenda": {
     "message": "Agenda"
   },

@@ -106,7 +106,8 @@ label>input[type="checkbox"] {
   flex-grow: 0.01;
 }
 
-color-switch {
+color-switch,
+better-text {
   flex-grow: 1;
 }
 

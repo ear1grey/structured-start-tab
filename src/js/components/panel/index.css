@@ -32,7 +32,7 @@ section.folded nav {
 
 section.folded>h1 {
   text-orientation: sideways-right;
-  writing-mode: vertical-lr;
+  writing-mode: vertical-rl;
   transform: rotate(-180deg);
   text-align: end;
   flex-grow: 0 !important;

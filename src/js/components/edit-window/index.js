@@ -1,6 +1,7 @@
 import * as ui from '../../services/ui.service.js';
 import { localizeHtml, addSpinner, removeSpinner, loadAsync, defineComponent } from '../../lib/util.js';
 import { iconsDictionary } from '../../../img/svg/index.js';
+import '../better-text/index.js';
 
 const getTemplate = loadAsync('/src/js/components/edit-window/index.html');
 const getStyle = loadAsync('/src/js/components/edit-window/index.css');
@@ -35,6 +36,8 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
         case 'string':
         case 'text':
           return label.querySelector('input').value;
+        case 'better-text':
+          return { value: label.querySelector('better-text').value, mode: label.querySelector('better-text').mode };
         case 'colour':
           return label.querySelector('color-switch').value;
         case 'switch':
@@ -135,6 +138,11 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
           case 'text':
             propValue = document.createElement('input');
             propValue.value = property.value;
+            break;
+          case 'better-text':
+            propValue = document.createElement('better-text');
+            propValue.value = property.value.text;
+            propValue.mode = property.value.mode;
             break;
           case 'colour':
             propValue = document.createElement('color-switch');

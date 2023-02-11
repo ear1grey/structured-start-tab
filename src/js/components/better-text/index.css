@@ -1,0 +1,55 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 0.125rem;
+  border: solid darkgrey thin;
+  border-radius: 0.5rem;
+  flex-grow: 1;
+}
+
+main>* {
+  padding: 0.5rem;
+}
+
+label.active {
+  background: lightgrey;
+  border-color: darkgrey;
+  color: black;
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.input {
+  grid-column: 1/ span 2;
+  grid-row: 2;
+
+  border-radius: 0 0 0.25rem 0.25rem;
+  border: none;
+  background: var(--bg-light);
+  color: var(--fg-dark);
+  min-height: 2rem;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.input:focus {
+  outline: none;
+}
+
+input {
+  padding: var(--small) var(--medium);
+}
+
+textarea {
+  resize: vertical;
+  padding: var(--medium);
+}

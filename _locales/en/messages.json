@@ -275,6 +275,12 @@
   "vertical": {
     "message": "Vertical"
   },
+  "single_line": {
+    "message": "Single Line"
+  },
+  "multi_line": {
+    "message": "Multi Line"
+  },
   "agenda": {
     "message": "Agenda"
   },

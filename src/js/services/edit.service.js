@@ -9,8 +9,6 @@ import { updateAgendaBackground, displayNewAgenda } from './agenda.service.js';
 import { domToJson, jsonElementToDom } from './parser.service.js';
 import { getPanelCloud, sharePanelCloud } from './cloud.service.js';
 
-const createStyleString = (n, v) => v[0] === '!' ? '' : `${n}:${v};`;
-
 export function editLink(element) {
   const editWindow = document.createElement('edit-window');
   document.body.appendChild(editWindow);
@@ -21,7 +19,9 @@ export function editLink(element) {
     title: chrome.i18n.getMessage('edit_link'),
     callBack: (properties) => {
       // Name
-      element.textContent = properties.name;
+      element.textContent = properties.name.value;
+      if (properties.name.mode === 'multi') element.style.whiteSpace = 'pre-wrap';
+      else element.style.whiteSpace = 'nowrap';
       // URL
       if (properties.url) {
         element.href = properties.url;
@@ -34,17 +34,24 @@ export function editLink(element) {
         element.removeAttribute('href');
       }
       // Colours
-      let styleString = '';
-      styleString += createStyleString('background', properties.background);
-      styleString += createStyleString('color', properties.foreground);
-      element.setAttribute('style', styleString);
+      element.style.background = properties.background;
+      element.style.color = properties.foreground;
 
       // Complete
       saveChanges({ newChanges: true });
       ui.flash(element);
     },
     properties: [
-      { name: 'name', type: 'text', value: element.textContent, placeholder: 'Name', locale: { primary: 'name', secondary: 'placeholder_item_name' } },
+      {
+        name: 'name',
+        type: 'better-text',
+        value: {
+          text: element.textContent,
+          mode: element.style.whiteSpace === 'pre-wrap' ? 'multi' : 'single',
+        },
+        placeholder: 'Name',
+        locale: { primary: 'name', secondary: 'placeholder_item_name' },
+      },
       { name: 'url', type: 'text', value: element.href, placeholder: 'URL', locale: { primary: 'link', secondary: 'placeholder_url' } },
       { name: 'background', type: 'colour', value: backgroundColour, locale: { primary: 'background' } },
       { name: 'foreground', type: 'colour', value: foregroundColour, locale: { primary: 'text' } },
@@ -69,7 +76,9 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
     ident: element.ident,
     customActions,
     callBack: (properties) => {
-      element.header = properties.name;
+      element.header = properties.name.value;
+      if (properties.name.mode === 'multi') element.style.whiteSpace = 'pre-wrap';
+      else element.style.whiteSpace = 'nowrap';
       element.backgroundColour = properties.background;
       element.textColour = properties.foreground;
       element.direction = properties.direction;
@@ -85,7 +94,16 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
       ui.flash(element);
     },
     properties: [
-      { name: 'name', type: 'text', value: element.header, placeholder: 'Name', locale: { primary: 'name', secondary: 'placeholder_panel_name' } },
+      {
+        name: 'name',
+        type: 'better-text',
+        value: {
+          text: element.header,
+          mode: element.style.whiteSpace === 'pre-wrap' ? 'multi' : 'single',
+        },
+        placeholder: 'Name',
+        locale: { primary: 'name', secondary: 'placeholder_panel_name' },
+      },
       ...extraProperties, // TODO: Add a way to edit where the custom properties are added (maybe add index?) - take into consideration default panel properties
       { name: 'background', type: 'colour', value: backgroundColour, locale: { primary: 'background' } },
       { name: 'foreground', type: 'colour', value: foregroundColour, locale: { primary: 'text' } },

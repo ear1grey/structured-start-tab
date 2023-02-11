@@ -48,6 +48,7 @@ const domToJson = (parentElement) => {
             singleLineDisplay: child.singleLineDisplay,
             private: child.private,
             header: child.header,
+            textMode: child.style.whiteSpace === 'pre-wrap' ? 'multi' : 'single',
             content: domToJson(child.content),
             folded: child.folded,
             grow: child.grow,
@@ -61,6 +62,7 @@ const domToJson = (parentElement) => {
             backgroundColour: child.style.backgroundColor,
             textColour: child.style.color,
             name: child.textContent,
+            textMode: child.style.whiteSpace === 'pre-wrap' ? 'multi' : 'single',
             url: child.href,
           });
         break;
@@ -144,6 +146,7 @@ const jsonElementToDom = (element, newId = false) => {
       panel.folded = element.folded;
       panel.grow = element.grow;
       if (element.invisible) { panel.classList.add('invisible'); }
+      if (element.textMode === 'multi') { panel.style.whiteSpace = 'pre-wrap'; } else { panel.style.whiteSpace = 'nowrap'; }
 
       // Set content
       for (const innerElement of element.content) {
@@ -160,6 +163,7 @@ const jsonElementToDom = (element, newId = false) => {
       link.style.backgroundColor = element.backgroundColour;
       link.style.color = element.textColour;
       link.textContent = element.name;
+      if (element.textMode === 'multi') { link.style.whiteSpace = 'pre-wrap'; } else { link.style.whiteSpace = 'nowrap'; }
       if (element.url) {
         link.setAttribute('href', element.url);
         setFavicon(link, element.url);
@@ -245,6 +249,7 @@ const jsonToDom = (parentElement, content) => {
         panel.folded = element.folded;
         panel.grow = element.grow;
         if (element.invisible) { panel.classList.add('invisible'); }
+        if (element.textMode === 'multi') { panel.style.whiteSpace = 'pre-wrap'; } else { panel.style.whiteSpace = 'nowrap'; }
 
         // Set content
         jsonToDom(panel.content, element.content);
@@ -263,7 +268,7 @@ const jsonToDom = (parentElement, content) => {
           link.setAttribute('href', element.url);
           setFavicon(link, element.url);
         }
-
+        if (element.textMode === 'multi') { link.style.whiteSpace = 'pre-wrap'; } else { link.style.whiteSpace = 'nowrap'; }
         appendItemWithDefaults(parentElement, link);
         break;
       }
