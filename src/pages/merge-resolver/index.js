@@ -1,15 +1,17 @@
 import { OPTS } from '../../js/lib/options.js';
 import * as options from '../../js/lib/options.js';
 import { jsonToDom, domToJson } from '../../js/services/parser.service.js';
-import '../../js/components/panel/index.js';
-import { prepareCSSVariables, addSpinner } from '../../js/lib/util.js';
+import { loadPanelDefinition } from '../../js/components/panel/index.js';
+import { prepareCSSVariables, addSpinner, getAllBySelector } from '../../js/lib/util.js';
 import { prepareDrag } from '../../js/services/drag.service.js';
 import { prepareFoldables } from '../../js/index.js';
 import { savePageCloud } from '../../js/services/cloud.service.js';
 
 let els;
+const allElements = [];
 
 const prepareElements = async () => {
+  await loadPanelDefinition();
   await options.load();
   prepareCSSVariables(OPTS);
   prepareDrag();
@@ -39,7 +41,30 @@ const prepareElements = async () => {
   };
 
   jsonToDom(els.left, [...OPTS.json]);
-  jsonToDom(els.right, [...OPTS.onlineJson]);
+  jsonToDom(els.right, [...OPTS.cloud.conflictData.cloudJson]);
+
+  // Highlight conflicting elements
+  allElements.push(...getAllBySelector(els.left, '[ident]'));
+  allElements.push(...getAllBySelector(els.right, '[ident]'));
+  allElements.forEach((element) => {
+    const ident = element.ident || element.getAttribute('ident');
+    const newBackgroundColour = OPTS.cloud.conflictData.conflictingElements.includes(ident) ? '#db3939b8' : '#60606050';
+
+    if (element.tagName === 'A') {
+      element.setAttribute('originalBackground', element.style.backgroundColor);
+      element.style.backgroundColor = newBackgroundColour;
+    } else if (element.tagName === 'SST-PANEL') {
+      element.tempBackgroundColour = newBackgroundColour;
+    }
+  });
+
+  // Sync scrolls
+  els.left.addEventListener('scroll', () => {
+    els.right.scrollTop = els.left.scrollTop;
+  });
+  els.right.addEventListener('scroll', () => {
+    els.left.scrollTop = els.right.scrollTop;
+  });
 };
 
 const disableAllButtons = () => {
@@ -49,18 +74,20 @@ const disableAllButtons = () => {
 };
 
 const save = async (pick) => {
-  if (pick === 'left') {
-    OPTS.json = domToJson(els.left);
-  } else if (pick === 'right') {
-    OPTS.json = domToJson(els.right);
-  }
+  allElements.forEach((element) => {
+    if (element.tagName === 'A') {
+      element.style.backgroundColor = element.getAttribute('originalBackground');
+    } else if (element.tagName === 'SST-PANEL') {
+      element.removeTemps();
+    }
+  });
 
+  OPTS.json = domToJson(pick === 'left' ? els.left : els.right);
   OPTS.cloud.version = OPTS.onlinePageVersion + 1;
 
   await savePageCloud(OPTS.json);
 
-  OPTS.onlineJson = null;
-  OPTS.onlinePageVersion = null;
+  delete OPTS.cloud.conflictData;
   OPTS.cloud.hasConflict = false;
 
   options.write();

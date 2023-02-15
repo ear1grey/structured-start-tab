@@ -20,7 +20,7 @@
 
 body {
   display: grid;
-  grid-template-columns: calc(100vw - var(--bookmark-width)) var(--bookmark-width);
+  grid-template-columns: var(--main-grid-template-columns);
   grid-template-rows: auto;
   grid-template-areas: "main sidebar";
   height: 100vh;
@@ -158,6 +158,57 @@ main>section,
   80% {
     filter: invert(0%)
   }
+}
+
+/* wiggle animation */
+@keyframes wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  10% {
+    transform: translate(1px, 1px)
+  }
+
+  20% {
+    transform: translate(-1px, -2px)
+  }
+
+  30% {
+    transform: translate(-3px, 0px)
+  }
+
+  40% {
+    transform: translate(3px, 2px)
+  }
+
+  50% {
+    transform: translate(1px, -1px)
+  }
+
+  60% {
+    transform: translate(-1px, 2px)
+  }
+
+  70% {
+    transform: translate(-3px, 1px)
+  }
+
+  80% {
+    transform: translate(3px, 1px)
+  }
+
+  90% {
+    transform: translate(-1px, -1px)
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.wiggle {
+  animation: wiggle 0.5s linear;
 }
 
 #edit {
@@ -621,4 +672,8 @@ section.extra-action a {
 
 #mergeConflictResolver {
   display: none;
+}
+
+edit-window {
+  position: absolute;
 }

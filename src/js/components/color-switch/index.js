@@ -115,6 +115,31 @@ export class ColorSwitch extends HTMLElement {
       this.el.main.removeAttribute('class');
     }
   }
+
+  static get observedAttributes() {
+    return ['auto', 'manual', 'value', 'open'];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      switch (name) {
+        case 'auto':
+          this.el.auto.textContent = newValue;
+          break;
+        case 'manual':
+          this.el.manual.textContent = newValue;
+          break;
+        case 'value':
+          this.value = newValue;
+          break;
+        case 'open':
+          this.open = newValue;
+          break;
+        default:
+          break;
+      }
+    }
+  }
 }
 customElements.define('color-switch', ColorSwitch);
 customElements.define('better-range', BetterRange);

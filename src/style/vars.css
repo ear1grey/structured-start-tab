@@ -4,7 +4,7 @@
   --page-font-size: 100%;
 
   --button-min-height: 3rem;
-  --trash-min-height: calc( var(--button-min-height * 2));
+  --trash-min-height: calc(var(--button-min-height * 2));
 
   --toast-width: 20rem;
   --toast-time: 3s;
@@ -13,17 +13,19 @@
   --tool-tip-top: 0;
   --tool-tip-left: 0;
 
+  --main-grid-template-columns: 100vw;
+
   /* Sizes */
 
   --page-width: 30rem;
 
   --tiny: 0.1rem;
-  --small: calc( var(--tiny) * 2 );
-  --medium: calc( var(--tiny) * 4 );
-  --large: calc( var(--tiny) * 8 );
-  --vlarge: calc( var(--tiny) * 12 );
-  --huge: calc( var(--tiny) * 16 );
-  --massive: calc( var(--tiny) * 32 );
+  --small: calc(var(--tiny) * 2);
+  --medium: calc(var(--tiny) * 4);
+  --large: calc(var(--tiny) * 8);
+  --vlarge: calc(var(--tiny) * 12);
+  --huge: calc(var(--tiny) * 16);
+  --massive: calc(var(--tiny) * 32);
 
 
 
@@ -43,13 +45,13 @@
 
   --bg-highlight: #ffff00;
 
-  --key-col:  #06C;
-  --key-col-inv:  #FFF;
+  --key-col: #06C;
+  --key-col-inv: #FFF;
 
 
-  --overlay-light: rgba(255,255,255,0.5);
-  --overlay-mid: rgba(255,255,255,0.3);
-  --overlay-dark: rgba(0,0,0,0.1);
+  --overlay-light: rgba(255, 255, 255, 0.5);
+  --overlay-mid: rgba(255, 255, 255, 0.3);
+  --overlay-dark: rgba(0, 0, 0, 0.1);
 
   --edit-border: #A00;
 
