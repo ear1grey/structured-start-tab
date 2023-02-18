@@ -1,5 +1,5 @@
 import * as toast from '../lib/toast.js';
-import { OPTS } from '../../js/lib/options.js';
+import { OPTS, write } from '../../js/lib/options.js';
 
 export function prepareCSSVariables(OPTS) {
   document.documentElement.style.setProperty('--tiny', `${OPTS.space / 1000}em`);
@@ -61,11 +61,12 @@ export function cloneTemplateToTarget(selector, where, after = true) {
   }
 }
 
-export function setFavicon(elem, url) {
+export function setFavicon(elem, url, size = 1) {
   let favicon = elem.querySelector('img.favicon');
   if (!favicon) {
     favicon = document.createElement('img');
     favicon.className = 'favicon';
+    favicon.style.width = `${size}rem`;
     elem.prepend(favicon);
   }
 
@@ -229,6 +230,7 @@ export function calculateDynamicFlex(where) {
 export function findTarget(e, returnFirst = false) {
   const path = e.path || (e.composedPath && e.composedPath());
   if (path[0].tagName === 'A' || returnFirst) return path[0];
+  if (path[0].tagName === 'IMG') return path[1];
   return e.target.tagName === 'SST-PANEL' ? path.find(x => x.tagName === 'SST-PANEL') : e.target;
 }
 
@@ -441,4 +443,30 @@ export function setOrRemoveProperty(element, propertyName, propertyValue) {
   } else {
     element.setAttribute(propertyName, propertyValue);
   }
+}
+
+export function linkClicked(e) {
+  const target = findTarget(e);
+  if (target instanceof HTMLElement && target.tagName === 'A') {
+    if (e.shiftKey) {
+      e.preventDefault();
+      import('../services/edit.service.js').then(({ editLink }) => {
+        e.preventDefault();
+        editLink(target);
+      });
+    } else if (!target.id) {
+      updateClickCount(target);
+    }
+  }
+}
+
+export function updateClickCount(a) {
+  const link = a.getAttribute('href');
+  if (!link) { return; }
+  if (OPTS.linkStats[link]) {
+    OPTS.linkStats[link]++;
+  } else {
+    OPTS.linkStats[link] = 1;
+  }
+  write();
 }

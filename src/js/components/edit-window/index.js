@@ -1,5 +1,5 @@
 import * as ui from '../../services/ui.service.js';
-import { localizeHtml, addSpinner, removeSpinner, loadAsync, defineComponent } from '../../lib/util.js';
+import { localizeHtml, addSpinner, removeSpinner, loadAsync, defineComponent, addAnchorListeners, linkClicked } from '../../lib/util.js';
 import { iconsDictionary } from '../../../img/svg/index.js';
 import { domToJson, jsonElementToDom } from '../../services/parser.service.js';
 import '../better-text/index.js';
@@ -21,7 +21,12 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
       this.$cancelBtn.addEventListener('click', () => {
         if (this.element && this.originalElement) {
           // restore original element
-          this.element.parentNode.replaceChild(jsonElementToDom(this.originalElement), this.element);
+          const newElement = jsonElementToDom(this.originalElement);
+          this.element.parentNode.replaceChild(newElement, this.element);
+
+          if (this.element.tagName === 'A') {
+            addAnchorListeners(newElement, linkClicked);
+          }
         }
         this.isVisible = false;
       });
@@ -149,6 +154,7 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
           case 'string':
           case 'text':
             propValueElement = document.createElement('input');
+            propValueElement.type = 'text';
             propValueElement.value = property.value;
             break;
           case 'better-text':

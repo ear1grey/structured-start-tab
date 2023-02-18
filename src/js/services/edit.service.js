@@ -16,6 +16,7 @@ export function editLink(element) {
   const { backgroundColour, foregroundColour } = ui.getColours(element);
 
   editWindow.init({
+    element,
     title: chrome.i18n.getMessage('edit_link'),
     callBack: (properties) => {
       // Name
@@ -25,7 +26,7 @@ export function editLink(element) {
       // URL
       if (properties.url) {
         element.href = properties.url;
-        setFavicon(element, properties.url);
+        setFavicon(element, properties.url, properties['icon-size']);
       } else {
         if (!OPTS.allowEmptyUrl) {
           ui.wiggleElement(document.querySelector('#editurl'));
@@ -55,6 +56,26 @@ export function editLink(element) {
       { name: 'url', type: 'text', value: element.href, placeholder: 'URL', locale: { primary: 'link', secondary: 'placeholder_url' } },
       { name: 'background', type: 'colour', value: backgroundColour, locale: { primary: 'background' } },
       { name: 'foreground', type: 'colour', value: foregroundColour, locale: { primary: 'text' } },
+      {
+        name: 'font-size',
+        type: 'slider',
+        value: element.style.fontSize.replace(/[^0-9.]/g, '') || 1,
+        min: 0.5,
+        max: 5,
+        step: 0.05,
+        locale: { primary: 'font_size' },
+        updateAction: (value) => (element.style.fontSize = value + 'em'),
+      },
+      {
+        name: 'icon-size',
+        type: 'slider',
+        value: element.querySelector('.favicon').style.width.replace(/[^0-9.]/g, '') || 1,
+        min: 0.5,
+        max: 5, // Limiting to 5 due to too high quality loss
+        step: 0.05,
+        locale: { primary: 'icon_size' },
+        updateAction: (value) => (element.querySelector('.favicon').style.width = value + 'rem'),
+      },
     ],
     options: {
       allowEmptyUrl: OPTS.allowEmptyUrl,

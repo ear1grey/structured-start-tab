@@ -71,6 +71,8 @@ const domToJson = (parentElement) => {
             name: child.textContent,
             textMode: child.style.whiteSpace === 'pre-wrap' ? 'multi' : 'single',
             url: child.href,
+            fontSize: child.style.fontSize.replace(/[^0-9.]/g, ''),
+            iconSize: child.querySelector('.favicon')?.style.width.replace(/[^0-9.]/g, ''),
           });
         break;
       case 'P':
@@ -186,8 +188,10 @@ const jsonElementToDom = (element, newId = false) => {
       if (element.textMode === 'multi') { link.style.whiteSpace = 'pre-wrap'; } else { link.style.whiteSpace = 'nowrap'; }
       if (element.url) {
         link.setAttribute('href', element.url);
-        setFavicon(link, element.url);
+        setFavicon(link, element.url, element.iconSize);
       }
+      link.style.fontSize = element.fontSize + 'em';
+      if (link.querySelector('.favicon')) { link.querySelector('.favicon').style.width = element.iconSize + 'rem'; }
 
       return link;
     }

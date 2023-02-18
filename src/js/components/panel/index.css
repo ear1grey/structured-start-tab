@@ -109,7 +109,7 @@ a:hover {
 
 .favicon {
   width: 1rem;
-  height: 1rem;
+  aspect-ratio: 1;
   flex-shrink: 0;
   margin-right: var(--small);
 }

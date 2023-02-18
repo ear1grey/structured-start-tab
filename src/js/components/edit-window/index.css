@@ -101,6 +101,10 @@ label>input {
   font-size: 1rem;
 }
 
+label>input[type="text"] {
+  padding: var(--small) var(--medium);
+}
+
 label>input[type="checkbox"] {
   width: auto;
   flex-grow: 0.01;

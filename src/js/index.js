@@ -15,34 +15,12 @@ import { syncPageCloud } from './services/cloud.service.js';
 import { OPTS } from './lib/options.js';
 import { prepareDrag } from './services/drag.service.js';
 import { updateAgendaBackground, displayNewAgenda, getAgendasFromObject } from './services/agenda.service.js';
-import { editLink, editPanel, editAgenda } from './services/edit.service.js';
+import { editPanel, editAgenda } from './services/edit.service.js';
 
 const oneDay = 1000 * 60 * 60 * 24;
 const fourDays = oneDay * 4;
 const twoWeeks = oneDay * 14;
 let els;
-
-function linkClicked(e) {
-  if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
-    if (e.shiftKey) {
-      e.preventDefault();
-      editLink(e.target);
-    } else if (!e.target.id) {
-      updateClickCount(e.target);
-    }
-  }
-}
-
-function updateClickCount(a) {
-  const link = a.getAttribute('href');
-  if (!link) { return; }
-  if (OPTS.linkStats[link]) {
-    OPTS.linkStats[link]++;
-  } else {
-    OPTS.linkStats[link] = 1;
-  }
-  options.write();
-}
 
 function prepareFavicons() {
   const links = els.main.querySelectorAll('a');
@@ -429,7 +407,7 @@ export function prepareFoldables() {
 function prepareListeners() {
   const anchors = util.getAllBySelector(els.main, 'a');
   for (const a of anchors) {
-    util.addAnchorListeners(a, linkClicked);
+    util.addAnchorListeners(a, util.linkClicked);
   }
   document.addEventListener('keydown', detectKeydown);
   els.addlink.addEventListener('click', addLinkListener);

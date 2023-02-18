@@ -59,6 +59,9 @@
   "font_size": {
     "message": "Taille de police"
   },
+  "icon_size": {
+    "message": "Taille de l'icône"
+  },
   "edit_panel": {
     "message": "Editer le panneau"
   },
