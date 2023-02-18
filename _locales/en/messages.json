@@ -47,6 +47,18 @@
   "remove": {
     "message": "Remove"
   },
+  "padding": {
+    "message": "Padding"
+  },
+  "border_size": {
+    "message": "Border Size"
+  },
+  "border_colour": {
+    "message": "Border Colour"
+  },
+  "font_size": {
+    "message": "Font Size"
+  },
   "edit_panel": {
     "message": "Editing Panel"
   },

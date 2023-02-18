@@ -206,8 +206,8 @@ export function prepareDynamicFlex(where) {
 
 export function calculateDynamicFlex(where) {
   let total = 0;
-  if (where._content) {
-    for (const child of where._content.children) {
+  if (where.$content) {
+    for (const child of where.$content.children) {
       if (child.tagName === 'SST-PANEL') {
         if (child.folded) {
           total += 1;
@@ -420,4 +420,25 @@ export function loadAsync(path) {
 
 export function defineComponent(name, classDef) {
   if (customElements.get(name) == null) { customElements.define(name, classDef); }
+}
+
+export function getValueOrDefault(element, propertyName, defaultValue) {
+  return element.hasAttribute(propertyName) ? element.getAttribute(propertyName) : defaultValue;
+}
+
+export function setOrRemoveProperty(element, propertyName, propertyValue) {
+  if (typeof propertyValue === 'boolean') {
+    if (propertyValue) {
+      element.setAttribute(propertyName, '');
+    } else {
+      element.removeAttribute(propertyName);
+    }
+    return;
+  }
+
+  if (propertyValue == null || propertyValue === '') {
+    element.removeAttribute(propertyName);
+  } else {
+    element.setAttribute(propertyName, propertyValue);
+  }
 }

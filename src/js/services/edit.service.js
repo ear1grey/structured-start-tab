@@ -69,9 +69,10 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
   const editWindow = document.createElement('edit-window');
   document.body.appendChild(editWindow);
 
-  const { backgroundColour, foregroundColour } = ui.getColours(element);
+  const { backgroundColour, foregroundColour, borderColour } = ui.getColours(element);
 
   editWindow.init({
+    element,
     title: title || chrome.i18n.getMessage('edit_panel'),
     ident: element.ident,
     customActions,
@@ -117,6 +118,43 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
       },
       { name: 'singleLineDisplay', type: 'checkbox', value: element.singleLineDisplay, locale: { primary: 'flex' } },
       { name: 'private', type: 'checkbox', value: element.private, locale: { primary: 'private' } },
+      {
+        name: 'padding',
+        type: 'slider',
+        value: element.padding,
+        min: 0,
+        max: 100,
+        step: 1,
+        locale: { primary: 'padding' },
+        updateAction: (value) => (element.padding = value),
+      },
+      {
+        name: 'border-size',
+        type: 'slider',
+        value: element.borderSize,
+        min: 0,
+        max: 30,
+        step: 1,
+        locale: { primary: 'border_size' },
+        updateAction: (value) => (element.borderSize = value),
+      },
+      {
+        name: 'font-size',
+        type: 'slider',
+        value: element.fontSize,
+        min: 0.5,
+        max: 5,
+        step: 0.05,
+        locale: { primary: 'font_size' },
+        updateAction: (value) => (element.fontSize = value),
+      },
+      {
+        name: 'border-colour',
+        type: 'colour',
+        value: borderColour,
+        locale: { primary: 'border_colour' },
+        updateAction: (value) => (element.borderColour = value),
+      },
     ],
     options: {
       allowEmptyUrl: OPTS.allowEmptyUrl,

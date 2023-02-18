@@ -111,6 +111,10 @@ const elementBasePropertiesEqual = (incomingElement, cloudElement, { syncFold, s
     incomingElement.textColour === cloudElement.textColour &&
     incomingElement.type === cloudElement.type &&
     incomingElement.textMode === cloudElement.textMode &&
+    incomingElement.padding === cloudElement.padding &&
+    incomingElement.borderSize === cloudElement.borderSize &&
+    incomingElement.borderColour === cloudElement.borderColour &&
+    incomingElement.fontSize === cloudElement.fontSize &&
     // optional panel properties
     (syncFold ? incomingElement.folded === cloudElement.folded : true) &&
     (syncPrivate ? incomingElement.private === cloudElement.private : true) &&

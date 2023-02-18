@@ -90,7 +90,7 @@ label>* {
 }
 
 label>input {
-  padding: var(--small) var(--medium);
+  padding: var(--small) 0;
   flex-grow: 1;
   height: 2rem;
   width: 30rem;

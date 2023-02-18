@@ -47,6 +47,18 @@
   "remove": {
     "message": "Retirer"
   },
+  "padding": {
+    "message": "Rembourrage"
+  },
+  "border_size": {
+    "message": "Taille de bordure"
+  },
+  "border_colour": {
+    "message": "Couleur de bordure"
+  },
+  "font_size": {
+    "message": "Taille de police"
+  },
   "edit_panel": {
     "message": "Editer le panneau"
   },
