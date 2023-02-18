@@ -102,6 +102,7 @@ const elementBasePropertiesEqual = (incomingElement, cloudElement, { syncFold, s
   return incomingElement.backgroundColour === cloudElement.backgroundColour &&
     incomingElement.textColour === cloudElement.textColour &&
     incomingElement.type === cloudElement.type &&
+    incomingElement.fontSize === cloudElement.fontSize &&
 
     // panel only properties
     incomingElement.direction === cloudElement.direction &&
@@ -114,13 +115,13 @@ const elementBasePropertiesEqual = (incomingElement, cloudElement, { syncFold, s
     incomingElement.padding === cloudElement.padding &&
     incomingElement.borderSize === cloudElement.borderSize &&
     incomingElement.borderColour === cloudElement.borderColour &&
-    incomingElement.fontSize === cloudElement.fontSize &&
     // optional panel properties
     (syncFold ? incomingElement.folded === cloudElement.folded : true) &&
     (syncPrivate ? incomingElement.private === cloudElement.private : true) &&
     // link only properties
     incomingElement.name === cloudElement.name &&
-    incomingElement.url === cloudElement.url;
+    incomingElement.url === cloudElement.url &&
+    incomingElement.iconSize === cloudElement.iconSize;
 };
 
 const buildResultingPage = (
