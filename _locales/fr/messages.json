@@ -362,8 +362,17 @@
   "cloud_remove_shared_panels": {
     "message": "Annuler la publication des panneaux du cloud"
   },
+  "sync_enabled": {
+    "message": "Activer la synchronisation"
+  },
   "cloud_sync_mode": {
     "message": "Mode de synchronisation"
+  },
+  "sync_warn_enable": {
+    "message": "Attention: cette fonctionnalité peut exposer vos données à d'autres utilisateurs et fournisseurs. Assurez-vous d'avoir une sauvegarde de vos données avant d'activer cette fonctionnalité et que vous faites confiance au fournisseur."
+  },
+  "sync_provider": {
+    "message": "Fournisseur"
   },
   "panel_export_file": {
     "message": "Exporter le panneau"

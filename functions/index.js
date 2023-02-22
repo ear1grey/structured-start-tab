@@ -3,6 +3,7 @@ import admin from 'firebase-admin';
 
 import * as sync from './src/sync.js';
 import * as share from './src/share.js';
+import * as base from './src/base.js';
 
 admin.initializeApp();
 
@@ -16,3 +17,7 @@ export const getAllPanels = functions.https.onRequest(share.getAllPanels);
 export const getPanel = functions.https.onRequest(share.getPanel);
 export const sharePanel = functions.https.onRequest(share.sharePanel);
 export const deleteAllSharedPanels = functions.https.onRequest(share.deleteAllPanels);
+
+// Base
+export const getFullContent = functions.https.onRequest(base.getFullContent);
+export const setFullContent = functions.https.onRequest(base.setFullContent);

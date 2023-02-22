@@ -1,5 +1,7 @@
 import { htmlStringToJson } from '../services/parser.service.js';
 import { newUuid } from './util.js';
+import { getAvailableServices } from '../services/sync.service.js';
+
 
 // default options - these are reverted to
 // if there are no options in the browser's sync store.
@@ -44,6 +46,12 @@ export const OPTS = {
     syncPrivateStatus: false,
     newChanges: false,
   },
+
+  sync: {
+    enabled: false,
+    provider: 'firebase',
+    settings: {},
+  },
 };
 
 const settingKey = 'structured-start-tab';
@@ -63,6 +71,9 @@ export function load() {
         OPTS.cloud.userId = chromeUserId || newUuid();
       }
 
+      // Load sync services settings
+      loadSyncServices();
+
       // if the json obj is empty, it means that is the first time the extension is installed or it is migrated from <1.10.0
       if (!OPTS.json || Object.keys(OPTS.json).length === 0) {
         OPTS.json = htmlStringToJson(chrome.i18n.getMessage('default_message'));
@@ -72,6 +83,25 @@ export function load() {
       resolve();
     });
   });
+}
+
+function loadSyncServices() {
+  const availableServices = getAvailableServices();
+
+  for (const service of availableServices) {
+    if (!Object.hasOwn(OPTS.sync.settings, service.id)) {
+      OPTS.sync.settings[service.id] = {};
+    }
+
+    for (const settingProperty of service.settings) {
+      if (!Object.hasOwn(OPTS.sync.settings[service.id], settingProperty.name)) {
+        OPTS.sync.settings[service.id][settingProperty.name] = settingProperty.default;
+      }
+    }
+  }
+
+  // Make sure that any new property with a default value is set
+  write();
 }
 
 function deepAssign(target, source) {

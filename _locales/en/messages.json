@@ -362,6 +362,15 @@
   "cloud_sync_mode": {
     "message": "Sync mode"
   },
+  "sync_enabled": {
+    "message": "Enable sync"
+  },
+  "sync_warn_enable": {
+    "message": "Warning: this feature may expose your data to other users and providers. Make sure that you have a backup of your data before enabling this feature and that you trust the provider."
+  },
+  "sync_provider": {
+    "message": "Provider"
+  },
   "panel_export_file": {
     "message": "Export panel to file"
   },

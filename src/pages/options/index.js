@@ -10,7 +10,7 @@ import { OPTS } from '../../js/lib/options.js';
 import { htmlStringToJson } from '../../js/services/parser.service.js';
 import { getAgendasFromObject } from '../../js/services/agenda.service.js';
 import { deleteAllSharedPanels } from '../../js/services/cloud.service.js';
-
+import { getAvailableServices } from '../../js/services/sync.service.js';
 
 function setCheckBox(prefs, what) {
   const elem = document.getElementById(what);
@@ -52,10 +52,21 @@ function deepGet(obj, path) {
   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 }
 function deepSet(obj, path, value) {
-  const parts = path.split('.');
-  const last = parts.pop();
-  const target = parts.reduce((acc, part) => acc[part], obj);
-  target[last] = value;
+  let schema = obj; // a moving reference to internal objects within obj
+  const pList = path.split('.');
+  const len = pList.length;
+  for (let i = 0; i < len - 1; i++) {
+    const elem = pList[i];
+    if (!schema[elem]) schema[elem] = {};
+    schema = schema[elem];
+  }
+
+  schema[pList[len - 1]] = value;
+
+  // const parts = path.split('.');
+  // const last = parts.pop();
+  // const target = parts.reduce((acc, part) => acc[part], obj);
+  // target[last] = value;
 }
 
 // incorporate the latest values of the page into
@@ -254,9 +265,70 @@ function createPageWithPrefs(prefs) {
         { name: 'Auto delete', value: 'autoDelete' },
       ],
     }, chrome.i18n.getMessage('cloud_sync_mode'));
+
+    // Sync
+    buildSyncSettings(settings);
   }
   updatePageWithPrefs(prefs);
 }
+
+function buildSyncSettings(settings) {
+  const sync = create(settings, 'section', {}, 'SYNC');
+  const availableServices = getAvailableServices();
+  // SYNC
+  create(sync, 'checkbox', { id: 'sync.enabled' }, chrome.i18n.getMessage('sync_enabled'), false, false, [
+    {
+      event: 'change',
+      handler: (e) => {
+        if (e.target.checked) {
+          alert(chrome.i18n.getMessage('sync_warn_enable'));
+        }
+      },
+    },
+  ]);
+
+  // TODO: On provider change, re-render the settings (remove current settings, add new settings)
+  create(sync, 'dropdown', {
+    id: 'sync.provider',
+    options: availableServices.map((service) => ({ name: service.friendlyName, value: service.id })),
+  }, chrome.i18n.getMessage('sync_provider'));
+
+  const availableSettings = availableServices.find(service => service.id === OPTS.sync.provider).settings;
+  for (const setting of availableSettings) {
+    create(sync, setting.type, { id: `sync.settings.${OPTS.sync.provider}.${setting.id}` }, setting.friendlyName, setting.default, false, [
+      {
+        event: 'change',
+        handler: () => {
+          // saveSyncSettings(OPTS.sync.provider);
+        },
+      },
+    ]);
+  }
+
+  if (Object.hasOwn(OPTS.sync.settings, OPTS.sync.provider)) {
+    loadSyncSettings({
+      provider: OPTS.sync.provider,
+      settings: OPTS.sync.settings[OPTS.sync.provider],
+    });
+  }
+}
+
+// Load settings for a specific provider
+function loadSyncSettings({ provider, settings }) {
+  console.log('loadSyncSettings', provider, settings);
+
+  for (const key in settings) {
+    const input = document.getElementById(`sync.settings.${provider}.${key}`);
+    if (input && settings[key]) input.value = settings[key];
+  }
+}
+
+function saveSyncSettings(provider) {
+  document.querySelectorAll(`[id^="sync.settings.${provider}"]`).forEach((input) => {
+    deepSet(OPTS, input.id, input.value);
+  });
+}
+
 function exportStartTab() {
   const now = (new Date()).toISOString().slice(0, 10).replace(/-/g, '_');
   io.downloadJson({
@@ -347,10 +419,13 @@ export async function loadOptions() {
   util.prepareCSSVariables(OPTS);
   util.localizeHtml(document);
   toast.prepare();
+
+  saveOptions();
 }
 export function saveOptions() {
   updatePrefsWithPage();
   updatePageWithPrefs(OPTS);
+  saveSyncSettings(OPTS.sync.provider);
   util.prepareCSSVariables(OPTS);
   options.write();
 }
