@@ -8,6 +8,7 @@ import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import * as util from './lib/util.js';
 import * as ui from './services/ui.service.js';
+import * as sync from './services/sync.service.js';
 
 import { domToJson, jsonToDom } from './services/parser.service.js';
 import { syncPageCloud } from './services/cloud.service.js';
@@ -598,7 +599,8 @@ const prepareSectionActions = () => {
   }
 
   document.querySelector('#forceCloudSync a').addEventListener('click', () => {
-    syncPageCloud({ window: els.main });
+    // syncPageCloud({ window: els.main });
+    sync.syncFullContent({ local: domToJson(els.main) });
   });
 };
 

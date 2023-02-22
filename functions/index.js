@@ -4,6 +4,7 @@ import admin from 'firebase-admin';
 import * as sync from './src/sync.js';
 import * as share from './src/share.js';
 import * as base from './src/base.js';
+import * as storage from './src/storage.js';
 
 admin.initializeApp();
 
@@ -21,3 +22,7 @@ export const deleteAllSharedPanels = functions.https.onRequest(share.deleteAllPa
 // Base
 export const getFullContent = functions.https.onRequest(base.getFullContent);
 export const setFullContent = functions.https.onRequest(base.setFullContent);
+
+// Storage (V2)
+export const getContentByUser = functions.https.onRequest(storage.getContentByUser);
+export const pushContent = functions.https.onRequest(storage.pushContent);

@@ -12,12 +12,16 @@ class FirebaseService {
   }
 
   // METHODS
-  getFullContent() {
-    return makeRequest(this.settings.getFullContentUrl, {
-      method: 'GET',
-      params: {
-        userId: this.settings.userId,
-      },
+  async getFullContent() {
+    const result = await makeRequest(`${this.settings.getFullContentUrl}?userId=${this.settings.userId}`, 'GET');
+    if (result.status === 404) return null;
+    return result.content;
+  }
+
+  setFullContent(content) {
+    return makeRequest(this.settings.setFullContentUrl, 'POST', {
+      userId: this.settings.userId,
+      content,
     });
   }
 }
