@@ -69,7 +69,7 @@ export function editLink(element) {
       {
         name: 'icon-size',
         type: 'slider',
-        value: element.querySelector('.favicon').style.width.replace(/[^0-9.]/g, '') || 1,
+        value: element.querySelector('.favicon')?.style.width.replace(/[^0-9.]/g, '') || 1,
         min: 0.5,
         max: 5, // Limiting to 5 due to too high quality loss
         step: 0.05,
