@@ -47,6 +47,21 @@
   "remove": {
     "message": "Retirer"
   },
+  "padding": {
+    "message": "Rembourrage"
+  },
+  "border_size": {
+    "message": "Taille de bordure"
+  },
+  "border_colour": {
+    "message": "Couleur de bordure"
+  },
+  "font_size": {
+    "message": "Taille de police"
+  },
+  "icon_size": {
+    "message": "Taille de l'icône"
+  },
   "edit_panel": {
     "message": "Editer le panneau"
   },
@@ -277,6 +292,12 @@
   },
   "vertical": {
     "message": "Vertical"
+  },
+  "single_line": {
+    "message": "Une seule igne"
+  },
+  "multi_line": {
+    "message": "Multi ligne"
   },
   "agenda": {
     "message": "Agenda"

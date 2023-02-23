@@ -23,7 +23,7 @@ export async function updateAgendaBackground(agenda) {
 }
 
 export function displayNewAgenda(agenda) {
-  const rootPanel = getAllBySelector(document.querySelector('main'), `#${agenda.agendaId}`)[0]?._panel;
+  const rootPanel = getAllBySelector(document.querySelector('main'), `#${agenda.agendaId}`)[0]?.$panel;
   if (!rootPanel) { return; }
   while (rootPanel.lastElementChild.firstChild) {
     rootPanel.lastElementChild.removeChild(rootPanel.lastElementChild.lastChild);

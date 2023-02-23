@@ -47,6 +47,21 @@
   "remove": {
     "message": "Remove"
   },
+  "padding": {
+    "message": "Padding"
+  },
+  "border_size": {
+    "message": "Border Size"
+  },
+  "border_colour": {
+    "message": "Border Colour"
+  },
+  "font_size": {
+    "message": "Font Size"
+  },
+  "icon_size": {
+    "message": "Icon Size"
+  },
   "edit_panel": {
     "message": "Editing Panel"
   },
@@ -274,6 +289,12 @@
   },
   "vertical": {
     "message": "Vertical"
+  },
+  "single_line": {
+    "message": "Single Line"
+  },
+  "multi_line": {
+    "message": "Multi Line"
   },
   "agenda": {
     "message": "Agenda"

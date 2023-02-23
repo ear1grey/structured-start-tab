@@ -33,6 +33,7 @@ export function getColours(el) {
     foregroundColour: el.textColour
       ? el.textColour
       : el.dataset.fg ? el.dataset.fg : translateColor(style.color),
+    borderColour: el.borderColour,
   };
 }
 
