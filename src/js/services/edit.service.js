@@ -4,12 +4,17 @@ import * as io from './io.service.js';
 
 import { saveChanges } from '../index.js';
 import { OPTS } from '../lib/options.js';
-import { setFavicon } from '../lib/util.js';
+import { setFavicon, newUuid } from '../lib/util.js';
 import { updateAgendaBackground, displayNewAgenda } from './agenda.service.js';
 import { domToJson, jsonElementToDom } from './parser.service.js';
 import { getPanelCloud, sharePanelCloud } from './cloud.service.js';
 
 export function editLink(element) {
+  // Make sure that the link has an identifier
+  if (!element.getAttribute('ident')) {
+    element.setAttribute('ident', newUuid());
+  }
+
   const editWindow = document.createElement('edit-window');
   document.body.appendChild(editWindow);
 

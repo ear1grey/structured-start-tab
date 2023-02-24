@@ -11,7 +11,6 @@ import * as ui from './services/ui.service.js';
 import * as sync from './services/sync.service.js';
 
 import { domToJson, jsonToDom } from './services/parser.service.js';
-import { syncPageCloud } from './services/cloud.service.js';
 
 import { OPTS } from './lib/options.js';
 import { prepareDrag } from './services/drag.service.js';
@@ -38,7 +37,7 @@ export function saveChanges({ makeBackup = true, newChanges = false } = {}) {
   }
 
   if (makeBackup) OPTS.jsonBackup = [...OPTS.json];
-  OPTS.cloud.newChanges = OPTS.cloud.newChanges || newChanges;
+  OPTS.sync.newChanges = OPTS.sync.newChanges || newChanges;
 
   OPTS.json = domToJson(els.main);
   options.write();
@@ -599,8 +598,7 @@ const prepareSectionActions = () => {
   }
 
   document.querySelector('#forceCloudSync a').addEventListener('click', () => {
-    // syncPageCloud({ window: els.main });
-    sync.syncFullContent({ local: domToJson(els.main) });
+    sync.syncFullContent({ window: els.main });
   });
 };
 
@@ -638,7 +636,8 @@ async function prepareAll() {
 
   prepareSectionActions();
 
-  if (OPTS.cloud.enabled && OPTS.cloud.hasConflict) { syncPageCloud({ window: els.main, ignoreConflict: true }); }
+  // If there's a conflict, try to re-sync the content
+  if (OPTS.sync.enabled && OPTS.sync.hasConflict) { sync.syncFullContent({ window: els.main, ignoreConflict: true }); }
 }
 
 

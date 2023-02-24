@@ -99,6 +99,12 @@ function updatePrefsWithPage() {
   getCheckBox('cloud.syncFoldStatus');
   getCheckBox('cloud.syncPrivateStatus');
   getDropdown('cloud.syncMode');
+
+  // Sync
+  getCheckBox('sync.enabled');
+  getDropdown('sync.mode');
+  getCheckBox('sync.syncFoldStatus');
+  getCheckBox('sync.syncPrivateStatus');
 }
 function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'lock');
@@ -127,6 +133,12 @@ function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'cloud.syncFoldStatus');
   setCheckBox(prefs, 'cloud.syncPrivateStatus');
   setDropdown(prefs, 'cloud.syncMode');
+
+  // Sync
+  setCheckBox(prefs, 'sync.enabled');
+  setDropdown(prefs, 'sync.mode');
+  setCheckBox(prefs, 'sync.syncFoldStatus');
+  setCheckBox(prefs, 'sync.syncPrivateStatus');
 
   // Defaults
   if (!util.isBeta()) { setCheckBox(prefs, 'showFeedback'); }
@@ -273,7 +285,7 @@ function createPageWithPrefs(prefs) {
 }
 
 function buildSyncSettings(settings) {
-  const sync = create(settings, 'section', {}, 'SYNC');
+  const sync = create(settings, 'section', {}, 'Sync');
   const availableServices = getAvailableServices();
   // SYNC
   create(sync, 'checkbox', { id: 'sync.enabled' }, chrome.i18n.getMessage('sync_enabled'), false, false, [
@@ -286,6 +298,18 @@ function buildSyncSettings(settings) {
       },
     },
   ]);
+  create(sync, 'dropdown', {
+    id: 'sync.mode',
+    options: [
+      { name: 'Manual', value: 'manual' },
+      { name: chrome.i18n.getMessage('sync_soft_push'), value: 'softPush' }, // Pushes creations
+      { name: chrome.i18n.getMessage('sync_hard_push'), value: 'hardPush' }, // Pushes creations and deletions
+      { name: chrome.i18n.getMessage('sync_soft_pull'), value: 'softPull' }, // Pulls creations
+      { name: chrome.i18n.getMessage('sync_hard_pull'), value: 'hardPull' }, // Pulls creations and deletions
+    ],
+  }, chrome.i18n.getMessage('sync_sync_mode'));
+  create(sync, 'checkbox', { id: 'sync.syncFoldStatus' }, chrome.i18n.getMessage('sync_syncFoldedStatus'), false);
+  create(sync, 'checkbox', { id: 'sync.syncPrivateStatus' }, chrome.i18n.getMessage('sync_syncPrivateStatus'), false);
 
   // TODO: On provider change, re-render the settings (remove current settings, add new settings)
   create(sync, 'dropdown', {
@@ -295,14 +319,7 @@ function buildSyncSettings(settings) {
 
   const availableSettings = availableServices.find(service => service.id === OPTS.sync.provider).settings;
   for (const setting of availableSettings) {
-    create(sync, setting.type, { id: `sync.settings.${OPTS.sync.provider}.${setting.id}` }, setting.friendlyName, setting.default, false, [
-      {
-        event: 'change',
-        handler: () => {
-          // saveSyncSettings(OPTS.sync.provider);
-        },
-      },
-    ]);
+    create(sync, setting.type, { id: `sync.settings.${OPTS.sync.provider}.${setting.id}` }, setting.friendlyName, setting.default, false);
   }
 
   if (Object.hasOwn(OPTS.sync.settings, OPTS.sync.provider)) {
@@ -324,6 +341,7 @@ function loadSyncSettings({ provider, settings }) {
 }
 
 function saveSyncSettings(provider) {
+  getCheckBox('sync.enabled');
   document.querySelectorAll(`[id^="sync.settings.${provider}"]`).forEach((input) => {
     deepSet(OPTS, input.id, input.value);
   });

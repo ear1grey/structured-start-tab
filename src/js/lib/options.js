@@ -49,7 +49,17 @@ export const OPTS = {
 
   sync: {
     enabled: false,
+
+    mode: 'manual',
+    syncFoldStatus: false,
+    syncPrivateStatus: false,
     provider: 'firebase',
+
+    // Sync status
+    hasConflict: false,
+    newChanges: false,
+
+    // Sync dynamic properties
     settings: {},
   },
 };

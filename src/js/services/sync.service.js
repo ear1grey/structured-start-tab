@@ -1,5 +1,6 @@
 import { services } from './sync/index.js';
-import { OPTS } from '../lib/options.js';
+import { OPTS, write } from '../lib/options.js';
+import { jsonToDom } from './parser.service.js';
 
 export const getAvailableServices = () => {
   // TODO: Validate services
@@ -26,28 +27,60 @@ export const getFullContent = () => {
   return getService().getFullContent();
 };
 
-export const setFullContent = content => {
-  return getService().setFullContent(content);
+export const setFullContent = async content => {
+  await getService().setFullContent(content);
+  OPTS.sync.hasConflict = false;
+  OPTS.sync.newChanges = false;
+  write();
 };
 
-export const syncFullContent = async ({ local, options }) => {
+export const syncFullContent = async ({ window = null, ignoreConflict = false } = {}) => {
+  if (!OPTS.sync.enabled || (OPTS.sync.hasConflict && !ignoreConflict)) return;
+
   const newPage = [];
   const remote = await getFullContent();
 
   if (remote == null) {
-    setFullContent({ version: 0, page: local });
+    await setFullContent({ version: 0, page: OPTS.json });
     return;
   }
 
+  const options = {
+    newChanges: OPTS.sync.newChanges,
+    syncMode: OPTS.sync.mode,
+    syncFold: OPTS.sync.syncFoldStatus,
+    syncPrivate: OPTS.sync.syncPrivateStatus,
+  };
+
   const conflictIdents = [];
   const updatedElements = [];
-  buildResultingPage(remote.page, local, options, newPage, conflictIdents, updatedElements);
+  buildResultingPage(remote.page, OPTS.json, options, newPage, conflictIdents, updatedElements);
 
-  // TODO: load settings OR handle merge conflicts
+  if (conflictIdents.length > 0) { // Show conflict page
+    OPTS.sync.hasConflict = true;
+    if (window) {
+      OPTS.sync.conflictData = {
+        remote: remote.page,
+        remoteVersion: remote.version,
+        conflictingElements: conflictIdents,
+      };
+      write();
+
+      document.querySelector('#mergeConflictResolver').style.display = 'block';
+    }
+  } if (updatedElements.length > 0) { // Push changes
+    await setFullContent({ version: 0, page: newPage });
+    OPTS.json = newPage;
+    write();
+
+    if (window) {
+      jsonToDom(window, OPTS.json);
+    }
+  }
 };
 
 const elementBasePropertiesEqual = (localElement, remoteElement) => {
-  const propertiesToIgnore = ['ident', 'id', 'content'];
+  const propertiesToIgnore = ['ident', 'id', 'content', 'grow'];
 
   // compare all the item properties dynamically
   for (const key in localElement) {
@@ -58,31 +91,6 @@ const elementBasePropertiesEqual = (localElement, remoteElement) => {
   }
 
   return true;
-
-
-  // return localElement.backgroundColour === remoteElement.backgroundColour &&
-  //   localElement.textColour === remoteElement.textColour &&
-  //   localElement.type === remoteElement.type &&
-  //   localElement.fontSize === remoteElement.fontSize &&
-
-  //   // panel only properties
-  //   localElement.direction === remoteElement.direction &&
-  //   localElement.header === remoteElement.header &&
-  //   localElement.id === remoteElement.id &&
-  //   localElement.singleLineDisplay === remoteElement.singleLineDisplay &&
-  //   localElement.textColour === remoteElement.textColour &&
-  //   localElement.type === remoteElement.type &&
-  //   localElement.textMode === remoteElement.textMode &&
-  //   localElement.padding === remoteElement.padding &&
-  //   localElement.borderSize === remoteElement.borderSize &&
-  //   localElement.borderColour === remoteElement.borderColour &&
-  //   // optional panel properties
-  //   localElement.folded === remoteElement.folded &&
-  //   localElement.private === remoteElement.private &&
-  //   // link only properties
-  //   localElement.name === remoteElement.name &&
-  //   localElement.url === remoteElement.url &&
-  //   localElement.iconSize === remoteElement.iconSize;
 };
 
 const buildResultingPage = (
@@ -94,33 +102,38 @@ const buildResultingPage = (
   // If they are both arrays, check all the elements
   if (Array.isArray(local) && Array.isArray(remote)) {
     // Go through all the elements of the incoming page
-    for (const incomingElement of local) {
-      const cloudElementIndex = remote.findIndex(elem => elem.ident === incomingElement.ident);
-      const cloudElement = cloudElementIndex !== -1 ? remote[cloudElementIndex] : null;
+    for (const localElement of local) {
+      const remoteElementIndex = remote.findIndex(elem => elem.ident === localElement.ident);
+      const remoteElement = remoteElementIndex !== -1 ? remote[remoteElementIndex] : null;
 
-      if (!cloudElement) { // Cloud element not found
-        if ((!newChanges && syncMode === 'autoAdd') || syncMode === 'manual') {
-          conflictIdents.push(incomingElement.ident);
-        } else if (!newChanges && syncMode === 'autoDelete') {
-          updatedElements.push(incomingElement);
-          continue;
-        } else {
-          resultPage.push(incomingElement);
-          updatedElements.push(incomingElement);
+      if (!remoteElement) { // Remote element not found
+        if (newChanges) { // User added a new element
+          if (syncMode.includes('Push')) { // Push element creation
+            resultPage.push(localElement);
+            updatedElements.push(localElement);
+          } else { // Not allowed to push element creation
+            conflictIdents.push(localElement.ident);
+          }
+        } else { // User deleted an element from another device
+          if (syncMode === 'hardPull') { // Pull element deletions
+            updatedElements.push(localElement);
+          } else { // Not allowed to pull element deletion
+            conflictIdents.push(localElement.ident);
+          }
         }
-      } else { // Cloud element found
-        remote.splice(cloudElementIndex, 1);
+      } else { // Remote element found
+        remote.splice(remoteElementIndex, 1);
 
         // Check if the panel properties are different
-        if (!elementBasePropertiesEqual(incomingElement, cloudElement, { syncFold, syncPrivate })) {
-          conflictIdents.push(incomingElement.ident);
+        if (!elementBasePropertiesEqual(localElement, remoteElement, { syncFold, syncPrivate })) {
+          conflictIdents.push(localElement.ident);
         }
 
-        const newElement = { ...cloudElement };
+        const newElement = { ...remoteElement };
         if (newElement.content) newElement.content = []; // Don't automatically add the content already present
-        if (incomingElement.content) {
+        if (localElement.content) {
           const contentConflictIdents = [];
-          buildResultingPage(cloudElement.content, incomingElement.content, { newChanges, syncMode, syncFold, syncPrivate }, newElement.content, contentConflictIdents, updatedElements);
+          buildResultingPage(remoteElement.content, localElement.content, { newChanges, syncMode, syncFold, syncPrivate }, newElement.content, contentConflictIdents, updatedElements);
           if (contentConflictIdents.length > 0) {
             for (const contentConflictIdent of contentConflictIdents) {
               conflictIdents.push(contentConflictIdent);
@@ -132,16 +145,26 @@ const buildResultingPage = (
     }
 
     // Elements that are left in the remote but are not present in the local
-    if (remote.length > 0) {
-      if (syncMode === 'autoDelete' && newChanges) { // We are pushing our page and we want to sync deletions
-        updatedElements.push(...remote);
-      } else if (syncMode === 'autoAdd' && !newChanges) {
-        resultPage.push(...remote);
-        updatedElements.push(...remote);
-      } else {
-        for (const cloudElement of remote) {
-          if (cloudElement.content == null) {
-            conflictIdents.push(cloudElement.ident);
+    if (remote.length > 0) { // Local elements not found
+      if (newChanges) { // User made changes
+        if (syncMode === 'hardPush') { // Push element deletions
+          updatedElements.push(...remote);
+        } else { // Not allow to push element deletion
+          for (const remoteElement of remote) {
+            if (remoteElement.content == null) {
+              conflictIdents.push(remoteElement.ident);
+            }
+          }
+        }
+      } else { // User deleted an element from another device
+        if (syncMode.includes('Pull')) { // Pull element creation from another device
+          resultPage.push(...remote);
+          updatedElements.push(...remote);
+        } else { // Not allowed to pull element creation from another device
+          for (const remoteElement of remote) {
+            if (remoteElement.content == null) {
+              conflictIdents.push(remoteElement.ident);
+            }
           }
         }
       }

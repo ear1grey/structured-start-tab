@@ -1,5 +1,6 @@
-import { syncPageCloud } from './services/cloud.service.js';
+import { syncFullContent } from './services/sync.service.js';
 import { updateAgendasBackground } from './services/agenda.service.js';
+
 
 // define the menu item
 const menuItems = [
@@ -113,7 +114,7 @@ const handleAlarm = (details) => {
       updateAgendasBackground();
       break;
     case 'savePage':
-      syncPageCloud();
+      syncFullContent();
       break;
     default:
       break;

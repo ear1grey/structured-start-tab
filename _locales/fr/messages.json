@@ -371,6 +371,27 @@
   "sync_warn_enable": {
     "message": "Attention: cette fonctionnalité peut exposer vos données à d'autres utilisateurs et fournisseurs. Assurez-vous d'avoir une sauvegarde de vos données avant d'activer cette fonctionnalité et que vous faites confiance au fournisseur."
   },
+  "sync_sync_mode": {
+    "message": "Mode de synchronisation"
+  },
+  "sync_soft_push": {
+    "message": "POUSSER créations"
+  },
+  "sync_hard_push": {
+    "message": "POUSSER créations & suppressions"
+  },
+  "sync_soft_pull": {
+    "message": "RETIRER créations"
+  },
+  "sync_hard_pull": {
+    "message": "RETIRER créations & suppressions"
+  },
+  "sync_syncFoldedStatus": {
+    "message": "État plié du panneau de synchronisation"
+  },
+  "sync_syncPrivateStatus": {
+    "message": "Statut privé du panneau de synchronisation"
+  },
   "sync_provider": {
     "message": "Fournisseur"
   },

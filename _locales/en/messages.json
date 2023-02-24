@@ -368,6 +368,27 @@
   "sync_warn_enable": {
     "message": "Warning: this feature may expose your data to other users and providers. Make sure that you have a backup of your data before enabling this feature and that you trust the provider."
   },
+  "sync_sync_mode": {
+    "message": "Sync mode"
+  },
+  "sync_soft_push": {
+    "message": "PUSH creations"
+  },
+  "sync_hard_push": {
+    "message": "PUSH creations & deletions"
+  },
+  "sync_soft_pull": {
+    "message": "PULL creations"
+  },
+  "sync_hard_pull": {
+    "message": "PULL creations & deletions"
+  },
+  "sync_syncFoldedStatus": {
+    "message": "Sync panel folded status"
+  },
+  "sync_syncPrivateStatus": {
+    "message": "Sync panel private status"
+  },
   "sync_provider": {
     "message": "Provider"
   },

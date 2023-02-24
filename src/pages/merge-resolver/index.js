@@ -5,7 +5,8 @@ import { loadPanelDefinition } from '../../js/components/panel/index.js';
 import { prepareCSSVariables, addSpinner, getAllBySelector } from '../../js/lib/util.js';
 import { prepareDrag } from '../../js/services/drag.service.js';
 import { prepareFoldables } from '../../js/index.js';
-import { savePageCloud } from '../../js/services/cloud.service.js';
+// import { savePageCloud } from '../../js/services/cloud.service.js';
+import { setFullContent } from '../../js/services/sync.service.js';
 
 let els;
 const allElements = [];
@@ -41,14 +42,14 @@ const prepareElements = async () => {
   };
 
   jsonToDom(els.left, [...OPTS.json]);
-  jsonToDom(els.right, [...OPTS.cloud.conflictData.cloudJson]);
+  jsonToDom(els.right, [...OPTS.sync.conflictData.remote]);
 
   // Highlight conflicting elements
   allElements.push(...getAllBySelector(els.left, '[ident]'));
   allElements.push(...getAllBySelector(els.right, '[ident]'));
   allElements.forEach((element) => {
     const ident = element.ident || element.getAttribute('ident');
-    const newBackgroundColour = OPTS.cloud.conflictData.conflictingElements.includes(ident) ? '#db3939b8' : '#60606050';
+    const newBackgroundColour = OPTS.sync.conflictData.conflictingElements.includes(ident) ? '#db3939b8' : '#60606050';
 
     if (element.tagName === 'A') {
       element.setAttribute('originalBackground', element.style.backgroundColor);
@@ -83,12 +84,12 @@ const save = async (pick) => {
   });
 
   OPTS.json = domToJson(pick === 'left' ? els.left : els.right);
-  OPTS.cloud.version = OPTS.onlinePageVersion + 1;
+  OPTS.sync.version = OPTS.onlinePageVersion + 1;
 
-  await savePageCloud(OPTS.json);
+  await setFullContent({ version: OPTS.sync.version, page: OPTS.json });
 
-  delete OPTS.cloud.conflictData;
-  OPTS.cloud.hasConflict = false;
+  delete OPTS.sync.conflictData;
+  OPTS.sync.hasConflict = false;
 
   options.write();
 };
