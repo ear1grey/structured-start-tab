@@ -11,28 +11,32 @@ class FirebaseService {
     this.settings = settings;
   }
 
+  get baseUrl() {
+    return this.settings.baseUrl.replace(/\/$/, '');
+  }
+
   // METHODS
   async getFullContent() {
-    const result = await makeRequest(`${this.settings.getFullContentUrl}?userId=${this.settings.userId}`, 'GET');
+    const result = await makeRequest(`${this.baseUrl}/${this.settings.getFullContentFunction}?userId=${this.settings.userId}`, 'GET');
     if (result.status === 404) return null;
     return result.content;
   }
 
   setFullContent(content) {
-    return makeRequest(this.settings.setFullContentUrl, 'POST', {
+    return makeRequest(`${this.baseUrl}/${this.settings.setFullContentFunction}`, 'POST', {
       userId: this.settings.userId,
       content,
     });
   }
 
   async getPanel(id) {
-    const response = await makeRequest(`${this.settings.getPanelUrl}?&id=${id}`, 'GET');
+    const response = await makeRequest(`${this.baseUrl}/${this.settings.getPanelFunction}?&id=${id}`, 'GET');
     if (response.status === 404) return null;
     return response.content.panel;
   }
 
   pushPanel(id, panel) {
-    return makeRequest(this.settings.pushPanelUrl, 'POST', {
+    return makeRequest(`${this.baseUrl}/${this.settings.pushPanelFunction}`, 'POST', {
       id,
       content: {
         panel,
@@ -42,11 +46,11 @@ class FirebaseService {
   }
 
   deleteAllPanels() {
-    return makeRequest(`${this.settings.deleteAllPanelsUrl}?owner=${this.settings.userId}`, 'DELETE');
+    return makeRequest(`${this.baseUrl}/${this.settings.deleteAllPanelsFunction}?owner=${this.settings.userId}`, 'DELETE');
   }
 }
 
-// TODO: Localisation
+// TODO: Localization
 export const register = () => {
   return {
     id: 'firebase',
@@ -68,34 +72,40 @@ export const register = () => {
         ],
       },
       {
-        id: 'getFullContentUrl',
-        friendlyName: 'Get Full Content URL',
+        id: 'baseUrl',
+        friendlyName: 'Base URL',
         type: 'text',
-        default: 'https://example.come/getContentByUser',
+        default: 'https://example.com/',
       },
       {
-        id: 'setFullContentUrl',
-        friendlyName: 'Set Full Content URL',
+        id: 'getFullContentFunction',
+        friendlyName: 'Get Full Content Function',
         type: 'text',
-        default: 'https://example.come/pushContent',
+        default: 'getContentByUser',
       },
       {
-        id: 'getPanelUrl',
-        friendlyName: 'Get Panel URL',
+        id: 'setFullContentFunction',
+        friendlyName: 'Set Full Content Function',
         type: 'text',
-        default: 'https://example.come/set-full-content',
+        default: 'pushContent',
       },
       {
-        id: 'pushPanelUrl',
-        friendlyName: 'Push Panel URL',
+        id: 'getPanelFunction',
+        friendlyName: 'Get Panel Function',
         type: 'text',
-        default: 'https://example.come/set-full-content',
+        default: 'getPanel',
       },
       {
-        id: 'deleteAllPanelsUrl',
-        friendlyName: 'Delete All Panels URL',
+        id: 'pushPanelFunction',
+        friendlyName: 'Push Panel Function',
         type: 'text',
-        default: 'https://example.come/set-full-content',
+        default: 'pushPanel',
+      },
+      {
+        id: 'deleteAllPanelsFunction',
+        friendlyName: 'Delete All Panels Function',
+        type: 'text',
+        default: 'deleteAllPanels',
       },
     ],
   };
