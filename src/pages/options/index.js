@@ -82,6 +82,7 @@ function updatePrefsWithPage() {
   getDropdown('sync.mode');
   getCheckBox('sync.syncFoldStatus');
   getCheckBox('sync.syncPrivateStatus');
+  getDropdown('sync.provider');
 }
 function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'lock');
@@ -108,6 +109,7 @@ function updatePageWithPrefs(prefs) {
   setDropdown(prefs, 'sync.mode');
   setCheckBox(prefs, 'sync.syncFoldStatus');
   setCheckBox(prefs, 'sync.syncPrivateStatus');
+  setDropdown(prefs, 'sync.provider');
 
   // Defaults
   if (!util.isBeta()) { setCheckBox(prefs, 'showFeedback'); }
@@ -235,11 +237,23 @@ function buildSyncSettings(settings) {
   create(sync, 'checkbox', { id: 'sync.syncFoldStatus' }, chrome.i18n.getMessage('sync_syncFoldedStatus'), false);
   create(sync, 'checkbox', { id: 'sync.syncPrivateStatus' }, chrome.i18n.getMessage('sync_syncPrivateStatus'), false);
 
-  // TODO: On provider change, re-render the settings (remove current settings, add new settings)
   create(sync, 'dropdown', {
     id: 'sync.provider',
     options: availableServices.map((service) => ({ name: service.friendlyName, value: service.id })),
-  }, chrome.i18n.getMessage('sync_provider'));
+  }, chrome.i18n.getMessage('sync_provider'), undefined, false, [
+    {
+      event: 'change',
+      handler: () => {
+        sync.remove();
+
+        const settings = document.querySelector('#settings');
+        if (settings) {
+          buildSyncSettings(settings);
+          updatePageWithPrefs(OPTS);
+        }
+      },
+    },
+  ]);
 
   const availableSettings = availableServices.find(service => service.id === OPTS.sync.provider).settings;
   for (const setting of availableSettings) {
@@ -272,8 +286,6 @@ function buildSyncSettings(settings) {
 
 // Load settings for a specific provider
 function loadSyncSettings({ provider, settings }) {
-  console.log('loadSyncSettings', provider, settings);
-
   for (const key in settings) {
     const input = document.getElementById(`sync.settings.${provider}.${key}`);
     if (input && settings[key]) input.value = settings[key];

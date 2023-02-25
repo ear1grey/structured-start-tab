@@ -36,15 +36,24 @@ const getService = () => {
  * Returns the stored full content of the page
  * @return {FullContent} The full content of the page
  */
-export const getFullContent = () => {
-  return getService().getFullContent();
+export const getFullContent = async () => {
+  try {
+    return await getService().getFullContent();
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 };
 
 export const setFullContent = async content => {
-  await getService().setFullContent(content);
-  OPTS.sync.hasConflict = false;
-  OPTS.sync.newChanges = false;
-  write();
+  try {
+    await getService().setFullContent(content);
+    OPTS.sync.hasConflict = false;
+    OPTS.sync.newChanges = false;
+    write();
+  } catch (e) {
+    console.error(e);
+  }
 };
 
 export const syncFullContent = async ({ window = null, ignoreConflict = false } = {}) => {

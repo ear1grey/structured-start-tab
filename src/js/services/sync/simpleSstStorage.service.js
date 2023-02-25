@@ -1,12 +1,7 @@
 import { newUuid } from '../../lib/util.js';
 import { makeRequest } from '../api.service.js';
 
-/**
- * REQUIREMENTS FOR FIREBASE SERVICE
- *
- */
-
-class FirebaseService {
+class SimpleSstStorageService {
   constructor(settings) {
     this.settings = settings;
   }
@@ -17,47 +12,48 @@ class FirebaseService {
 
   // METHODS
   async getFullContent() {
-    const result = await makeRequest(`${this.baseUrl}/getContentByUser?userId=${this.settings.userId}`, 'GET');
-    if (result.status === 404) return null;
+    const result = await makeRequest(`${this.baseUrl}?userId=${this.settings.userId}`, 'GET', null, { Authorization: this.settings.token });
+    if (result.status < 200 || result.status >= 300) return null;
     return result.content;
   }
 
   setFullContent(content) {
-    return makeRequest(`${this.baseUrl}/pushContent`, 'POST', {
+    return makeRequest(`${this.baseUrl}`, 'POST', {
       userId: this.settings.userId,
       content,
-    });
+    }, { Authorization: this.settings.token });
   }
 
   async getPanel(id) {
-    const response = await makeRequest(`${this.baseUrl}/getPanel?&id=${id}`, 'GET');
+    const response = await makeRequest(`${this.baseUrl}/panel?&panelId=${id}`, 'GET', null, { Authorization: this.settings.token });
     if (response.status === 404) return null;
     return response.content.panel;
   }
 
   pushPanel(id, panel) {
-    return makeRequest(`${this.baseUrl}/pushPanel`, 'POST', {
-      id,
+    return makeRequest(`${this.baseUrl}/panel`, 'POST', {
+      panelId: id,
       content: {
         panel,
         owner: this.settings.userId,
       },
-    });
+    }, { Authorization: this.settings.token });
   }
 
   deleteAllPanels() {
-    return makeRequest(`${this.baseUrl}/deleteAllPanels?owner=${this.settings.userId}`, 'DELETE');
+    return makeRequest(`${this.baseUrl}/panels?owner=${this.settings.userId}`, 'DELETE', null, { Authorization: this.settings.token });
   }
 }
 
 // TODO: Localization
 export const register = () => {
   return {
-    id: 'firebase',
-    friendlyName: 'Firebase',
-    Service: FirebaseService,
+    id: 'simpleSstStorage',
+    friendlyName: 'Simple SST Storage',
+    Service: SimpleSstStorageService,
     settings: [
       {
+        // TODO: Validation - it cannot have slashes
         id: 'userId',
         friendlyName: 'User ID',
         type: 'text',
@@ -76,6 +72,12 @@ export const register = () => {
         friendlyName: 'Base URL',
         type: 'text',
         default: 'https://example.com/',
+      },
+      {
+        id: 'token',
+        friendlyName: 'Token',
+        type: 'text',
+        default: '',
       },
     ],
   };
