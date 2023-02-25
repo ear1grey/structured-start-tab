@@ -39,12 +39,7 @@ export const OPTS = {
     mode: 'manual',
     syncFoldStatus: false,
     syncPrivateStatus: false,
-    provider: {
-      id: 'firebase',
-
-      // Allowed provider actions
-      allowsPanelShare: false,
-    },
+    provider: 'firebase',
 
     // Sync status
     hasConflict: false,
