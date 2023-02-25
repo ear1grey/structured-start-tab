@@ -1,21 +1,34 @@
 import { services } from './sync/index.js';
 import { OPTS, write } from '../lib/options.js';
 import { jsonToDom } from './parser.service.js';
+import { updateAgenda } from './agenda.service.js';
+
+/**
+ * Any provider requires the following implementations:
+ *
+ * - getFullContent()
+ * - setFullContent(content)
+ * - getPanel(id)
+ * - pushPanel(id, panel)
+ * - deleteAllPanels()
+ *
+ */
 
 export const getAvailableServices = () => {
   // TODO: Validate services
   return services.map(serviceDetails => {
     return {
-      id: serviceDetails.name,
+      id: serviceDetails.id,
       friendlyName: serviceDetails.friendlyName,
       settings: serviceDetails.settings,
+      allowsPanelShare: serviceDetails.allowsPanelShare ?? false,
     };
   });
 };
 
 const getService = () => {
   return new (services.find(serviceDetails => {
-    return serviceDetails.name === OPTS.sync.provider;
+    return serviceDetails.id === OPTS.sync.provider;
   })).Service(OPTS.sync.settings[OPTS.sync.provider]);
 };
 
@@ -75,6 +88,7 @@ export const syncFullContent = async ({ window = null, ignoreConflict = false } 
 
     if (window) {
       jsonToDom(window, OPTS.json);
+      updateAgenda();
     }
   }
 };
@@ -150,22 +164,16 @@ const buildResultingPage = (
         if (syncMode === 'hardPush') { // Push element deletions
           updatedElements.push(...remote);
         } else { // Not allow to push element deletion
-          for (const remoteElement of remote) {
-            if (remoteElement.content == null) {
-              conflictIdents.push(remoteElement.ident);
-            }
-          }
+          const ids = remote.map(elem => elem.ident);
+          conflictIdents.push(...ids);
         }
       } else { // User deleted an element from another device
         if (syncMode.includes('Pull')) { // Pull element creation from another device
           resultPage.push(...remote);
           updatedElements.push(...remote);
         } else { // Not allowed to pull element creation from another device
-          for (const remoteElement of remote) {
-            if (remoteElement.content == null) {
-              conflictIdents.push(remoteElement.ident);
-            }
-          }
+          const ids = remote.map(elem => elem.ident);
+          conflictIdents.push(...ids);
         }
       }
     }
@@ -184,4 +192,25 @@ const buildResultingPage = (
     }
     resultPage.push(remote);
   }
+};
+
+// PANELS SHARE METHODS
+export const getPanel = (id) => {
+  return getService().getPanel(id);
+};
+
+export const pushPanel = (id, panel) => {
+  return getService().pushPanel(id, panel);
+};
+
+export const deleteAllPanels = () => {
+  return getService().deleteAllPanels();
+};
+
+export const panelShareAvailable = () => {
+  const service = getService();
+  return service &&
+    typeof service.getPanel === 'function' &&
+    typeof service.pushPanel === 'function' &&
+    typeof service.deleteAllPanels === 'function';
 };

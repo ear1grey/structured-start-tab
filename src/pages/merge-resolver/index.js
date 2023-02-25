@@ -5,7 +5,6 @@ import { loadPanelDefinition } from '../../js/components/panel/index.js';
 import { prepareCSSVariables, addSpinner, getAllBySelector } from '../../js/lib/util.js';
 import { prepareDrag } from '../../js/services/drag.service.js';
 import { prepareFoldables } from '../../js/index.js';
-// import { savePageCloud } from '../../js/services/cloud.service.js';
 import { setFullContent } from '../../js/services/sync.service.js';
 
 let els;

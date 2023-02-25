@@ -1,5 +1,4 @@
 import { htmlStringToJson } from '../services/parser.service.js';
-import { newUuid } from './util.js';
 import { getAvailableServices } from '../services/sync.service.js';
 
 
@@ -32,28 +31,20 @@ export const OPTS = {
   json: [],
   linkStats: {},
   agendas: [],
-  // Cloud sync settings
-  cloud: {
-    userId: null,
-    version: 0,
-    hasConflict: false,
 
-    enabled: false,
-    url: '',
-
-    syncMode: 'manual',
-    syncFoldStatus: false,
-    syncPrivateStatus: false,
-    newChanges: false,
-  },
-
+  // Storage sync options
   sync: {
     enabled: false,
 
     mode: 'manual',
     syncFoldStatus: false,
     syncPrivateStatus: false,
-    provider: 'firebase',
+    provider: {
+      id: 'firebase',
+
+      // Allowed provider actions
+      allowsPanelShare: false,
+    },
 
     // Sync status
     hasConflict: false,
@@ -68,18 +59,12 @@ const settingKey = 'structured-start-tab';
 
 export function load() {
   return new Promise(resolve => {
-    chrome.storage.local.get([settingKey], async (result) => {
+    chrome.storage.local.get([settingKey], (result) => {
       if (!result[settingKey]) {
         result[settingKey] = {};
       }
 
       deepAssign(OPTS, result[settingKey]);
-
-      // If the user has no cloud id, generate one
-      if (!OPTS.cloud.userId) {
-        const chromeUserId = (await chrome?.identity?.getProfileUserInfo())?.id;
-        OPTS.cloud.userId = chromeUserId || newUuid();
-      }
 
       // Load sync services settings
       loadSyncServices();

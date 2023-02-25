@@ -13,9 +13,7 @@
     "favicon",
     "contextMenus",
     "topSites",
-    "alarms",
-    "identity",
-    "identity.email"
+    "alarms"
   ],
   "host_permissions": [
     "https://calendar.google.com/calendar/*",

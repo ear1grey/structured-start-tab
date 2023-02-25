@@ -329,38 +329,14 @@
   "configure_shortcut": {
     "message": "<p>The keyboard shortcuts used to toggle the sidebar (and other features) can be configured to suit your preference.  Depending on your browser the way to do this will be different, so please consult these guides.</p><ul><li><a href=\"https://obie.ai/blog/how-to-add-and-remove-custom-keyboard-shortcuts-and-hotkeys-for-a-chrome-extension-in-5-seconds-flat/\">Chrome</a></li><li><a href=\"https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox\">Firefox</a></li></ul>"
   },
-  "cloud": {
-    "message": "Cloud storage"
-  },
-  "cloud_userId": {
-    "message": "User Id"
-  },
-  "cloud_enabled": {
-    "message": "Use cloud storage"
-  },
-  "cloud_url": {
-    "message": "Storage URL"
-  },
-  "cloud_syncFoldedStatus": {
-    "message": "Sync panel folded status"
-  },
-  "cloud_syncPrivateStatus": {
-    "message": "Sync panel private status"
-  },
-  "cloud_warn_enable": {
-    "message": "Warning: this feature uses your Google Id and the data will be stored on Google servers. If your Google Id is compromised, your data will be compromised too."
-  },
-  "cloud_warn_id_change": {
+  "sync_warn_id_change": {
     "message": "Warning: changing the user Id may result in data loss. Make sure that you have a backup of your data before changing the user Id."
   },
-  "cloud_panel_code": {
+  "sync_panel_code": {
     "message": "Panel code"
   },
-  "cloud_remove_shared_panels": {
-    "message": "Unpublish panels from the cloud"
-  },
-  "cloud_sync_mode": {
-    "message": "Sync mode"
+  "sync_remove_shared_panels": {
+    "message": "Unpublish panels from storage"
   },
   "sync_enabled": {
     "message": "Enable sync"
@@ -398,11 +374,11 @@
   "panel_import_file": {
     "message": "Import panel from file"
   },
-  "panel_export_cloud": {
-    "message": "Export panel to cloud"
+  "panel_export_storage": {
+    "message": "Export panel to storage"
   },
-  "panel_import_cloud": {
-    "message": "Import panel from cloud"
+  "panel_import_storage": {
+    "message": "Import panel from storage"
   },
   "title_agenda_nb": {
     "message": "Number of words to be displayed from the event title"
@@ -446,7 +422,7 @@
   "action_feedback": {
     "message": "Feedback"
   },
-  "action_cloud_sync": {
-    "message": "Cloud Sync"
+  "action_storage_sync": {
+    "message": "Sync"
   }
 }

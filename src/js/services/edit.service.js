@@ -1,13 +1,13 @@
 import * as ui from '../services/ui.service.js';
 import * as options from '../lib/options.js';
 import * as io from './io.service.js';
+import * as syncService from './sync.service.js';
 
 import { saveChanges } from '../index.js';
 import { OPTS } from '../lib/options.js';
 import { setFavicon, newUuid } from '../lib/util.js';
 import { updateAgendaBackground, displayNewAgenda } from './agenda.service.js';
 import { domToJson, jsonElementToDom } from './parser.service.js';
-import { getPanelCloud, sharePanelCloud } from './cloud.service.js';
 
 export function editLink(element) {
   // Make sure that the link has an identifier
@@ -189,30 +189,30 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
 }
 
 export function editPanel(element) {
-  let cloudActions = [];
-  if (OPTS.cloud.enabled && OPTS.cloud.url) {
-    cloudActions = [
+  let storageActions = [];
+  if (OPTS.sync.enabled && syncService.panelShareAvailable()) {
+    storageActions = [
       {
-        name: 'cloud-import',
-        title: chrome.i18n.getMessage('panel_import_cloud'),
+        name: 'storage-import',
+        title: chrome.i18n.getMessage('panel_import_storage'),
         icon: 'cloud-download',
         event: ({ dialog }) => {
-          if (dialog.shadow.querySelector('#cloud-import-code')) {
-            dialog.shadow.querySelector('#cloud-import-code').remove();
+          if (dialog.shadow.querySelector('#storage-import-code')) {
+            dialog.shadow.querySelector('#storage-import-code').remove();
             return;
           }
 
           const label = document.createElement('label');
-          label.id = 'cloud-import-code';
+          label.id = 'storage-import-code';
           const input = document.createElement('input');
-          input.placeholder = chrome.i18n.getMessage('cloud_panel_code');
+          input.placeholder = chrome.i18n.getMessage('sync_panel_code');
           const button = document.createElement('button');
           button.textContent = chrome.i18n.getMessage('import');
           button.addEventListener('click', () => {
             if (!input.value) return;
 
             dialog.setLoading(true);
-            getPanelCloud(input.value)
+            syncService.getPanel(input.value)
               .then((panelContent) => {
                 if (panelContent != null) {
                   const newElement = jsonElementToDom(panelContent, true);
@@ -232,19 +232,19 @@ export function editPanel(element) {
           label.appendChild(input);
           label.appendChild(button);
 
-          dialog.$customActionsContainer.querySelector('#cloud-import').insertAdjacentElement('beforebegin', label);
+          dialog.$customActionsContainer.querySelector('#storage-import').insertAdjacentElement('beforebegin', label);
 
           input.focus();
         },
       },
       {
-        name: 'cloud-export',
-        title: chrome.i18n.getMessage('panel_export_cloud'),
+        name: 'storage-export',
+        title: chrome.i18n.getMessage('panel_export_storage'),
         icon: 'cloud-upload',
         event: async ({ dialog }) => {
           dialog.setLoading(true);
           const json = domToJson({ children: [element] })[0];
-          const result = await sharePanelCloud(element.ident, json);
+          const result = await syncService.pushPanel(element.ident, json);
           if (result.ok) { dialog.showIdent = true; }
           dialog.setLoading(false);
         },
@@ -278,7 +278,7 @@ export function editPanel(element) {
           });
         },
       },
-      ...cloudActions,
+      ...storageActions,
     ],
   });
 }

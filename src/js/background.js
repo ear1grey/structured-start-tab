@@ -91,8 +91,8 @@ function menuInstaller() {
     periodInMinutes: 10,
   });
 
-  // Save page to the cloud every 10 minutes
-  chrome.alarms.create('savePage', {
+  // Save page to the storage every 10 minutes
+  chrome.alarms.create('storageSavePage', {
     periodInMinutes: 10,
   });
 }
@@ -113,7 +113,7 @@ const handleAlarm = (details) => {
     case 'agendaUpdate':
       updateAgendasBackground();
       break;
-    case 'savePage':
+    case 'storageSavePage':
       syncFullContent();
       break;
     default:

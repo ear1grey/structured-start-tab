@@ -14,7 +14,7 @@ import { domToJson, jsonToDom } from './services/parser.service.js';
 
 import { OPTS } from './lib/options.js';
 import { prepareDrag } from './services/drag.service.js';
-import { updateAgendaBackground, displayNewAgenda, getAgendasFromObject } from './services/agenda.service.js';
+import { updateAgenda, getAgendasFromObject } from './services/agenda.service.js';
 import { editPanel, editAgenda } from './services/edit.service.js';
 
 const oneDay = 1000 * 60 * 60 * 24;
@@ -253,16 +253,6 @@ function addAgenda() {
   updateAgenda();
 }
 
-async function updateAgenda(updateAgendas = true) {
-  for (let index = 0; index < OPTS.agendas.length; index++) {
-    const agenda = OPTS.agendas[index];
-    if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { continue; }
-    if (agenda.events.length === 0 && updateAgendas) {
-      await updateAgendaBackground(agenda);
-    }
-    displayNewAgenda(agenda);
-  }
-}
 
 function duplicatePanel(keepLinks) {
   if (OPTS.lock) {
@@ -593,11 +583,11 @@ const prepareSectionActions = () => {
     document.querySelector('#feedback').style.display = 'none';
   }
 
-  if (!OPTS.cloud.enabled || !OPTS.cloud.url) {
-    document.querySelector('#forceCloudSync').style.display = 'none';
+  if (!OPTS.sync.enabled) {
+    document.querySelector('#forceStorageSync').style.display = 'none';
   }
 
-  document.querySelector('#forceCloudSync a').addEventListener('click', () => {
+  document.querySelector('#forceStorageSync a').addEventListener('click', () => {
     sync.syncFullContent({ window: els.main });
   });
 };
