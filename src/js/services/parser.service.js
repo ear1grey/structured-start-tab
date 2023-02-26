@@ -107,6 +107,10 @@ const domToJson = (parentElement) => {
   return jsonContent;
 };
 
+const domToJsonSingle = (element) => {
+  return domToJson({ children: [element] })[0];
+};
+
 const jsonElementToDom = (element, newId = false) => {
   switch (element.type) {
     case 'section': {
@@ -243,6 +247,7 @@ const htmlStringToJson = (htmlString) => {
 
 export {
   domToJson,
+  domToJsonSingle,
   htmlStringToJson,
 
   jsonToDom,

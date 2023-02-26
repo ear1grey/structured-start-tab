@@ -2,6 +2,7 @@ import { services } from './sync/index.js';
 import { OPTS, write } from '../lib/options.js';
 import { jsonToDom } from './parser.service.js';
 import { updateAgenda } from './agenda.service.js';
+import { areObjectEquals } from '../lib/util.js';
 
 /**
  * Any provider requires the following implementations:
@@ -104,16 +105,7 @@ export const syncFullContent = async ({ window = null, ignoreConflict = false } 
 
 const elementBasePropertiesEqual = (localElement, remoteElement) => {
   const propertiesToIgnore = ['ident', 'id', 'content', 'grow'];
-
-  // compare all the item properties dynamically
-  for (const key in localElement) {
-    if (propertiesToIgnore.includes(key)) continue;
-    if (localElement[key] !== remoteElement[key]) {
-      return false;
-    }
-  }
-
-  return true;
+  return areObjectEquals(localElement, remoteElement, propertiesToIgnore);
 };
 
 const buildResultingPage = (

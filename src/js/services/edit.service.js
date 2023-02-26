@@ -6,8 +6,8 @@ import * as syncService from './sync.service.js';
 import { saveChanges } from '../index.js';
 import { OPTS } from '../lib/options.js';
 import { setFavicon, newUuid } from '../lib/util.js';
-import { updateAgendaBackground, displayNewAgenda } from './agenda.service.js';
-import { domToJson, jsonElementToDom } from './parser.service.js';
+import { updateAndDisplayAgenda } from './agenda.service.js';
+import { domToJsonSingle, jsonElementToDom } from './parser.service.js';
 
 export function editLink(element) {
   // Make sure that the link has an identifier
@@ -27,7 +27,7 @@ export function editLink(element) {
       // Name
       element.textContent = properties.name.value;
       if (properties.name.mode === 'multi') element.style.whiteSpace = 'pre-wrap';
-      else element.style.whiteSpace = 'nowrap';
+      else element.style.whiteSpace = 'unset';
       // URL
       if (properties.url) {
         element.href = properties.url;
@@ -91,7 +91,7 @@ export function editLink(element) {
   element.setAttribute('draggable', 'true');
 }
 
-function editPanelBase({ element, title, customActions = [], extraProperties = [], additionalCallback = null }) {
+function editPanelBase({ element, title, customActions = [], extraProperties = [], callbackExtension = null, cancelCallback = null }) {
   const editWindow = document.createElement('edit-window');
   document.body.appendChild(editWindow);
 
@@ -105,21 +105,22 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
     callBack: (properties) => {
       element.header = properties.name.value;
       if (properties.name.mode === 'multi') element.style.whiteSpace = 'pre-wrap';
-      else element.style.whiteSpace = 'nowrap';
+      else element.style.whiteSpace = 'unset';
       element.backgroundColour = properties.background;
       element.textColour = properties.foreground;
       element.direction = properties.direction;
       element.singleLineDisplay = properties.singleLineDisplay;
       element.private = properties.private;
 
-      if (additionalCallback) {
-        additionalCallback(properties);
+      if (callbackExtension) {
+        callbackExtension(properties);
       }
 
       // Complete
       saveChanges({ newChanges: true });
       ui.flash(element);
     },
+    cancelCallback,
     properties: [
       {
         name: 'name',
@@ -243,7 +244,7 @@ export function editPanel(element) {
         icon: 'cloud-upload',
         event: async ({ dialog }) => {
           dialog.setLoading(true);
-          const json = domToJson({ children: [element] })[0];
+          const json = domToJsonSingle(element);
           const result = await syncService.pushPanel(element.ident, json);
           if (result.ok) { dialog.showIdent = true; }
           dialog.setLoading(false);
@@ -260,7 +261,7 @@ export function editPanel(element) {
         title: chrome.i18n.getMessage('panel_export_file'),
         icon: 'file-code',
         event: () => {
-          const json = domToJson({ children: [element] })[0];
+          const json = domToJsonSingle(element);
           io.downloadJson({ name: `${element.ident}.json`, data: json });
         },
       },
@@ -293,7 +294,7 @@ export function editAgenda(element) {
         { name: 'agendaUrl', type: 'text', value: agenda?.agendaUrl || '', locale: { primary: 'url_agenda', secondary: 'placeholder_panel_url_agenda' } },
         { name: 'email', type: 'text', value: agenda?.email || '', locale: { primary: 'email_agenda', secondary: 'placeholder_panel_email_agenda' } },
       ],
-      additionalCallback: async (properties) => {
+      callbackExtension: (properties) => {
         if (agenda == null) {
           agenda = {
             agendaId: element.id,
@@ -308,8 +309,11 @@ export function editAgenda(element) {
         }
 
         options.write();
-        await updateAgendaBackground(agenda);
-        await displayNewAgenda(agenda);
+        updateAndDisplayAgenda(agenda);
+      },
+      cancelCallback: (contentChanged) => {
+        if (agenda == null || !contentChanged) return;
+        updateAndDisplayAgenda(agenda);
       },
     });
 }

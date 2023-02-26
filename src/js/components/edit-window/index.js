@@ -1,7 +1,7 @@
 import * as ui from '../../services/ui.service.js';
-import { localizeHtml, addSpinner, removeSpinner, loadAsync, defineComponent, addAnchorListeners, linkClicked } from '../../lib/util.js';
+import { localizeHtml, addSpinner, removeSpinner, loadAsync, defineComponent, addAnchorListeners, linkClicked, areObjectEquals } from '../../lib/util.js';
 import { iconsDictionary } from '../../../img/svg/index.js';
-import { domToJson, jsonElementToDom } from '../../services/parser.service.js';
+import { domToJsonSingle, jsonElementToDom } from '../../services/parser.service.js';
 import '../better-text/index.js';
 
 const getTemplate = loadAsync('/src/js/components/edit-window/index.html');
@@ -19,7 +19,8 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
 
       // Event listeners
       this.$cancelBtn.addEventListener('click', () => {
-        if (this.element && this.originalElement) {
+        const contentChanged = !areObjectEquals(domToJsonSingle(this.element), this.originalElement);
+        if (this.element && this.originalElement && contentChanged) {
           // restore original element
           const newElement = jsonElementToDom(this.originalElement);
           this.element.parentNode.replaceChild(newElement, this.element);
@@ -29,6 +30,8 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
           }
         }
         this.isVisible = false;
+
+        if (this._cancelCallback) { this._cancelCallback(contentChanged); }
       });
 
       this.$okBtn.addEventListener('click', () => {
@@ -94,15 +97,16 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
       }
     }
 
-    init({ title, ident, customActions, properties, callBack, options, element }) {
+    init({ title, ident, customActions, properties, options, element, callBack, cancelCallback }) {
       this.$title.textContent = title;
       this.$ident.textContent = ident;
       this._callBack = callBack;
+      this._cancelCallback = cancelCallback;
       this._options = options;
 
       if (element) {
         this.element = element;
-        this.originalElement = domToJson({ children: [element] })[0];
+        this.originalElement = domToJsonSingle(element);
       }
 
       if (customActions) { this.addCustomActions(customActions); }

@@ -12,6 +12,11 @@ export async function updateAgendasBackground() {
   });
 }
 
+export async function updateAndDisplayAgenda(agenda) {
+  await updateAgendaBackground(agenda);
+  displayNewAgenda(agenda);
+}
+
 /** Update specific agenda */
 export async function updateAgendaBackground(agenda) {
   if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { return; }
