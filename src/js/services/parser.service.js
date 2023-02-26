@@ -165,7 +165,7 @@ const jsonElementToDom = (element, newId = false) => {
       panel.fontSize = element.fontSize;
 
       if (element.invisible) { panel.classList.add('invisible'); }
-      if (element.textMode === 'multi') { panel.style.whiteSpace = 'pre-wrap'; } else { panel.style.whiteSpace = 'nowrap'; }
+      if (element.textMode === 'multi') { panel.style.whiteSpace = 'pre-wrap'; } else { panel.style.whiteSpace = 'unset'; }
 
       // Set content
       for (const innerElement of element.content) {
