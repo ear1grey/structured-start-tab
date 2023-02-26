@@ -161,6 +161,9 @@
   "import": {
     "message": "Import"
   },
+  "subscribe": {
+    "message": "Subscribe"
+  },
   "colour": {
     "message": "Colour"
   },

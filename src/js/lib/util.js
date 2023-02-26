@@ -444,6 +444,8 @@ export function areObjectEquals(obj1, obj2, propertiesToIgnore = []) {
   if (obj1Props.length !== obj2Props.length) return false;
 
   for (const prop of obj1Props) {
+    if (obj1[prop] === obj2[prop]) continue;
+
     if (typeof obj1[prop] === 'object') {
       if (!areObjectEquals(obj1[prop], obj2[prop])) {
         return false;

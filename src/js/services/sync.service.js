@@ -91,7 +91,12 @@ export const syncFullContent = async ({ window = null, ignoreConflict = false } 
 
       document.querySelector('#mergeConflictResolver').style.display = 'block';
     }
-  } if (updatedElements.length > 0) { // Push changes
+  } else {
+    OPTS.sync.hasConflict = false;
+    write();
+  }
+
+  if (updatedElements.length > 0) { // Push changes
     await setFullContent({ version: 0, page: newPage });
     OPTS.json = newPage;
     write();
@@ -101,18 +106,24 @@ export const syncFullContent = async ({ window = null, ignoreConflict = false } 
       updateAgenda();
     }
   }
+
+  updateSubscriptions({ window });
 };
 
-const elementBasePropertiesEqual = (localElement, remoteElement) => {
-  const propertiesToIgnore = ['ident', 'id', 'content', 'grow'];
+const elementBasePropertiesEqual = (localElement, remoteElement, additionalPropsToIgnore = []) => {
+  return elementPropertiesEqual(localElement, remoteElement, ['content', ...additionalPropsToIgnore]);
+};
+
+const elementPropertiesEqual = (localElement, remoteElement, additionalPropsToIgnore = []) => {
+  const propertiesToIgnore = ['ident', 'id', 'grow', ...additionalPropsToIgnore];
   return areObjectEquals(localElement, remoteElement, propertiesToIgnore);
 };
 
 const buildResultingPage = (
   remote, local, { newChanges = false, syncMode = 'manual', syncFold = true, syncPrivate = true } = {}, resultPage, conflictIdents, updatedElements) => {
   // clean-up content!!
-  if (Array.isArray(local)) local = local.filter(elem => elem.id !== 'trash');
-  if (Array.isArray(remote)) remote = remote.filter(elem => elem.id !== 'trash');
+  if (Array.isArray(local)) local = local.filter(elem => elem.id !== 'trash' && elem.remotePanelId == null);
+  if (Array.isArray(remote)) remote = remote.filter(elem => elem.id !== 'trash' && elem.remotePanelId == null);
 
   // If they are both arrays, check all the elements
   if (Array.isArray(local) && Array.isArray(remote)) {
@@ -140,7 +151,7 @@ const buildResultingPage = (
         remote.splice(remoteElementIndex, 1);
 
         // Check if the panel properties are different
-        if (!elementBasePropertiesEqual(localElement, remoteElement, { syncFold, syncPrivate })) {
+        if (!elementBasePropertiesEqual(localElement, remoteElement)) {
           conflictIdents.push(localElement.ident);
         }
 
@@ -179,7 +190,7 @@ const buildResultingPage = (
       }
     }
   } else { // If they are not both arrays, check the base properties
-    if (!elementBasePropertiesEqual(local, remote, { syncFold, syncPrivate })) {
+    if (!elementBasePropertiesEqual(local, remote)) {
       conflictIdents.push(local.ident);
     }
     if (local.content) {
@@ -208,10 +219,77 @@ export const deleteAllPanels = () => {
   return getService().deleteAllPanels();
 };
 
+// PANEL SUBSCRIPTIONS METHODS
+const updateSubscriptions = async ({ window = null } = {}) => {
+  const allIds = getSubscriptionIds(OPTS.json);
+
+  let remotePanels = [];
+  if (supportsMultiplePanelsGet()) {
+    remotePanels.push(...getService().getPanels(allIds));
+  } else {
+    for (const id of allIds) {
+      remotePanels.push(await getService().getPanel(id));
+    }
+  }
+  // Create dictionary of remote panels
+  remotePanels = remotePanels.reduce((acc, panel) => {
+    acc[panel.ident] = panel;
+    return acc;
+  }, {});
+
+  if (updatePanelsInContent(OPTS.json, remotePanels) && window) {
+    jsonToDom(window, OPTS.json);
+    updateAgenda();
+  }
+
+  write();
+};
+
+const getSubscriptionIds = (content) => {
+  const subscriptionIds = [];
+
+  for (const element of content) {
+    if (element.remotePanelId != null && element.remotePanelId !== '') {
+      subscriptionIds.push(element.remotePanelId);
+    } else if (element.content) {
+      subscriptionIds.push(...getSubscriptionIds(element.content));
+    }
+  }
+  return subscriptionIds.filter((id, index) => subscriptionIds.indexOf(id) === index);
+};
+
+const updatePanelsInContent = (content, panels) => {
+  let contentUpdated = false;
+
+  for (let i = 0; i < content.length; i++) {
+    if (content[i].id === 'trash') continue;
+    if (content[i].remotePanelId != null && content[i].remotePanelId !== '' &&
+    !elementPropertiesEqual(content[i], panels[content[i].remotePanelId], ['remotePanelId'])) {
+      const panelIdent = content[i].ident;
+      content[i] = panels[content[i].remotePanelId];
+      content[i].remotePanelId = content[i].ident;
+      content[i].ident = panelIdent;
+
+      contentUpdated = true;
+    } else if (content[i].content) {
+      updatePanelsInContent(content[i].content, panels);
+    }
+  }
+
+  return contentUpdated;
+};
+
+// INFORMATION METHODS
 export const panelShareAvailable = () => {
   const service = getService();
   return service &&
     typeof service.getPanel === 'function' &&
     typeof service.pushPanel === 'function' &&
     typeof service.deleteAllPanels === 'function';
+};
+
+const supportsMultiplePanelsGet = () => {
+  const service = getService();
+  return service &&
+    typeof service.getPanels === 'function';
 };

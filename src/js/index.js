@@ -384,7 +384,7 @@ function editSection(e) {
 
   if (target.id.startsWith('agenda')) {
     editAgenda(target);
-  } else { editPanel(target); }
+  } else if (!target.isSubscribed) { editPanel(target); }
 }
 
 /** add a fold button to the page if necessary */

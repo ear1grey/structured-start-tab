@@ -65,7 +65,7 @@ header section p {
 
 #custom-actions-container label>button {
   width: unset !important;
-  margin: 0px;
+  margin: var(--small);
   padding: var(--medium)
 }
 
