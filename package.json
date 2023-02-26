@@ -20,8 +20,8 @@
     "version": "node update-manifest-version.js; git add .;",
     "postversion": "npm run all",
     "validatelogs": "if grep -qr 'console.log' src/; then echo 'WARNING: console.log were left in the code!'; fi",
-    "firebase:start": "npm run serve --prefix providers/firebase/functions",
-    "firebase:deploy": "npm run deploy --prefix providers/firebase/functions",
+    "firebase:start": "npm run serve --prefix providers/firebase",
+    "firebase:deploy": "npm run deploy --prefix providers/firebase",
     "simple-sst-storage:start": "npm start --prefix providers/simple-sst-storage"
   },
   "repository": {
