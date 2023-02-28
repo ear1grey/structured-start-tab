@@ -128,10 +128,6 @@ function getColorHeatMap(value, max) {
   return 'hsl(' + String(h) + ', 100%, 50%)';
 }
 
-function addLinkListener() {
-  addLink();
-}
-
 function addLink(target) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
@@ -151,6 +147,8 @@ function addLink(target) {
   a.draggable = true;
   toast.html('addlink', chrome.i18n.getMessage('toast_link_add'));
   ui.flash(a, 'highlight');
+  saveChanges({ newChanges: true });
+  return a;
 }
 
 function addPanel() {
@@ -158,7 +156,9 @@ function addPanel() {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
-  return util.createPanel(els.main);
+  const newPanel = util.createPanel(els.main);
+  saveChanges({ newChanges: true });
+  return newPanel;
 }
 
 function addTopSitesPanel() {
@@ -349,7 +349,7 @@ function findSection(elem) {
 }
 
 function toggleFold(e) {
-  if (!OPTS.allowCollapsingLocked) {
+  if (OPTS.lock && !OPTS.allowCollapsingLocked) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
@@ -400,7 +400,7 @@ function prepareListeners() {
     util.addAnchorListeners(a, util.linkClicked);
   }
   document.addEventListener('keydown', detectKeydown);
-  els.addlink.addEventListener('click', addLinkListener);
+  els.addlink.addEventListener('click', () => addLink());
   els.addpanel.addEventListener('click', addPanel);
 }
 

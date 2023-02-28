@@ -438,8 +438,8 @@ export function updateClickCount(a) {
 }
 
 export function areObjectEquals(obj1, obj2, propertiesToIgnore = []) {
-  const obj1Props = Object.getOwnPropertyNames(obj1).filter(p => !propertiesToIgnore.includes(p));
-  const obj2Props = Object.getOwnPropertyNames(obj2).filter(p => !propertiesToIgnore.includes(p));
+  const obj1Props = Object.getOwnPropertyNames(obj1).filter(p => !propertiesToIgnore.includes(p) && obj1[p] != null);
+  const obj2Props = Object.getOwnPropertyNames(obj2).filter(p => !propertiesToIgnore.includes(p) && obj2[p] != null);
 
   if (obj1Props.length !== obj2Props.length) return false;
 
