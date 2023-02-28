@@ -249,6 +249,7 @@ const getSubscriptionIds = (content) => {
   const subscriptionIds = [];
 
   for (const element of content) {
+    if (content.id === 'trash') continue;
     if (element.remotePanelId != null && element.remotePanelId !== '') {
       subscriptionIds.push(element.remotePanelId);
     } else if (element.content) {
