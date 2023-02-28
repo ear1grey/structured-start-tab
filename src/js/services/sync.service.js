@@ -273,7 +273,7 @@ const updatePanelsInContent = (content, panels) => {
 
       contentUpdated = true;
     } else if (content[i].content) {
-      updatePanelsInContent(content[i].content, panels);
+      contentUpdated = contentUpdated || updatePanelsInContent(content[i].content, panels);
     }
   }
 
