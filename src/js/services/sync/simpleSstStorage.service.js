@@ -43,6 +43,8 @@ class SimpleSstStorageService {
   deleteAllPanels() {
     return makeRequest(`${this.baseUrl}/panels?owner=${this.settings.userId}`, 'DELETE', null, { Authorization: this.settings.token });
   }
+
+  // TODO: getPanels([id])
 }
 
 // TODO: Localization

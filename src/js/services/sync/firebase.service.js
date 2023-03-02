@@ -48,6 +48,8 @@ class FirebaseService {
   deleteAllPanels() {
     return makeRequest(`${this.baseUrl}/deleteAllPanels?owner=${this.settings.userId}`, 'DELETE');
   }
+
+  // TODO: getPanels([id])
 }
 
 // TODO: Localization

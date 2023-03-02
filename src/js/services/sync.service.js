@@ -7,12 +7,15 @@ import { areObjectEquals } from '../lib/util.js';
 /**
  * Any provider requires the following implementations:
  *
+ * REQUIRED:
  * - getFullContent()
  * - setFullContent(content)
  * - getPanel(id)
  * - pushPanel(id, panel)
  * - deleteAllPanels()
  *
+ * OPTIONAL:
+ * - getPanels([id])
  */
 
 export const getAvailableServices = () => {
@@ -122,8 +125,10 @@ const elementPropertiesEqual = (localElement, remoteElement, additionalPropsToIg
 const buildResultingPage = (
   remote, local, { newChanges = false, syncMode = 'manual', syncFold = true, syncPrivate = true } = {}, resultPage, conflictIdents, updatedElements) => {
   // clean-up content!!
-  if (Array.isArray(local)) local = local.filter(elem => elem.id !== 'trash' && elem.remotePanelId == null);
-  if (Array.isArray(remote)) remote = remote.filter(elem => elem.id !== 'trash' && elem.remotePanelId == null);
+  // if (Array.isArray(local)) local = local.filter(elem => elem.id !== 'trash' && elem.remotePanelId == null);
+  // if (Array.isArray(remote)) remote = remote.filter(elem => elem.id !== 'trash' && elem.remotePanelId == null);
+  if (Array.isArray(local)) local = local.filter(elem => elem.id !== 'trash');
+  if (Array.isArray(remote)) remote = remote.filter(elem => elem.id !== 'trash');
 
   // If they are both arrays, check all the elements
   if (Array.isArray(local) && Array.isArray(remote)) {
@@ -237,7 +242,7 @@ const updateSubscriptions = async ({ window = null } = {}) => {
     return acc;
   }, {});
 
-  if (updatePanelsInContent(OPTS.json, remotePanels) && window) {
+  if (updatePanelSubscriptionContent(OPTS.json, remotePanels) && window) {
     jsonToDom(window, OPTS.json);
     updateAgenda();
   }
@@ -259,7 +264,7 @@ const getSubscriptionIds = (content) => {
   return subscriptionIds.filter((id, index) => subscriptionIds.indexOf(id) === index);
 };
 
-const updatePanelsInContent = (content, panels) => {
+const updatePanelSubscriptionContent = (content, panels) => {
   let contentUpdated = false;
 
   for (let i = 0; i < content.length; i++) {
@@ -273,7 +278,7 @@ const updatePanelsInContent = (content, panels) => {
 
       contentUpdated = true;
     } else if (content[i].content) {
-      contentUpdated = contentUpdated || updatePanelsInContent(content[i].content, panels);
+      contentUpdated = contentUpdated || updatePanelSubscriptionContent(content[i].content, panels);
     }
   }
 
