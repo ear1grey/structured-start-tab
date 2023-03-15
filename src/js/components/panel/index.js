@@ -45,6 +45,8 @@ const define = (css) => {
         'border-colour',
         'border-size',
         'font-size',
+
+        'remote-panel-id',
       ];
     }
 
@@ -105,6 +107,10 @@ const define = (css) => {
 
     get fontSize() { return getValueOrDefault(this, 'font-size', '1'); }
     set fontSize(fontSize) { setOrRemoveProperty(this, 'font-size', fontSize); }
+
+    get remotePanelId() { return getValueOrDefault(this, 'remote-panel-id', null); }
+    set remotePanelId(remotePanelId) { setOrRemoveProperty(this, 'remote-panel-id', remotePanelId); }
+    get isSubscribed() { return this.hasAttribute('remote-panel-id') && this.remotePanelId != null; }
 
     // Methods
     toggleFold() {

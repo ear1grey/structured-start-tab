@@ -207,9 +207,12 @@ export function editPanel(element) {
           label.id = 'storage-import-code';
           const input = document.createElement('input');
           input.placeholder = chrome.i18n.getMessage('sync_panel_code');
-          const button = document.createElement('button');
-          button.textContent = chrome.i18n.getMessage('import');
-          button.addEventListener('click', () => {
+          input.type = 'text';
+
+          // Import button
+          const importButton = document.createElement('button');
+          importButton.textContent = chrome.i18n.getMessage('import');
+          importButton.addEventListener('click', () => {
             if (!input.value) return;
 
             dialog.setLoading(true);
@@ -230,8 +233,37 @@ export function editPanel(element) {
               });
           });
 
+          // Subscribe button
+          const subscribeButton = document.createElement('button');
+          subscribeButton.textContent = chrome.i18n.getMessage('subscribe');
+          subscribeButton.addEventListener('click', () => {
+            if (!input.value) return;
+
+            // TODO: Don't allow subscribing to your own panel (check if panel exists in the page)
+
+            dialog.setLoading(true);
+            syncService.getPanel(input.value)
+              .then((panelContent) => {
+                if (panelContent != null) {
+                  panelContent.remotePanelId = input.value;
+                  const newElement = jsonElementToDom(panelContent, true);
+                  newElement.setAttribute('draggable', true);
+                  // newElement.setAttribute('remote-panel-id', input.value);
+                  element.replaceWith(newElement);
+
+                  dialog.isVisible = false;
+                  saveChanges({ newChanges: true });
+                }
+                dialog.setLoading(false);
+              })
+              .catch(() => {
+                dialog.setLoading(false);
+              });
+          });
+
           label.appendChild(input);
-          label.appendChild(button);
+          label.appendChild(importButton);
+          label.appendChild(subscribeButton);
 
           dialog.$customActionsContainer.querySelector('#storage-import').insertAdjacentElement('beforebegin', label);
 

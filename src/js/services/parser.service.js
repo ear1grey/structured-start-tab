@@ -59,6 +59,7 @@ const domToJson = (parentElement) => {
             borderSize: child.borderSize,
             fontSize: child.fontSize,
             borderColour: child.borderColour,
+            remotePanelId: child.remotePanelId,
           });
         break;
       case 'A':
@@ -167,6 +168,7 @@ const jsonElementToDom = (element, newId = false) => {
       panel.borderSize = element.borderSize;
       panel.borderColour = element.borderColour;
       panel.fontSize = element.fontSize;
+      panel.remotePanelId = element.remotePanelId;
 
       if (element.invisible) { panel.classList.add('invisible'); }
       if (element.textMode === 'multi') { panel.style.whiteSpace = 'pre-wrap'; } else { panel.style.whiteSpace = 'unset'; }
@@ -174,6 +176,9 @@ const jsonElementToDom = (element, newId = false) => {
       // Set content
       for (const innerElement of element.content) {
         const domInnerElement = jsonElementToDom(innerElement, newId);
+
+        if (panel.isSubscribed) { domInnerElement.setAttribute('draggable', false); }
+
         panel.content.appendChild(domInnerElement);
       }
 
