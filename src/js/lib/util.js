@@ -1,5 +1,5 @@
 import * as toast from '../lib/toast.js';
-import { OPTS } from '../../js/lib/options.js';
+import { OPTS, write } from '../../js/lib/options.js';
 
 export function prepareCSSVariables(OPTS) {
   document.documentElement.style.setProperty('--tiny', `${OPTS.space / 1000}em`);
@@ -61,11 +61,12 @@ export function cloneTemplateToTarget(selector, where, after = true) {
   }
 }
 
-export function setFavicon(elem, url) {
+export function setFavicon(elem, url, size = 1) {
   let favicon = elem.querySelector('img.favicon');
   if (!favicon) {
     favicon = document.createElement('img');
     favicon.className = 'favicon';
+    favicon.style.width = `${size}rem`;
     elem.prepend(favicon);
   }
 
@@ -206,8 +207,8 @@ export function prepareDynamicFlex(where) {
 
 export function calculateDynamicFlex(where) {
   let total = 0;
-  if (where._content) {
-    for (const child of where._content.children) {
+  if (where.$content) {
+    for (const child of where.$content.children) {
       if (child.tagName === 'SST-PANEL') {
         if (child.folded) {
           total += 1;
@@ -229,6 +230,7 @@ export function calculateDynamicFlex(where) {
 export function findTarget(e, returnFirst = false) {
   const path = e.path || (e.composedPath && e.composedPath());
   if (path[0].tagName === 'A' || returnFirst) return path[0];
+  if (path[0].tagName === 'IMG') return path[1];
   return e.target.tagName === 'SST-PANEL' ? path.find(x => x.tagName === 'SST-PANEL') : e.target;
 }
 
@@ -344,40 +346,6 @@ export function isBeta() {
   return chrome.runtime.getManifest().version.split('.').length > 3;
 }
 
-export function isContentEqual(a, b) {
-  if ((a == null && b == null) || !Array.isArray(a)) return true;
-
-  // Each content is an array - if the length is different, they are not equal
-  if (a.filter(elem => elem.id !== 'trash').length !== b.filter(elem => elem.id !== 'trash').length) return false;
-
-  return a
-    .filter(elem => elem.id !== 'trash') // Trash content does not need to be equal
-    .every(elemA => {
-      const elemB = b.find(elemB => elemB.ident === elemA.ident);
-      if (!elemB) return false;
-
-      return elemA.backgroundColour === elemB.backgroundColour &&
-        elemA.textColour === elemB.textColour &&
-        elemA.type === elemB.type &&
-
-        // panel only properties
-        isContentEqual(elemA.content, elemB.content) &&
-        elemA.direction === elemB.direction &&
-        elemA.grow === elemB.grow &&
-        elemA.header === elemB.header &&
-        elemA.id === elemB.id &&
-        elemA.singleLineDisplay === elemB.singleLineDisplay &&
-        elemA.textColour === elemB.textColour &&
-        elemA.type === elemB.type &&
-        (OPTS.cloud.syncFoldStatus ? elemA.folded === elemB.folded : true) &&
-        (OPTS.cloud.syncPrivateStatus ? elemA.private === elemB.private : true) &&
-
-        // link only properties
-        elemA.name === elemB.name &&
-        elemA.url === elemB.url;
-    });
-}
-
 function spinElement({ element, duration = 0, disable = false } = {}) {
   element.classList.add('spin');
   if (duration > 0) {
@@ -420,4 +388,70 @@ export function loadAsync(path) {
 
 export function defineComponent(name, classDef) {
   if (customElements.get(name) == null) { customElements.define(name, classDef); }
+}
+
+export function getValueOrDefault(element, propertyName, defaultValue) {
+  return element.hasAttribute(propertyName) ? element.getAttribute(propertyName) : defaultValue;
+}
+
+export function setOrRemoveProperty(element, propertyName, propertyValue) {
+  if (typeof propertyValue === 'boolean') {
+    if (propertyValue) {
+      element.setAttribute(propertyName, '');
+    } else {
+      element.removeAttribute(propertyName);
+    }
+    return;
+  }
+
+  if (propertyValue == null || propertyValue === '') {
+    element.removeAttribute(propertyName);
+  } else {
+    element.setAttribute(propertyName, propertyValue);
+  }
+}
+
+export function linkClicked(e) {
+  const target = findTarget(e);
+  if (target instanceof HTMLElement && target.tagName === 'A') {
+    if (e.shiftKey) {
+      e.preventDefault();
+      import('../services/edit.service.js').then(({ editLink }) => {
+        e.preventDefault();
+        editLink(target);
+      });
+    } else if (!target.id) {
+      updateClickCount(target);
+    }
+  }
+}
+
+export function updateClickCount(a) {
+  const link = a.getAttribute('href');
+  if (!link) { return; }
+  if (OPTS.linkStats[link]) {
+    OPTS.linkStats[link]++;
+  } else {
+    OPTS.linkStats[link] = 1;
+  }
+  write();
+}
+
+export function areObjectEquals(obj1, obj2, propertiesToIgnore = []) {
+  const obj1Props = Object.getOwnPropertyNames(obj1).filter(p => !propertiesToIgnore.includes(p) && obj1[p] != null);
+  const obj2Props = Object.getOwnPropertyNames(obj2).filter(p => !propertiesToIgnore.includes(p) && obj2[p] != null);
+
+  if (obj1Props.length !== obj2Props.length) return false;
+
+  for (const prop of obj1Props) {
+    if (obj1[prop] === obj2[prop]) continue;
+
+    if (typeof obj1[prop] === 'object') {
+      if (!areObjectEquals(obj1[prop], obj2[prop])) {
+        return false;
+      }
+    } else if (obj1[prop] !== obj2[prop]) return false;
+  }
+
+  return true;
 }

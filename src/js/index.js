@@ -8,41 +8,19 @@ import * as toast from './lib/toast.js';
 import * as tooltip from './lib/tooltip.js';
 import * as util from './lib/util.js';
 import * as ui from './services/ui.service.js';
+import * as sync from './services/sync.service.js';
 
 import { domToJson, jsonToDom } from './services/parser.service.js';
-import { syncPageCloud } from './services/cloud.service.js';
 
 import { OPTS } from './lib/options.js';
 import { prepareDrag } from './services/drag.service.js';
-import { updateAgendaBackground, displayNewAgenda, getAgendasFromObject } from './services/agenda.service.js';
-import { editLink, editPanel, editAgenda } from './services/edit.service.js';
+import { updateAgenda, getAgendasFromObject } from './services/agenda.service.js';
+import { editPanel, editAgenda } from './services/edit.service.js';
 
 const oneDay = 1000 * 60 * 60 * 24;
 const fourDays = oneDay * 4;
 const twoWeeks = oneDay * 14;
 let els;
-
-function linkClicked(e) {
-  if (e.target instanceof HTMLElement && e.target.tagName === 'A') {
-    if (e.shiftKey) {
-      e.preventDefault();
-      editLink(e.target);
-    } else if (!e.target.id) {
-      updateClickCount(e.target);
-    }
-  }
-}
-
-function updateClickCount(a) {
-  const link = a.getAttribute('href');
-  if (!link) { return; }
-  if (OPTS.linkStats[link]) {
-    OPTS.linkStats[link]++;
-  } else {
-    OPTS.linkStats[link] = 1;
-  }
-  options.write();
-}
 
 function prepareFavicons() {
   const links = els.main.querySelectorAll('a');
@@ -59,7 +37,7 @@ export function saveChanges({ makeBackup = true, newChanges = false } = {}) {
   }
 
   if (makeBackup) OPTS.jsonBackup = [...OPTS.json];
-  OPTS.cloud.newChanges = OPTS.cloud.newChanges || newChanges;
+  OPTS.sync.newChanges = OPTS.sync.newChanges || newChanges;
 
   OPTS.json = domToJson(els.main);
   options.write();
@@ -150,10 +128,6 @@ function getColorHeatMap(value, max) {
   return 'hsl(' + String(h) + ', 100%, 50%)';
 }
 
-function addLinkListener() {
-  addLink();
-}
-
 function addLink(target) {
   if (OPTS.lock) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
@@ -173,6 +147,8 @@ function addLink(target) {
   a.draggable = true;
   toast.html('addlink', chrome.i18n.getMessage('toast_link_add'));
   ui.flash(a, 'highlight');
+  saveChanges({ newChanges: true });
+  return a;
 }
 
 function addPanel() {
@@ -180,7 +156,9 @@ function addPanel() {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
-  return util.createPanel(els.main);
+  const newPanel = util.createPanel(els.main);
+  saveChanges({ newChanges: true });
+  return newPanel;
 }
 
 function addTopSitesPanel() {
@@ -275,16 +253,6 @@ function addAgenda() {
   updateAgenda();
 }
 
-async function updateAgenda(updateAgendas = true) {
-  for (let index = 0; index < OPTS.agendas.length; index++) {
-    const agenda = OPTS.agendas[index];
-    if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { continue; }
-    if (agenda.events.length === 0 && updateAgendas) {
-      await updateAgendaBackground(agenda);
-    }
-    displayNewAgenda(agenda);
-  }
-}
 
 function duplicatePanel(keepLinks) {
   if (OPTS.lock) {
@@ -381,7 +349,7 @@ function findSection(elem) {
 }
 
 function toggleFold(e) {
-  if (!OPTS.allowCollapsingLocked) {
+  if (OPTS.lock && !OPTS.allowCollapsingLocked) {
     toast.html('locked', chrome.i18n.getMessage('locked'));
     return;
   }
@@ -416,7 +384,7 @@ function editSection(e) {
 
   if (target.id.startsWith('agenda')) {
     editAgenda(target);
-  } else { editPanel(target); }
+  } else if (!target.isSubscribed) { editPanel(target); }
 }
 
 /** add a fold button to the page if necessary */
@@ -429,10 +397,10 @@ export function prepareFoldables() {
 function prepareListeners() {
   const anchors = util.getAllBySelector(els.main, 'a');
   for (const a of anchors) {
-    util.addAnchorListeners(a, linkClicked);
+    util.addAnchorListeners(a, util.linkClicked);
   }
   document.addEventListener('keydown', detectKeydown);
-  els.addlink.addEventListener('click', addLinkListener);
+  els.addlink.addEventListener('click', () => addLink());
   els.addpanel.addEventListener('click', addPanel);
 }
 
@@ -615,12 +583,12 @@ const prepareSectionActions = () => {
     document.querySelector('#feedback').style.display = 'none';
   }
 
-  if (!OPTS.cloud.enabled || !OPTS.cloud.url) {
-    document.querySelector('#forceCloudSync').style.display = 'none';
+  if (!OPTS.sync.enabled) {
+    document.querySelector('#forceStorageSync').style.display = 'none';
   }
 
-  document.querySelector('#forceCloudSync a').addEventListener('click', () => {
-    syncPageCloud({ window: els.main });
+  document.querySelector('#forceStorageSync a').addEventListener('click', () => {
+    sync.syncFullContent({ window: els.main });
   });
 };
 
@@ -658,7 +626,8 @@ async function prepareAll() {
 
   prepareSectionActions();
 
-  if (OPTS.cloud.enabled && OPTS.cloud.hasConflict) { syncPageCloud({ window: els.main, ignoreConflict: true }); }
+  // If there's a conflict, try to re-sync the content
+  if (OPTS.sync.enabled && OPTS.sync.hasConflict) { sync.syncFullContent({ window: els.main, ignoreConflict: true }); }
 }
 
 

@@ -409,7 +409,7 @@ section section nav {
 main * section.folded,
 main>section>h1 {
   text-orientation: sideways-right;
-  writing-mode: vertical-lr;
+  writing-mode: vertical-rl;
   transform: rotate(-180deg);
   text-align: end;
   flex-grow: 0 !important;
@@ -417,7 +417,7 @@ main>section>h1 {
 
 main>sst-panel::part(header) {
   text-orientation: sideways-right;
-  writing-mode: vertical-lr;
+  writing-mode: vertical-rl;
   transform: rotate(-180deg);
   text-align: end;
   flex-grow: 0 !important;

@@ -1,0 +1,40 @@
+{
+  "name": "sst-storage",
+  "version": "1.0.0",
+  "description": "Server that allows storage simple for SST",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "adrianoBP",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.34.0",
+    "eslint-config-portsoc": "^1.0.1",
+    "nodemon": "^2.0.20"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": false,
+      "es6": true
+    },
+    "ignorePatterns": [
+      "node_modules"
+    ],
+    "extends": [
+      "portsoc"
+    ],
+    "root": true,
+    "rules": {
+      "no-restricted-syntax": 0,
+      "no-unused-expressions": 0
+    }
+  }
+}

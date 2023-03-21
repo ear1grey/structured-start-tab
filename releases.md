@@ -4,7 +4,7 @@ Every release for the foreseeable future will be an alpha level release.  This m
 
 ## Current Beta Release
 
-* 1.11.0.0 [Cloud Sync](https://github.com/ear1grey/structured-start-tab/milestone/23?closed=1)
+* 1.13.0-beta [Panel Subscriptions](https://github.com/ear1grey/structured-start-tab/milestone/25?closed=1)
 
 ## Current Stable Release
 
@@ -12,6 +12,8 @@ Every release for the foreseeable future will be an alpha level release.  This m
 
 ### Previous Releases
 
+* 1.12.0-beta [Panel Sharing](https://github.com/ear1grey/structured-start-tab/milestone/24?closed=1)
+* 1.11.0.0 [Cloud Sync](https://github.com/ear1grey/structured-start-tab/milestone/23?closed=1)
 * 1.10.1.1 [JSON pages, Component Panels & bug fixes](https://github.com/ear1grey/structured-start-tab/milestone/22?closed=1)
 * 1.9.1 [Preparation for manifest V3](https://github.com/ear1grey/structured-start-tab/milestone/21?closed=1)
 * 1.9.0 New calendar panel

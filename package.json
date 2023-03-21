@@ -1,6 +1,6 @@
 {
   "name": "structured-start-tab-beta",
-  "version": "1.12.0-beta",
+  "version": "1.13.0-beta",
   "description": "Structured Start Tab (beta)",
   "author": "Rich Boakes <rich@boakes.org>",
   "contributors": [
@@ -19,7 +19,10 @@
     "preversion": "npm run lint",
     "version": "node update-manifest-version.js; git add .;",
     "postversion": "npm run all",
-    "validatelogs": "if grep -qr 'console.log' src/; then echo 'WARNING: console.log were left in the code!'; fi"
+    "validatelogs": "if grep -qr 'console.log' src/; then echo 'WARNING: console.log were left in the code!'; fi",
+    "firebase:start": "npm run serve --prefix providers/firebase",
+    "firebase:deploy": "npm run deploy --prefix providers/firebase",
+    "simple-sst-storage:start": "npm start --prefix providers/simple-sst-storage"
   },
   "repository": {
     "type": "git",

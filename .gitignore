@@ -8,5 +8,5 @@ sst.zip
 sst.xpi
 *.log
 .firebaserc
-firebase_data/*
-firebase-export*/
+**/firebase_data/*
+**/firebase-export*/

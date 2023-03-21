@@ -5,12 +5,11 @@ import * as toast from '../../js/lib/toast.js';
 import * as util from '../../js/lib/util.js';
 import * as options from '../../js/lib/options.js';
 import * as io from '../../js/services/io.service.js';
+import * as syncService from '../../js/services/sync.service.js';
 
 import { OPTS } from '../../js/lib/options.js';
 import { htmlStringToJson } from '../../js/services/parser.service.js';
 import { getAgendasFromObject } from '../../js/services/agenda.service.js';
-import { deleteAllSharedPanels } from '../../js/services/cloud.service.js';
-
 
 function setCheckBox(prefs, what) {
   const elem = document.getElementById(what);
@@ -30,15 +29,6 @@ function getValue(what) {
   deepSet(OPTS, what, elem.valueAsNumber);
 }
 
-function setText(prefs, what) {
-  const elem = document.getElementById(what);
-  elem.value = deepGet(prefs, what);
-}
-function getText(what) {
-  const elem = document.getElementById(what);
-  deepSet(OPTS, what, elem.value);
-}
-
 function setDropdown(prefs, what, defaultValue = 0) {
   const elem = document.getElementById(what);
   elem.value = deepGet(prefs, what) || defaultValue;
@@ -52,10 +42,16 @@ function deepGet(obj, path) {
   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 }
 function deepSet(obj, path, value) {
-  const parts = path.split('.');
-  const last = parts.pop();
-  const target = parts.reduce((acc, part) => acc[part], obj);
-  target[last] = value;
+  let schema = obj;
+  const pList = path.split('.');
+  const len = pList.length;
+  for (let i = 0; i < len - 1; i++) {
+    const elem = pList[i];
+    if (!schema[elem]) schema[elem] = {};
+    schema = schema[elem];
+  }
+
+  schema[pList[len - 1]] = value;
 }
 
 // incorporate the latest values of the page into
@@ -81,13 +77,12 @@ function updatePrefsWithPage() {
   getValue('agendaNb');
   getValue('titleAgendaNb');
 
-  // Cloud
-  getText('cloud.userId');
-  getCheckBox('cloud.enabled');
-  getText('cloud.url');
-  getCheckBox('cloud.syncFoldStatus');
-  getCheckBox('cloud.syncPrivateStatus');
-  getDropdown('cloud.syncMode');
+  // Sync
+  getCheckBox('sync.enabled');
+  getDropdown('sync.mode');
+  getCheckBox('sync.syncFoldStatus');
+  getCheckBox('sync.syncPrivateStatus');
+  getDropdown('sync.provider');
 }
 function updatePageWithPrefs(prefs) {
   setCheckBox(prefs, 'lock');
@@ -109,13 +104,12 @@ function updatePageWithPrefs(prefs) {
   setValue(prefs, 'agendaNb');
   setValue(prefs, 'titleAgendaNb');
 
-  // Cloud
-  setText(prefs, 'cloud.userId');
-  setCheckBox(prefs, 'cloud.enabled');
-  setText(prefs, 'cloud.url');
-  setCheckBox(prefs, 'cloud.syncFoldStatus');
-  setCheckBox(prefs, 'cloud.syncPrivateStatus');
-  setDropdown(prefs, 'cloud.syncMode');
+  // Sync
+  setCheckBox(prefs, 'sync.enabled');
+  setDropdown(prefs, 'sync.mode');
+  setCheckBox(prefs, 'sync.syncFoldStatus');
+  setCheckBox(prefs, 'sync.syncPrivateStatus');
+  setDropdown(prefs, 'sync.provider');
 
   // Defaults
   if (!util.isBeta()) { setCheckBox(prefs, 'showFeedback'); }
@@ -188,7 +182,6 @@ function createPageWithPrefs(prefs) {
     const feed = create(settings, 'section', {}, chrome.i18n.getMessage('messages'));
     const agenda = create(settings, 'section', {}, chrome.i18n.getMessage('agenda'));
     const configureShortcut = create(settings, 'section', {}, chrome.i18n.getMessage('configure_shortcut_title'));
-    const cloud = create(settings, 'section', {}, chrome.i18n.getMessage('cloud'));
     create(book, 'checkbox', { id: 'showBookmarksSidebar' }, chrome.i18n.getMessage('showBookmarksSidebar'));
     create(book, 'checkbox', { id: 'hideBookmarksInPage' }, chrome.i18n.getMessage('hideBookmarksInPage'));
     create(book, 'number', { id: 'showBookmarksLimit' }, chrome.i18n.getMessage('showBookmarksLimit'));
@@ -210,53 +203,102 @@ function createPageWithPrefs(prefs) {
     create(agenda, 'checkbox', { id: 'showLocationAgenda' }, chrome.i18n.getMessage('showLocationAgenda'));
     create(agenda, 'checkbox', { id: 'showEndDateAgenda' }, chrome.i18n.getMessage('showEndDateAgenda'));
     create(configureShortcut, 'show', { id: 'textConfigure' }, chrome.i18n.getMessage('configure_shortcut'));
-    // Cloud
-    create(cloud, 'text', { id: 'cloud.userId' }, chrome.i18n.getMessage('cloud_userId'), null, false, [
-      {
-        // Alert when the input box is clicked
-        event: 'click',
-        handler: () => {
-          alert(chrome.i18n.getMessage('cloud_warn_id_change'));
-        },
+
+    // Sync
+    buildSyncSettings(settings);
+  }
+  updatePageWithPrefs(prefs);
+}
+
+function buildSyncSettings(settings) {
+  const sync = create(settings, 'section', {}, 'Sync');
+  const availableServices = syncService.getAvailableServices();
+  // SYNC
+  create(sync, 'checkbox', { id: 'sync.enabled' }, chrome.i18n.getMessage('sync_enabled'), false, false, [
+    {
+      event: 'change',
+      handler: (e) => {
+        if (e.target.checked) {
+          alert(chrome.i18n.getMessage('sync_warn_enable'));
+        }
       },
-    ]);
-    create(cloud, 'checkbox', { id: 'cloud.enabled' }, chrome.i18n.getMessage('cloud_enabled'), false, false, [
-      {
-        event: 'change',
-        handler: (e) => {
-          if (e.target.checked) {
-            alert(chrome.i18n.getMessage('cloud_warn_enable'));
-          }
-        },
+    },
+  ]);
+  create(sync, 'dropdown', {
+    id: 'sync.mode',
+    options: [
+      { name: 'Manual', value: 'manual' },
+      { name: chrome.i18n.getMessage('sync_soft_push'), value: 'softPush' }, // Pushes creations
+      { name: chrome.i18n.getMessage('sync_hard_push'), value: 'hardPush' }, // Pushes creations and deletions
+      { name: chrome.i18n.getMessage('sync_soft_pull'), value: 'softPull' }, // Pulls creations
+      { name: chrome.i18n.getMessage('sync_hard_pull'), value: 'hardPull' }, // Pulls creations and deletions
+    ],
+  }, chrome.i18n.getMessage('sync_sync_mode'));
+  create(sync, 'checkbox', { id: 'sync.syncFoldStatus' }, chrome.i18n.getMessage('sync_syncFoldedStatus'), false);
+  create(sync, 'checkbox', { id: 'sync.syncPrivateStatus' }, chrome.i18n.getMessage('sync_syncPrivateStatus'), false);
+
+  create(sync, 'dropdown', {
+    id: 'sync.provider',
+    options: availableServices.map((service) => ({ name: service.friendlyName, value: service.id })),
+  }, chrome.i18n.getMessage('sync_provider'), undefined, false, [
+    {
+      event: 'change',
+      handler: () => {
+        sync.remove();
+
+        const settings = document.querySelector('#settings');
+        if (settings) {
+          buildSyncSettings(settings);
+          updatePageWithPrefs(OPTS);
+        }
       },
-    ]);
-    create(cloud, 'text', { id: 'cloud.url' }, chrome.i18n.getMessage('cloud_url'));
-    create(cloud, 'checkbox', { id: 'cloud.syncFoldStatus' }, chrome.i18n.getMessage('cloud_syncFoldedStatus'), false);
-    create(cloud, 'checkbox', { id: 'cloud.syncPrivateStatus' }, chrome.i18n.getMessage('cloud_syncPrivateStatus'), false);
-    create(cloud, 'button', { btnText: chrome.i18n.getMessage('remove') }, chrome.i18n.getMessage('cloud_remove_shared_panels'), null, false, [
+    },
+  ]);
+
+  const availableSettings = availableServices.find(service => service.id === OPTS.sync.provider).settings;
+  for (const setting of availableSettings) {
+    create(sync, setting.type, { id: `sync.settings.${OPTS.sync.provider}.${setting.id}` }, setting.friendlyName, setting.default, false, setting.customActions);
+  }
+
+  if (Object.hasOwn(OPTS.sync.settings, OPTS.sync.provider)) {
+    loadSyncSettings({
+      provider: OPTS.sync.provider,
+      settings: OPTS.sync.settings[OPTS.sync.provider],
+    });
+  }
+
+  if (syncService.panelShareAvailable()) {
+    create(sync, 'button', { btnText: chrome.i18n.getMessage('remove') }, chrome.i18n.getMessage('sync_remove_shared_panels'), null, false, [
       {
         event: 'click',
         handler: async (e) => {
           try {
             util.addSpinner(e.target, true);
-            await deleteAllSharedPanels();
+            await syncService.deleteAllPanels();
           } finally {
             util.removeSpinner({ element: e.target, display: 'block', enable: true });
           }
         },
       },
     ]);
-    create(cloud, 'dropdown', {
-      id: 'cloud.syncMode',
-      options: [
-        { name: 'Manual', value: 'manual' },
-        { name: 'Auto add', value: 'autoAdd' },
-        { name: 'Auto delete', value: 'autoDelete' },
-      ],
-    }, chrome.i18n.getMessage('cloud_sync_mode'));
   }
-  updatePageWithPrefs(prefs);
 }
+
+// Load settings for a specific provider
+function loadSyncSettings({ provider, settings }) {
+  for (const key in settings) {
+    const input = document.getElementById(`sync.settings.${provider}.${key}`);
+    if (input && settings[key]) input.value = settings[key];
+  }
+}
+
+function saveSyncSettings(provider) {
+  getCheckBox('sync.enabled');
+  document.querySelectorAll(`[id^="sync.settings.${provider}"]`).forEach((input) => {
+    deepSet(OPTS, input.id, input.value);
+  });
+}
+
 function exportStartTab() {
   const now = (new Date()).toISOString().slice(0, 10).replace(/-/g, '_');
   io.downloadJson({
@@ -347,10 +389,13 @@ export async function loadOptions() {
   util.prepareCSSVariables(OPTS);
   util.localizeHtml(document);
   toast.prepare();
+
+  saveOptions();
 }
 export function saveOptions() {
   updatePrefsWithPage();
   updatePageWithPrefs(OPTS);
+  saveSyncSettings(OPTS.sync.provider);
   util.prepareCSSVariables(OPTS);
   options.write();
 }

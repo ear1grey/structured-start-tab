@@ -47,6 +47,21 @@
   "remove": {
     "message": "Retirer"
   },
+  "padding": {
+    "message": "Rembourrage"
+  },
+  "border_size": {
+    "message": "Taille de bordure"
+  },
+  "border_colour": {
+    "message": "Couleur de bordure"
+  },
+  "font_size": {
+    "message": "Taille de police"
+  },
+  "icon_size": {
+    "message": "Taille de l'icône"
+  },
   "edit_panel": {
     "message": "Editer le panneau"
   },
@@ -148,6 +163,9 @@
   },
   "import": {
     "message": "Importation"
+  },
+  "subscribe": {
+    "message": "S'abonner"
   },
   "colour": {
     "message": "Couleur"
@@ -278,6 +296,12 @@
   "vertical": {
     "message": "Vertical"
   },
+  "single_line": {
+    "message": "Une seule igne"
+  },
+  "multi_line": {
+    "message": "Multi ligne"
+  },
   "agenda": {
     "message": "Agenda"
   },
@@ -311,38 +335,44 @@
   "configure_shortcut": {
     "message": "<ul><li><a href=\"https://obie.ai/blog/how-to-add-and-remove-custom-keyboard-shortcuts-and-hotkeys-for-a-chrome-extension-in-5-seconds-flat/\">Chrome</a></li><li><a href=\"https://support.mozilla.org/fr/kb/gerer-raccourcis-extensions-firefox\">Firefox</a></li></ul>"
   },
-  "cloud": {
-    "message": "Stockage en ligne"
-  },
-  "cloud_userId": {
-    "message": "Identifiant utilisateur"
-  },
-  "cloud_enabled": {
-    "message": "Utiliser le stockage en nuage"
-  },
-  "cloud_url": {
-    "message": "URL de stockage"
-  },
-  "cloud_syncFoldedStatus": {
-    "message": "État plié du panneau de synchronisation"
-  },
-  "cloud_syncPrivateStatus": {
-    "message": "Statut privé du panneau de synchronisation"
-  },
-  "cloud_warn_enable": {
-    "message": "Attention: cette fonctionnalité utilise votre identifiant Google et les données seront stockées sur les serveurs de Google. Si votre identifiant Google est compromis, vos données le seront également."
-  },
-  "cloud_warn_id_change": {
+  "sync_warn_id_change": {
     "message": "Attention: la modification de l'identifiant de l'utilisateur peut entraîner une perte de données. Assurez-vous d'avoir une sauvegarde de vos données avant de modifier l'ID utilisateur."
   },
-  "cloud_panel_code": {
+  "sync_panel_code": {
     "message": "Panel code"
   },
-  "cloud_remove_shared_panels": {
-    "message": "Annuler la publication des panneaux du cloud"
+  "sync_remove_shared_panels": {
+    "message": "Annuler la publication des panneaux du stockage"
   },
-  "cloud_sync_mode": {
+  "sync_enabled": {
+    "message": "Activer la synchronisation"
+  },
+  "sync_warn_enable": {
+    "message": "Attention: cette fonctionnalité peut exposer vos données à d'autres utilisateurs et fournisseurs. Assurez-vous d'avoir une sauvegarde de vos données avant d'activer cette fonctionnalité et que vous faites confiance au fournisseur."
+  },
+  "sync_sync_mode": {
     "message": "Mode de synchronisation"
+  },
+  "sync_soft_push": {
+    "message": "POUSSER créations"
+  },
+  "sync_hard_push": {
+    "message": "POUSSER créations & suppressions"
+  },
+  "sync_soft_pull": {
+    "message": "RETIRER créations"
+  },
+  "sync_hard_pull": {
+    "message": "RETIRER créations & suppressions"
+  },
+  "sync_syncFoldedStatus": {
+    "message": "État plié du panneau de synchronisation"
+  },
+  "sync_syncPrivateStatus": {
+    "message": "Statut privé du panneau de synchronisation"
+  },
+  "sync_provider": {
+    "message": "Fournisseur"
   },
   "panel_export_file": {
     "message": "Exporter le panneau"
@@ -350,11 +380,11 @@
   "panel_import_file": {
     "message": "Importer un panneau"
   },
-  "panel_export_cloud": {
-    "message": "Exporter le panneau vers le cloud"
+  "panel_export_storage": {
+    "message": "Exporter le panneau vers le stockage"
   },
-  "panel_import_cloud": {
-    "message": "Importer un panneau depuis le cloud"
+  "panel_import_storage": {
+    "message": "Importer un panneau depuis le stockage"
   },
   "title_agenda_nb": {
     "message": "Nombre de mots à afficher dans le titre de l'événement"
@@ -398,7 +428,7 @@
   "action_feedback": {
     "message": "Commentaires"
   },
-  "action_cloud_sync": {
-    "message": "Synchronisation cloud"
+  "action_storage_sync": {
+    "message": "Sync"
   }
 }

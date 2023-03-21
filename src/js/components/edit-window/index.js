@@ -1,6 +1,8 @@
 import * as ui from '../../services/ui.service.js';
-import { localizeHtml, addSpinner, removeSpinner, loadAsync, defineComponent } from '../../lib/util.js';
+import { localizeHtml, addSpinner, removeSpinner, loadAsync, defineComponent, addAnchorListeners, linkClicked, areObjectEquals } from '../../lib/util.js';
 import { iconsDictionary } from '../../../img/svg/index.js';
+import { domToJsonSingle, jsonElementToDom } from '../../services/parser.service.js';
+import '../better-text/index.js';
 
 const getTemplate = loadAsync('/src/js/components/edit-window/index.html');
 const getStyle = loadAsync('/src/js/components/edit-window/index.css');
@@ -17,7 +19,19 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
 
       // Event listeners
       this.$cancelBtn.addEventListener('click', () => {
+        const contentChanged = !areObjectEquals(domToJsonSingle(this.element), this.originalElement);
+        if (this.element && this.originalElement && contentChanged) {
+          // restore original element
+          const newElement = jsonElementToDom(this.originalElement);
+          this.element.parentNode.replaceChild(newElement, this.element);
+
+          if (this.element.tagName === 'A') {
+            addAnchorListeners(newElement, linkClicked);
+          }
+        }
         this.isVisible = false;
+
+        if (this._cancelCallback) { this._cancelCallback(contentChanged); }
       });
 
       this.$okBtn.addEventListener('click', () => {
@@ -35,12 +49,16 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
         case 'string':
         case 'text':
           return label.querySelector('input').value;
+        case 'better-text':
+          return { value: label.querySelector('better-text').value, mode: label.querySelector('better-text').mode };
         case 'colour':
           return label.querySelector('color-switch').value;
         case 'switch':
           return label.querySelector('input:checked').id.split('-')[1];
         case 'checkbox':
           return label.querySelector('input').checked;
+        case 'slider':
+          return label.querySelector('input').value;
         default:
           return null;
       }
@@ -79,11 +97,17 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
       }
     }
 
-    init({ title, ident, customActions, properties, callBack, options }) {
+    init({ title, ident, customActions, properties, options, element, callBack, cancelCallback }) {
       this.$title.textContent = title;
       this.$ident.textContent = ident;
       this._callBack = callBack;
+      this._cancelCallback = cancelCallback;
       this._options = options;
+
+      if (element) {
+        this.element = element;
+        this.originalElement = domToJsonSingle(element);
+      }
 
       if (customActions) { this.addCustomActions(customActions); }
       if (properties) { this.addProperties(properties); }
@@ -128,24 +152,30 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
         propName.textContent = property.friendlyName;
         label.appendChild(propName);
 
-        let propValue;
+        let propValueElement;
         switch (property.type) {
           case 'number':
           case 'string':
           case 'text':
-            propValue = document.createElement('input');
-            propValue.value = property.value;
+            propValueElement = document.createElement('input');
+            propValueElement.type = 'text';
+            propValueElement.value = property.value;
+            break;
+          case 'better-text':
+            propValueElement = document.createElement('better-text');
+            propValueElement.value = property.value.text;
+            propValueElement.mode = property.value.mode;
             break;
           case 'colour':
-            propValue = document.createElement('color-switch');
-            propValue.value = property.value;
-            propValue.auto = 'Automatic';
-            propValue.manual = 'Manual';
-            propValue.open = property.value?.[0] !== '!';
+            propValueElement = document.createElement('color-switch');
+            propValueElement.value = property.value;
+            propValueElement.auto = 'Automatic';
+            propValueElement.manual = 'Manual';
+            propValueElement.open = property.value?.[0] !== '!';
             break;
           case 'switch':
-            propValue = document.createElement('div');
-            propValue.classList.add('switch');
+            propValueElement = document.createElement('div');
+            propValueElement.classList.add('switch');
             for (const option of property.options) {
               const input = document.createElement('input');
               input.type = 'radio';
@@ -158,22 +188,35 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
 
               if (option.name === property.selectedOption) input.checked = true;
 
-              propValue.appendChild(input);
-              propValue.appendChild(label);
+              propValueElement.appendChild(input);
+              propValueElement.appendChild(label);
             }
             break;
           case 'checkbox':
-            propValue = document.createElement('input');
-            propValue.type = 'checkbox';
-            propValue.checked = property.value;
+            propValueElement = document.createElement('input');
+            propValueElement.type = 'checkbox';
+            propValueElement.checked = property.value;
+            break;
+          case 'slider':
+            propValueElement = document.createElement('input');
+            propValueElement.type = 'range';
+            propValueElement.min = property.min;
+            propValueElement.max = property.max;
+            propValueElement.step = property.step;
+            propValueElement.value = property.value;
             break;
         }
 
         if (property.locale?.primary) propName.setAttribute('data-locale', property.locale.primary);
-        if (property.locale?.secondary) propValue.setAttribute('data-locale', property.locale.secondary);
-        if (property.placeholder) propValue.setAttribute('placeholder', property.placeholder);
+        if (property.locale?.secondary) propValueElement.setAttribute('data-locale', property.locale.secondary);
+        if (property.placeholder) propValueElement.setAttribute('placeholder', property.placeholder);
+        if (property.updateAction) {
+          propValueElement.addEventListener('input', () => {
+            property.updateAction(this.getPropValueByType(label, property.type));
+          });
+        }
 
-        label.appendChild(propValue);
+        label.appendChild(propValueElement);
 
         this.$main.appendChild(label);
       }

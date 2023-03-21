@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "version": "1.12.0.1",
-  "version_name": "1.12.0-beta",
+  "version": "1.13.0.1",
+  "version_name": "1.13.0-beta",
   "name": "Structured Start Tab (Beta)",
   "description": "Show a structured page when a new tab is opened.",
   "author": "Rich Boakes",
@@ -13,14 +13,10 @@
     "favicon",
     "contextMenus",
     "topSites",
-    "alarms",
-    "identity",
-    "identity.email"
+    "alarms"
   ],
   "host_permissions": [
-    "https://calendar.google.com/calendar/*",
-    "http://127.0.0.1:5001/*",
-    "*://*.cloudfunctions.net/*"
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "src/js/background.js",

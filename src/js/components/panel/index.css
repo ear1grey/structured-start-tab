@@ -32,7 +32,7 @@ section.folded nav {
 
 section.folded>h1 {
   text-orientation: sideways-right;
-  writing-mode: vertical-lr;
+  writing-mode: vertical-rl;
   transform: rotate(-180deg);
   text-align: end;
   flex-grow: 0 !important;
@@ -109,7 +109,7 @@ a:hover {
 
 .favicon {
   width: 1rem;
-  height: 1rem;
+  aspect-ratio: 1;
   flex-shrink: 0;
   margin-right: var(--small);
 }

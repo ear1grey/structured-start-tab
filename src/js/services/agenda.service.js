@@ -12,6 +12,11 @@ export async function updateAgendasBackground() {
   });
 }
 
+export async function updateAndDisplayAgenda(agenda) {
+  await updateAgendaBackground(agenda);
+  displayNewAgenda(agenda);
+}
+
 /** Update specific agenda */
 export async function updateAgendaBackground(agenda) {
   if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { return; }
@@ -22,8 +27,19 @@ export async function updateAgendaBackground(agenda) {
   } catch (e) { }
 }
 
+export async function updateAgenda(updateAgendas = true) {
+  for (let index = 0; index < OPTS.agendas.length; index++) {
+    const agenda = OPTS.agendas[index];
+    if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { continue; }
+    if (agenda.events.length === 0 && updateAgendas) {
+      await updateAgendaBackground(agenda);
+    }
+    displayNewAgenda(agenda);
+  }
+}
+
 export function displayNewAgenda(agenda) {
-  const rootPanel = getAllBySelector(document.querySelector('main'), `#${agenda.agendaId}`)[0]?._panel;
+  const rootPanel = getAllBySelector(document.querySelector('main'), `#${agenda.agendaId}`)[0]?.$panel;
   if (!rootPanel) { return; }
   while (rootPanel.lastElementChild.firstChild) {
     rootPanel.lastElementChild.removeChild(rootPanel.lastElementChild.lastChild);

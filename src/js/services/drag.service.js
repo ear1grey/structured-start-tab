@@ -102,7 +102,7 @@ function dragOver(e) {
   }
 
   const target = e.target;
-  if (target === els.toolbar || els.toolbar?.contains(target) || target === els.bin || eventPathInvalid(e)) {
+  if (target === els.toolbar || els.toolbar?.contains(target) || target === els.bin || eventPathInvalid(e, dragging.el)) {
     e.preventDefault();
     dragging.dummy?.remove();
     if (target === els.bin) { els.bin.classList.add('over'); }
@@ -157,7 +157,7 @@ function dragDrop(e) {
       e.target.id.includes('bookmark') // can't drop on bookmarks
   ) {
     util.replaceElementInOriginalPosition();
-    dragging.dummy.remove();
+    if (dragging.dummy) dragging.dummy.remove();
     dragging.dummy = null;
   } else {
     if (!dragging.startedOnThisPage) {
@@ -238,8 +238,21 @@ function extractDataFromDrop(e) {
   }
 }
 
-function eventPathInvalid(e) {
+function eventPathInvalid(e, movingElement) {
   const path = (e.path || (e.composedPath && e.composedPath()));
   const invalidIds = ['agenda', 'bookmark', 'sidebar'];
-  return path.some(elem => invalidIds.some(id => elem.id?.includes(id)));
+
+  for (const elem of path) {
+    if (elem.id && invalidIds.some(id => elem.id.includes(id))) return true;
+
+    // Don't drag into subscription panels
+    if (elem.isSubscribed) return true;
+
+    // Don't drag into its own subscription
+    if (movingElement && movingElement.isSubscribed && elem.ident === movingElement.remotePanelId) {
+      return true;
+    }
+  }
+
+  return false;
 }

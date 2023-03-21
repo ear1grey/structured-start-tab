@@ -65,7 +65,7 @@ header section p {
 
 #custom-actions-container label>button {
   width: unset !important;
-  margin: 0px;
+  margin: var(--small);
   padding: var(--medium)
 }
 
@@ -90,7 +90,7 @@ label>* {
 }
 
 label>input {
-  padding: var(--small) var(--medium);
+  padding: var(--small) 0;
   flex-grow: 1;
   height: 2rem;
   width: 30rem;
@@ -101,12 +101,17 @@ label>input {
   font-size: 1rem;
 }
 
+label>input[type="text"] {
+  padding: var(--small) var(--medium);
+}
+
 label>input[type="checkbox"] {
   width: auto;
   flex-grow: 0.01;
 }
 
-color-switch {
+color-switch,
+better-text {
   flex-grow: 1;
 }
 

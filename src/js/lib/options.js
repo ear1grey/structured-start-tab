@@ -1,5 +1,6 @@
 import { htmlStringToJson } from '../services/parser.service.js';
-import { newUuid } from './util.js';
+import { getAvailableServices } from '../services/sync.service.js';
+
 
 // default options - these are reverted to
 // if there are no options in the browser's sync store.
@@ -30,19 +31,22 @@ export const OPTS = {
   json: [],
   linkStats: {},
   agendas: [],
-  // Cloud sync settings
-  cloud: {
-    userId: null,
-    version: 0,
-    hasConflict: false,
 
+  // Storage sync options
+  sync: {
     enabled: false,
-    url: '',
 
-    syncMode: 'manual',
+    mode: 'manual',
     syncFoldStatus: false,
     syncPrivateStatus: false,
+    provider: 'firebase',
+
+    // Sync status
+    hasConflict: false,
     newChanges: false,
+
+    // Sync dynamic properties
+    settings: {},
   },
 };
 
@@ -50,18 +54,15 @@ const settingKey = 'structured-start-tab';
 
 export function load() {
   return new Promise(resolve => {
-    chrome.storage.local.get([settingKey], async (result) => {
+    chrome.storage.local.get([settingKey], (result) => {
       if (!result[settingKey]) {
         result[settingKey] = {};
       }
 
       deepAssign(OPTS, result[settingKey]);
 
-      // If the user has no cloud id, generate one
-      if (!OPTS.cloud.userId) {
-        const chromeUserId = (await chrome?.identity?.getProfileUserInfo())?.id;
-        OPTS.cloud.userId = chromeUserId || newUuid();
-      }
+      // Load sync services settings
+      loadSyncServices();
 
       // if the json obj is empty, it means that is the first time the extension is installed or it is migrated from <1.10.0
       if (!OPTS.json || Object.keys(OPTS.json).length === 0) {
@@ -72,6 +73,25 @@ export function load() {
       resolve();
     });
   });
+}
+
+function loadSyncServices() {
+  const availableServices = getAvailableServices();
+
+  for (const service of availableServices) {
+    if (!Object.hasOwn(OPTS.sync.settings, service.id)) {
+      OPTS.sync.settings[service.id] = {};
+    }
+
+    for (const settingProperty of service.settings) {
+      if (!Object.hasOwn(OPTS.sync.settings[service.id], settingProperty.name)) {
+        OPTS.sync.settings[service.id][settingProperty.name] = settingProperty.default;
+      }
+    }
+  }
+
+  // Make sure that any new property with a default value is set
+  write();
 }
 
 function deepAssign(target, source) {

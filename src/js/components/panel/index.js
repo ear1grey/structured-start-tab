@@ -1,4 +1,4 @@
-import { defineComponent } from '../../lib/util.js';
+import { defineComponent, getValueOrDefault, setOrRemoveProperty } from '../../lib/util.js';
 
 export async function loadPanelDefinition() {
   const res = await fetch('/src/js/components/panel/index.css');
@@ -16,26 +16,42 @@ const define = (css) => {
       // For now this is the only way to load the css only once (not using @import)
       this.shadow.innerHTML = `<style>${css}</style>`;
 
-      this._panel = document.createElement('section');
-      this._panel.setAttribute('part', 'panel');
-      this._header = document.createElement('h1');
-      this._header.setAttribute('part', 'header');
-      this._header.textContent = 'Panel';
-      this._content = document.createElement('nav');
-      this._content.setAttribute('part', 'content');
+      this.$panel = document.createElement('section');
+      this.$panel.setAttribute('part', 'panel');
+      this.$header = document.createElement('h1');
+      this.$header.setAttribute('part', 'header');
+      this.$header.textContent = 'Panel';
+      this.$content = document.createElement('nav');
+      this.$content.setAttribute('part', 'content');
 
-      this._panel.append(this._header, this._content);
-      this.shadow.append(this._panel);
+      this.$panel.append(this.$header, this.$content);
+      this.shadow.append(this.$panel);
     }
 
     static get observedAttributes() {
       return [
-        'background-color', 'text-color', 'direction', 'single-line-display', 'private', 'header', 'folded', 'grow', 'blur', 'temp-bg-colour', 'temp-text-colour',
+        'background-color',
+        'text-color',
+        'direction',
+        'single-line-display',
+        'private',
+        'header',
+        'folded',
+        'grow',
+        'blur',
+        'temp-bg-colour',
+        'temp-text-colour',
+        'padding',
+        'border-colour',
+        'border-size',
+        'font-size',
+
+        'remote-panel-id',
       ];
     }
 
     // Getters & setters
-    get content() { return this._content; }
+    get content() { return this.$content; }
 
     get ident() { return this.getAttribute('ident'); }
 
@@ -53,7 +69,7 @@ const define = (css) => {
     get tempBackgroundColour() { return this.getAttribute('temp-bg-colour'); }
     set tempBackgroundColour(color) { this.setAttribute('temp-bg-colour', color); }
 
-    get textColour() { return this.getAttribute('text-color') || '!#ddddddaN'; }
+    get textColour() { return getValueOrDefault(this, 'text-color', '!#ddddddaa'); }
     set textColour(color) {
       this.setAttribute('text-color', color.slice(0, 1) + color.slice(1).replace('!', ''));
     }
@@ -62,52 +78,39 @@ const define = (css) => {
     set direction(direction) { this.setAttribute('direction', direction); }
 
     get singleLineDisplay() { return this.hasAttribute('single-line-display'); }
-    set singleLineDisplay(isSingleLine) {
-      if (isSingleLine) {
-        this.setAttribute('single-line-display', '');
-      } else {
-        this.removeAttribute('single-line-display');
-      }
-    }
+    set singleLineDisplay(isSingleLine) { setOrRemoveProperty(this, 'single-line-display', isSingleLine); }
 
     get private() { return this.hasAttribute('private'); }
-    set private(isPrivate) {
-      if (isPrivate) {
-        this.setAttribute('private', '');
-      } else {
-        this.removeAttribute('private');
-      }
-    }
+    set private(isPrivate) { setOrRemoveProperty(this, 'private', isPrivate); }
 
-    get header() { return this.getAttribute('header') == null ? this._panel.firstChild.textContent : this.getAttribute('header'); }
+    get header() { return getValueOrDefault(this, 'header', this.$panel.firstChild.textContent); }
     set header(header) { this.setAttribute('header', header); }
 
     get folded() { return this.hasAttribute('folded'); }
-    set folded(isFolded) {
-      if (isFolded) {
-        this.setAttribute('folded', '');
-      } else {
-        this.removeAttribute('folded');
-      }
-    }
+    set folded(isFolded) { setOrRemoveProperty(this, 'folded', isFolded); }
 
-    get grow() { return this.getAttribute('grow') || ''; }
-    set grow(grow) {
-      if (grow === '') {
-        this.removeAttribute('grow');
-      } else {
-        this.setAttribute('grow', grow);
-      }
-    }
+    get grow() { return getValueOrDefault(this, 'grow', ''); }
+    set grow(grow) { setOrRemoveProperty(this, 'grow', grow); }
 
     get blur() { return this.hasAttribute('blur'); }
-    set blur(isBlur) {
-      if (isBlur) {
-        this.setAttribute('blur', '');
-      } else {
-        this.removeAttribute('blur');
-      }
-    }
+    set blur(isBlur) { setOrRemoveProperty(this, 'blur', isBlur); }
+
+    get padding() { return getValueOrDefault(this, 'padding', '0'); }
+
+    set padding(padding) { setOrRemoveProperty(this, 'padding', padding); }
+
+    get borderColour() { return this.getAttribute('border-colour') || '#0005'; }
+    set borderColour(borderColour) { setOrRemoveProperty(this, 'border-colour', borderColour); }
+
+    get borderSize() { return this.getAttribute('border-size') || '1'; }
+    set borderSize(borderSize) { setOrRemoveProperty(this, 'border-size', borderSize); }
+
+    get fontSize() { return getValueOrDefault(this, 'font-size', '1'); }
+    set fontSize(fontSize) { setOrRemoveProperty(this, 'font-size', fontSize); }
+
+    get remotePanelId() { return getValueOrDefault(this, 'remote-panel-id', null); }
+    set remotePanelId(remotePanelId) { setOrRemoveProperty(this, 'remote-panel-id', remotePanelId); }
+    get isSubscribed() { return this.hasAttribute('remote-panel-id') && this.remotePanelId != null; }
 
     // Methods
     toggleFold() {
@@ -121,46 +124,46 @@ const define = (css) => {
 
     // Event handlers
     onBackgroundColourChange() {
-      this._panel.style.backgroundColor = this.backgroundColour;
+      this.$panel.style.backgroundColor = this.backgroundColour;
     }
 
     onTextColourChange() {
-      this._panel.style.color = this.textColour;
+      this.$panel.style.color = this.textColour;
     }
 
     onDirectionChange() {
       if (this.direction === 'vertical') {
-        this._panel.classList.add('vertical');
+        this.$panel.classList.add('vertical');
       } else {
-        this._panel.classList.remove('vertical');
+        this.$panel.classList.remove('vertical');
       }
     }
 
     onSingleLineDisplayChange() {
       if (this.singleLineDisplay) {
-        this._panel.classList.add('single-line-display');
+        this.$panel.classList.add('single-line-display');
       } else {
-        this._panel.classList.remove('single-line-display');
+        this.$panel.classList.remove('single-line-display');
       }
     }
 
     onPrivateChange() {
       if (this.private) {
-        this._panel.classList.add('private');
+        this.$panel.classList.add('private');
       } else {
-        this._panel.classList.remove('private');
+        this.$panel.classList.remove('private');
       }
     }
 
     onHeaderChange() {
-      this._header.textContent = this.header;
+      this.$header.textContent = this.header;
     }
 
     onFoldChange() {
-      if (this.folded && !this._panel.classList.contains('folded')) {
-        this._panel.classList.add('folded');
-      } else if (!this.folded && this._panel.classList.contains('folded')) {
-        this._panel.classList.remove('folded');
+      if (this.folded && !this.$panel.classList.contains('folded')) {
+        this.$panel.classList.add('folded');
+      } else if (!this.folded && this.$panel.classList.contains('folded')) {
+        this.$panel.classList.remove('folded');
       }
 
       this.onGrowChange();
@@ -176,10 +179,26 @@ const define = (css) => {
 
     onBlurChange() {
       if (this.blur && this.private) {
-        this._panel.classList.add('blur');
+        this.$panel.classList.add('blur');
       } else {
-        this._panel.classList.remove('blur');
+        this.$panel.classList.remove('blur');
       }
+    }
+
+    onPaddingChange() {
+      this.$panel.style.padding = this.padding + 'px';
+    }
+
+    onBorderColourChange() {
+      this.$panel.style.borderColor = this.borderColour;
+    }
+
+    onBorderSizeChange() {
+      this.$panel.style.borderWidth = this.borderSize + 'px';
+    }
+
+    onFontSizeChange() {
+      this.$header.style.fontSize = this.fontSize + 'em';
     }
 
     attributeChangedCallback(name) {
@@ -213,6 +232,18 @@ const define = (css) => {
           break;
         case 'temp-bg-colour':
           this.onBackgroundColourChange();
+          break;
+        case 'padding':
+          this.onPaddingChange();
+          break;
+        case 'border-colour':
+          this.onBorderColourChange();
+          break;
+        case 'border-size':
+          this.onBorderSizeChange();
+          break;
+        case 'font-size':
+          this.onFontSizeChange();
           break;
       }
     }

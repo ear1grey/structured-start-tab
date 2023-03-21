@@ -1,5 +1,6 @@
-import { syncPageCloud } from './services/cloud.service.js';
+import { syncFullContent } from './services/sync.service.js';
 import { updateAgendasBackground } from './services/agenda.service.js';
+
 
 // define the menu item
 const menuItems = [
@@ -90,8 +91,8 @@ function menuInstaller() {
     periodInMinutes: 10,
   });
 
-  // Save page to the cloud every 10 minutes
-  chrome.alarms.create('savePage', {
+  // Save page to the storage every 10 minutes
+  chrome.alarms.create('storageSavePage', {
     periodInMinutes: 10,
   });
 }
@@ -112,8 +113,8 @@ const handleAlarm = (details) => {
     case 'agendaUpdate':
       updateAgendasBackground();
       break;
-    case 'savePage':
-      syncPageCloud();
+    case 'storageSavePage':
+      syncFullContent();
       break;
     default:
       break;
