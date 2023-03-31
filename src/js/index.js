@@ -134,7 +134,7 @@ function addLink(target) {
     return;
   }
   const a = util.createExampleLink();
-  if (target) {
+  if (target && target.srcElement.id !== 'addlink') {
     if (target.tagName === 'SECTION') {
       target.lastElementChild?.append(a);
     } else {
@@ -400,7 +400,7 @@ function prepareListeners() {
     util.addAnchorListeners(a, util.linkClicked);
   }
   document.addEventListener('keydown', detectKeydown);
-  els.addlink.addEventListener('click', () => addLink());
+  els.addlink.addEventListener('click', addLink);
   els.addpanel.addEventListener('click', addPanel);
 }
 
