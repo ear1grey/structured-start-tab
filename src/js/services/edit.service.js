@@ -87,6 +87,9 @@ export function editLink(element) {
     },
   });
 
+  // Propagate scrollbar usage
+  editWindow.setAttribute('use-custom-scrollbar', OPTS.useCustomScrollbar);
+
   // Make sure that links are always draggable
   element.setAttribute('draggable', 'true');
 }
@@ -187,6 +190,9 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
       allowEmptyUrl: OPTS.allowEmptyUrl,
     },
   });
+
+  // Propagate scrollbar usage
+  editWindow.setAttribute('use-custom-scrollbar', OPTS.useCustomScrollbar);
 }
 
 export function editPanel(element) {

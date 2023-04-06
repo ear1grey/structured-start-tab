@@ -80,6 +80,9 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
     get showIdent() { return this.hasAttribute('show-ident'); }
     set showIdent(value) { value ? this.setAttribute('show-ident', '') : this.removeAttribute('show-ident'); }
 
+    get useCustomScrollbar() { return this.hasAttribute('use-custom-scrollbar'); }
+    set useCustomScrollbar(value) { value ? this.setAttribute('use-custom-scrollbar', '') : this.removeAttribute('use-custom-scrollbar'); }
+
     // Methods
     onVisibleChanged() {
       if (this.isVisible) {
@@ -94,6 +97,14 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
         this.$ident.classList.remove('hidden');
       } else {
         this.$ident.classList.add('hidden');
+      }
+    }
+
+    onCustomScrollbarChanged() {
+      if (this.useCustomScrollbar) {
+        this.$dialog.classList.add('use-custom-scrollbar');
+      } else {
+        this.$dialog.classList.remove('use-custom-scrollbar');
       }
     }
 
@@ -263,7 +274,7 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
 
     // Structure
     static get observedAttributes() {
-      return ['visible', 'show-ident'];
+      return ['visible', 'show-ident', 'use-custom-scrollbar'];
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -275,6 +286,9 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
           break;
         case 'show-ident':
           this.onShowIdentChanged();
+          break;
+        case 'use-custom-scrollbar':
+          this.onCustomScrollbarChanged();
           break;
         default:
           break;
