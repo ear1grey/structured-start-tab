@@ -20,10 +20,18 @@ export function editLink(element) {
 
   const { backgroundColour, foregroundColour } = ui.getColours(element);
 
+  const previewElement = jsonElementToDom(domToJsonSingle(element));
+  previewElement.style.flexGrow = 0;
+
   editWindow.init({
     element,
+    previewElement,
     title: chrome.i18n.getMessage('edit_link'),
-    callBack: (properties) => {
+    callBack: (properties, previewElement) => {
+      if (previewElement) {
+        element.replaceWith(previewElement);
+        element = previewElement;
+      }
       // Name
       element.textContent = properties.name.value;
       if (properties.name.mode === 'multi') element.style.whiteSpace = 'pre-wrap';
@@ -69,7 +77,7 @@ export function editLink(element) {
         max: 5,
         step: 0.05,
         locale: { primary: 'font_size' },
-        updateAction: (value) => (element.style.fontSize = value + 'em'),
+        updateAction: (value) => (previewElement.style.fontSize = value + 'em'),
       },
       {
         name: 'icon-size',
@@ -79,7 +87,7 @@ export function editLink(element) {
         max: 5, // Limiting to 5 due to too high quality loss
         step: 0.05,
         locale: { primary: 'icon_size' },
-        updateAction: (value) => (element.querySelector('.favicon').style.width = value + 'rem'),
+        updateAction: (value) => (previewElement.querySelector('.favicon').style.width = value + 'rem'),
       },
     ],
     options: {
@@ -100,12 +108,21 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
 
   const { backgroundColour, foregroundColour, borderColour } = ui.getColours(element);
 
+  const previewElement = jsonElementToDom(domToJsonSingle(element));
+  previewElement.style.flexGrow = 0;
+
   editWindow.init({
     element,
+    previewElement,
     title: title || chrome.i18n.getMessage('edit_panel'),
     ident: element.ident,
     customActions,
-    callBack: (properties) => {
+    callBack: (properties, previewElement) => {
+      if (previewElement) {
+        element.replaceWith(previewElement);
+        element = previewElement;
+      }
+
       element.header = properties.name.value;
       if (properties.name.mode === 'multi') element.style.whiteSpace = 'pre-wrap';
       else element.style.whiteSpace = 'unset';
@@ -156,7 +173,7 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
         max: 100,
         step: 1,
         locale: { primary: 'padding' },
-        updateAction: (value) => (element.padding = value),
+        updateAction: (value) => (previewElement.padding = value),
       },
       {
         name: 'border-size',
@@ -166,7 +183,7 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
         max: 30,
         step: 1,
         locale: { primary: 'border_size' },
-        updateAction: (value) => (element.borderSize = value),
+        updateAction: (value) => (previewElement.borderSize = value),
       },
       {
         name: 'font-size',
@@ -176,14 +193,14 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
         max: 5,
         step: 0.05,
         locale: { primary: 'font_size' },
-        updateAction: (value) => (element.fontSize = value),
+        updateAction: (value) => (previewElement.fontSize = value),
       },
       {
         name: 'border-colour',
         type: 'colour',
         value: borderColour,
         locale: { primary: 'border_colour' },
-        updateAction: (value) => (element.borderColour = value),
+        updateAction: (value) => (previewElement.borderColour = value),
       },
     ],
     options: {

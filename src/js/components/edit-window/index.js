@@ -69,7 +69,8 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
     get $title() { return this.shadow.querySelector('#title'); }
     get $ident() { return this.shadow.querySelector('#ident'); }
     get $customActionsContainer() { return this.shadow.querySelector('#custom-actions-container'); }
-    get $main() { return this.shadow.querySelector('main'); }
+    get $options() { return this.shadow.querySelector('main #options'); }
+    get $preview() { return this.shadow.querySelector('main #preview'); }
     get $cancelBtn() { return this.shadow.querySelector('#edit-cancel'); }
     get $okBtn() { return this.shadow.querySelector('#edit-ok'); }
 
@@ -108,7 +109,7 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
       }
     }
 
-    init({ title, ident, customActions, properties, options, element, callBack, cancelCallback }) {
+    init({ title, ident, customActions, properties, options, element, previewElement, callBack, cancelCallback }) {
       this.$title.textContent = title;
       this.$ident.textContent = ident;
       this._callBack = callBack;
@@ -118,6 +119,8 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
       if (element) {
         this.element = element;
         this.originalElement = domToJsonSingle(element);
+
+        this.$preview.appendChild(previewElement);
       }
 
       if (customActions) { this.addCustomActions(customActions); }
@@ -229,7 +232,7 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
 
         label.appendChild(propValueElement);
 
-        this.$main.appendChild(label);
+        this.$options.appendChild(label);
       }
     }
 
@@ -252,7 +255,7 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
           resObject[prop.name] = this.getPropValueByType(this.shadow.querySelector(`#${prop.name}`), prop.type);
         }
 
-        this._callBack(resObject);
+        this._callBack(resObject, this.$preview.firstElementChild);
       }
       this.isVisible = false;
     }

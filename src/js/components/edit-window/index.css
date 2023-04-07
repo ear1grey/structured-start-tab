@@ -1,21 +1,21 @@
-dialog.use-custom-scrollbar::-webkit-scrollbar {
+dialog.use-custom-scrollbar #options::-webkit-scrollbar {
   width: calc(0.5rem + var(--small));
   height: var(--small);
 }
 
-dialog.use-custom-scrollbar::-webkit-scrollbar-thumb {
+dialog.use-custom-scrollbar #options::-webkit-scrollbar-thumb {
   background: var(--fg-mid);
   border: var(--fg-light-alpha) solid thin;
   border-radius: var(--medium);
 }
 
-dialog.use-custom-scrollbar::-webkit-scrollbar-track {
+dialog.use-custom-scrollbar #options::-webkit-scrollbar-track {
   background-color: inherit;
 }
 
 /* Turn on single button up on top, and down on bottom */
-dialog.use-custom-scrollbar::-webkit-scrollbar-button:start:decrement,
-dialog.use-custom-scrollbar::-webkit-scrollbar-button:end:increment {
+dialog.use-custom-scrollbar #options::-webkit-scrollbar-button:start:decrement,
+dialog.use-custom-scrollbar #options::-webkit-scrollbar-button:end:increment {
   display: block;
   height: var(--medium);
 }
@@ -25,9 +25,6 @@ p {
 }
 
 dialog {
-  display: flex;
-  flex-direction: column;
-
   background: var(--bg-mid);
   color: var(--fg-mid);
   margin: auto;
@@ -37,7 +34,11 @@ dialog {
   border: none;
 
   width: 90vw;
-  height: 90vh;
+  max-height: 90vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 dialog::backdrop {
@@ -49,6 +50,9 @@ header {
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
+
+  position: sticky;
+  top: 0;
 }
 
 header section {
@@ -95,11 +99,47 @@ header section p {
 }
 
 main {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  overflow-y: auto;
+  height: 100%;
+}
+
+#options,
+#preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  height: 100%;
+}
+
+#options {
+  overflow-y: scroll;
+  margin-top: auto;
+  padding-right: 1rem;
+}
+
+#preview {
+  overflow-y: hidden;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  height: auto;
+
+}
+
+#preview>div {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
 }
 
 label {
@@ -118,7 +158,6 @@ label>input {
   padding: var(--small) 0;
   flex-grow: 1;
   height: 2rem;
-  width: 30rem;
   background: var(--bg-light);
   color: var(--fg-dark);
   border: none;
@@ -147,7 +186,7 @@ better-text {
 .switch {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-width: 30rem;
+  flex-grow: 1;
   gap: 0.0625em;
 }
 
@@ -189,6 +228,9 @@ button:hover {
 footer {
   display: flex;
   flex-direction: row-reverse;
+
+  position: sticky;
+  bottom: 0;
 }
 
 /* Attributes */
@@ -215,4 +257,21 @@ footer {
 
 .spin {
   animation: spin-animation 1s infinite linear;
+}
+
+#preview a {
+  color: inherit;
+  display: flex;
+  align-items: center;
+  background: var(--overlay-mid);
+  border: solid transparent thin;
+  border-radius: var(--tiny);
+  justify-content: center;
+  margin: var(--tiny);
+  padding: var(--medium);
+  min-height: 1.5rem;
+  text-align: center;
+  text-decoration: none;
+  overflow: hidden;
+  flex-grow: 1;
 }
