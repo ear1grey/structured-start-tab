@@ -239,6 +239,7 @@ const jsonToDom = (container, content) => {
 
   for (const element of content) {
     const domElement = jsonElementToDom(element);
+    domElement.isTopLevel = true;
     container.appendChild(domElement);
   }
 };

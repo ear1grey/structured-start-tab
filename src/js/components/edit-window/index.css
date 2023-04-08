@@ -133,13 +133,25 @@ main {
 
 }
 
-#preview>div {
-  width: 100%;
-  height: 100%;
+#preview a {
+  color: inherit;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  background: var(--overlay-mid);
+  border: solid transparent thin;
+  border-radius: var(--tiny);
   justify-content: center;
+  margin: var(--tiny);
+  padding: var(--medium);
+  min-height: 1.5rem;
+  text-align: center;
+  text-decoration: none;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+#preview>* {
+  width: 80%;
 }
 
 label {
@@ -257,21 +269,4 @@ footer {
 
 .spin {
   animation: spin-animation 1s infinite linear;
-}
-
-#preview a {
-  color: inherit;
-  display: flex;
-  align-items: center;
-  background: var(--overlay-mid);
-  border: solid transparent thin;
-  border-radius: var(--tiny);
-  justify-content: center;
-  margin: var(--tiny);
-  padding: var(--medium);
-  min-height: 1.5rem;
-  text-align: center;
-  text-decoration: none;
-  overflow: hidden;
-  flex-grow: 1;
 }

@@ -108,8 +108,15 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
 
   const { backgroundColour, foregroundColour, borderColour } = ui.getColours(element);
 
+  // Keep track of original properties - these properties will be edited during the preview to make it easier on the user
+  const isTopLevel = element.isTopLevel;
+  const folded = element.folded;
+
   const previewElement = jsonElementToDom(domToJsonSingle(element));
-  previewElement.style.flexGrow = 0;
+  previewElement.isTopLevel = false;
+  previewElement.folded = false;
+  previewElement.grow = 0;
+
 
   editWindow.init({
     element,
@@ -131,6 +138,10 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
       element.direction = properties.direction;
       element.singleLineDisplay = properties.singleLineDisplay;
       element.private = properties.private;
+
+      // Set original properties
+      element.isTopLevel = isTopLevel;
+      element.folded = folded;
 
       if (callbackExtension) {
         callbackExtension(properties);

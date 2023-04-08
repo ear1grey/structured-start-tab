@@ -45,6 +45,7 @@ const define = (css) => {
         'border-colour',
         'border-size',
         'font-size',
+        'top-level', // Top level panels have different direction when folded
 
         'remote-panel-id',
       ];
@@ -107,6 +108,9 @@ const define = (css) => {
 
     get fontSize() { return getValueOrDefault(this, 'font-size', '1'); }
     set fontSize(fontSize) { setOrRemoveProperty(this, 'font-size', fontSize); }
+
+    get isTopLevel() { return this.hasAttribute('top-level'); }
+    set isTopLevel(isTopLevel) { setOrRemoveProperty(this, 'top-level', isTopLevel); }
 
     get remotePanelId() { return getValueOrDefault(this, 'remote-panel-id', null); }
     set remotePanelId(remotePanelId) { setOrRemoveProperty(this, 'remote-panel-id', remotePanelId); }
@@ -201,6 +205,14 @@ const define = (css) => {
       this.$header.style.fontSize = this.fontSize + 'em';
     }
 
+    onTopLevelChange() {
+      if (this.isTopLevel) {
+        this.$panel.classList.add('top-level');
+      } else {
+        this.$panel.classList.remove('top-level');
+      }
+    }
+
     attributeChangedCallback(name) {
       switch (name) {
         case 'background-color':
@@ -244,6 +256,9 @@ const define = (css) => {
           break;
         case 'font-size':
           this.onFontSizeChange();
+          break;
+        case 'top-level':
+          this.onTopLevelChange();
           break;
       }
     }

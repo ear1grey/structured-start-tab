@@ -9,16 +9,19 @@ section>h1 {
   flex-grow: 0;
 }
 
-section>h1:not(:empty) {
-  margin-top: var(--small);
+section:not(.folded)>h1:not(:empty) {
   border: 0.125rem solid transparent;
+}
+
+section.folded>h1:not(:empty) {
+  margin: var(--small);
 }
 
 section>nav {
   display: flex;
   flex: 1 1 auto;
   background: transparent;
-  margin: var(--medium);
+  margin-left: 0px;
 }
 
 section>nav:empty {
@@ -31,6 +34,22 @@ section.folded nav {
 }
 
 section.folded>h1 {
+  text-orientation: sideways-right;
+  writing-mode: vertical-rl;
+  transform: rotate(-180deg);
+  text-align: end;
+  flex-grow: 0 !important;
+}
+
+section.folded.top-level>h1 {
+  text-orientation: sideways-right;
+  writing-mode: horizontal-tb;
+  transform: none;
+  text-align: end;
+  flex-grow: 0 !important;
+}
+
+section.top-level>h1 {
   text-orientation: sideways-right;
   writing-mode: vertical-rl;
   transform: rotate(-180deg);
@@ -118,7 +137,7 @@ section sst-panel {
   width: unset;
 }
 
-section sst-panel::part(panel) {
+section:not(.top-level) {
   flex-direction: column;
   border-radius: var(--small);
 }

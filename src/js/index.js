@@ -380,6 +380,9 @@ function editSection(e) {
   if (!e.shiftKey) return;
 
   const target = util.findTarget(e);
+
+  // Tags to ignore
+  if (target.tagName === 'MAIN') return;
   if (target.tagName === 'A') return;
 
   if (target.id.startsWith('agenda')) {
