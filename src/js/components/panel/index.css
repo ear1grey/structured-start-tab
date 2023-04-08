@@ -57,9 +57,12 @@ section.top-level>h1 {
   flex-grow: 0 !important;
 }
 
-section>nav,
 section {
   flex-wrap: nowrap;
+}
+
+section>nav {
+  flex-wrap: wrap;
 }
 
 section {

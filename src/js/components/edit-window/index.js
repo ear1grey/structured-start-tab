@@ -174,11 +174,24 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
             propValueElement = document.createElement('input');
             propValueElement.type = 'text';
             propValueElement.value = property.value;
+
+            // Add update listener
+            propValueElement.addEventListener('input', () => {
+              property.updateAction?.(this.getPropValueByType(label, property.type));
+            });
             break;
           case 'better-text':
             propValueElement = document.createElement('better-text');
             propValueElement.value = property.value.text;
             propValueElement.mode = property.value.mode;
+
+            // Add update listener
+            propValueElement.addEventListener('input', () => {
+              property.updateAction?.(this.getPropValueByType(label, property.type));
+            });
+            propValueElement.addEventListener('click', () => {
+              property.updateAction?.(this.getPropValueByType(label, property.type));
+            });
             break;
           case 'colour':
             propValueElement = document.createElement('color-switch');
@@ -186,6 +199,11 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
             propValueElement.auto = 'Automatic';
             propValueElement.manual = 'Manual';
             propValueElement.open = property.value?.[0] !== '!';
+
+            // Add update listener
+            propValueElement.addEventListener('input', () => {
+              property.updateAction?.(this.getPropValueByType(label, property.type));
+            });
             break;
           case 'switch':
             propValueElement = document.createElement('div');
@@ -202,6 +220,11 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
 
               if (option.name === property.selectedOption) input.checked = true;
 
+              // Add update listener
+              input.addEventListener('change', () => {
+                property.updateAction?.(option.name);
+              });
+
               propValueElement.appendChild(input);
               propValueElement.appendChild(label);
             }
@@ -210,6 +233,11 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
             propValueElement = document.createElement('input');
             propValueElement.type = 'checkbox';
             propValueElement.checked = property.value;
+
+            // Add update listener
+            propValueElement.addEventListener('input', () => {
+              property.updateAction?.(this.getPropValueByType(label, property.type));
+            });
             break;
           case 'slider':
             propValueElement = document.createElement('input');
@@ -218,17 +246,17 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
             propValueElement.max = property.max;
             propValueElement.step = property.step;
             propValueElement.value = property.value;
+
+            // Add update listener
+            propValueElement.addEventListener('input', () => {
+              property.updateAction?.(this.getPropValueByType(label, property.type));
+            });
             break;
         }
 
         if (property.locale?.primary) propName.setAttribute('data-locale', property.locale.primary);
         if (property.locale?.secondary) propValueElement.setAttribute('data-locale', property.locale.secondary);
         if (property.placeholder) propValueElement.setAttribute('placeholder', property.placeholder);
-        if (property.updateAction) {
-          propValueElement.addEventListener('input', () => {
-            property.updateAction(this.getPropValueByType(label, property.type));
-          });
-        }
 
         label.appendChild(propValueElement);
 

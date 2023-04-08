@@ -32,24 +32,15 @@ export function editLink(element) {
         element.replaceWith(previewElement);
         element = previewElement;
       }
-      // Name
-      element.textContent = properties.name.value;
-      if (properties.name.mode === 'multi') element.style.whiteSpace = 'pre-wrap';
-      else element.style.whiteSpace = 'unset';
-      // URL
-      if (properties.url) {
-        element.href = properties.url;
-        setFavicon(element, properties.url, properties['icon-size']);
-      } else {
+
+      if (!properties.url) {
         if (!OPTS.allowEmptyUrl) {
-          ui.wiggleElement(document.querySelector('#editurl'));
-          return;
+          // TODO: Add message
+          // return;
         }
         element.removeAttribute('href');
+        element.firstChild.remove();
       }
-      // Colours
-      element.style.background = properties.background;
-      element.style.color = properties.foreground;
 
       // Complete
       saveChanges({ newChanges: true });
@@ -65,10 +56,47 @@ export function editLink(element) {
         },
         placeholder: 'Name',
         locale: { primary: 'name', secondary: 'placeholder_item_name' },
+        updateAction: (value) => {
+          if (value.mode === 'multi') {
+            previewElement.style.whiteSpace = 'pre-wrap';
+          } else { previewElement.style.whiteSpace = 'unset'; }
+
+          previewElement.textContent = value.value;
+
+          const favicon = previewElement.querySelector('.favicon');
+          if (favicon) { previewElement.prepend(favicon); }
+        },
       },
-      { name: 'url', type: 'text', value: element.href, placeholder: 'URL', locale: { primary: 'link', secondary: 'placeholder_url' } },
-      { name: 'background', type: 'colour', value: backgroundColour, locale: { primary: 'background' } },
-      { name: 'foreground', type: 'colour', value: foregroundColour, locale: { primary: 'text' } },
+      {
+        name: 'url',
+        type: 'text',
+        value: element.href,
+        placeholder: 'URL',
+        locale: {
+          primary: 'link',
+          secondary: 'placeholder_url',
+        },
+        updateAction: (value) => {
+          if (value) {
+            previewElement.href = value;
+            setFavicon(previewElement, value);
+          }
+        },
+      },
+      {
+        name: 'background',
+        type: 'colour',
+        value: backgroundColour,
+        locale: { primary: 'background' },
+        updateAction: (value) => (previewElement.style.background = value),
+      },
+      {
+        name: 'foreground',
+        type: 'colour',
+        value: foregroundColour,
+        locale: { primary: 'text' },
+        updateAction: (value) => (previewElement.style.color = value),
+      },
       {
         name: 'font-size',
         type: 'slider',
@@ -130,16 +158,10 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
         element = previewElement;
       }
 
-      element.header = properties.name.value;
-      if (properties.name.mode === 'multi') element.style.whiteSpace = 'pre-wrap';
-      else element.style.whiteSpace = 'unset';
-      element.backgroundColour = properties.background;
-      element.textColour = properties.foreground;
-      element.direction = properties.direction;
-      element.singleLineDisplay = properties.singleLineDisplay;
+      // element.singleLineDisplay = properties.singleLineDisplay;
       element.private = properties.private;
 
-      // Set original properties
+      // Restore original properties
       element.isTopLevel = isTopLevel;
       element.folded = folded;
 
@@ -162,10 +184,28 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
         },
         placeholder: 'Name',
         locale: { primary: 'name', secondary: 'placeholder_panel_name' },
+        updateAction: (value) => {
+          if (value.mode === 'multi') {
+            previewElement.style.whiteSpace = 'pre-wrap';
+          } else { previewElement.style.whiteSpace = 'unset'; }
+          previewElement.header = value.value;
+        },
       },
       ...extraProperties, // TODO: Add a way to edit where the custom properties are added (maybe add index?) - take into consideration default panel properties
-      { name: 'background', type: 'colour', value: backgroundColour, locale: { primary: 'background' } },
-      { name: 'foreground', type: 'colour', value: foregroundColour, locale: { primary: 'text' } },
+      {
+        name: 'background',
+        type: 'colour',
+        value: backgroundColour,
+        locale: { primary: 'background' },
+        updateAction: (value) => (previewElement.backgroundColour = value),
+      },
+      {
+        name: 'foreground',
+        type: 'colour',
+        value: foregroundColour,
+        locale: { primary: 'text' },
+        updateAction: (value) => (previewElement.textColour = value),
+      },
       {
         name: 'direction',
         type: 'switch',
@@ -173,8 +213,15 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
         options: [{ name: 'horizontal', locale: 'horizontal' }, { name: 'vertical', locale: 'vertical' }],
         selectedOption: element.direction === 'vertical' ? 'vertical' : 'horizontal',
         locale: { primary: 'direction' },
+        updateAction: (value) => (previewElement.direction = value),
       },
-      { name: 'singleLineDisplay', type: 'checkbox', value: element.singleLineDisplay, locale: { primary: 'flex' } },
+      {
+        name: 'singleLineDisplay',
+        type: 'checkbox',
+        value: element.singleLineDisplay,
+        locale: { primary: 'flex' },
+        updateAction: (value) => (previewElement.singleLineDisplay = value),
+      },
       { name: 'private', type: 'checkbox', value: element.private, locale: { primary: 'private' } },
       {
         name: 'padding',
