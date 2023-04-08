@@ -17,6 +17,13 @@ export async function updateAndDisplayAgenda(agenda) {
   displayNewAgenda(agenda);
 }
 
+export async function updateAndDisplayAgendas() {
+  await options.load();
+  OPTS.agendas.forEach(async (agenda) => {
+    await updateAndDisplayAgenda(agenda);
+  });
+}
+
 /** Update specific agenda */
 export async function updateAgendaBackground(agenda) {
   if (!agenda.agendaUrl || agenda.agendaUrl === chrome.i18n.getMessage('default_agenda_link')) { return; }

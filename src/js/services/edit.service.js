@@ -6,7 +6,7 @@ import * as syncService from './sync.service.js';
 import { saveChanges } from '../index.js';
 import { OPTS } from '../lib/options.js';
 import { setFavicon, newUuid } from '../lib/util.js';
-import { updateAndDisplayAgenda } from './agenda.service.js';
+import { updateAndDisplayAgenda, updateAndDisplayAgendas } from './agenda.service.js';
 import { domToJsonSingle, jsonElementToDom } from './parser.service.js';
 
 export function editLink(element) {
@@ -394,6 +394,7 @@ export function editPanel(element) {
       },
       ...storageActions,
     ],
+    callbackExtension: () => { updateAndDisplayAgendas(); },
   });
 }
 
