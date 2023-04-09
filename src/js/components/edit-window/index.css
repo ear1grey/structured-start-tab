@@ -1,18 +1,46 @@
+@import url('/src/style/animations.css');
+
+dialog.use-custom-scrollbar #options::-webkit-scrollbar {
+  width: calc(0.5rem + var(--small));
+  height: var(--small);
+}
+
+dialog.use-custom-scrollbar #options::-webkit-scrollbar-thumb {
+  background: var(--fg-mid);
+  border: var(--fg-light-alpha) solid thin;
+  border-radius: var(--medium);
+}
+
+dialog.use-custom-scrollbar #options::-webkit-scrollbar-track {
+  background-color: inherit;
+}
+
+/* Turn on single button up on top, and down on bottom */
+dialog.use-custom-scrollbar #options::-webkit-scrollbar-button:start:decrement,
+dialog.use-custom-scrollbar #options::-webkit-scrollbar-button:end:increment {
+  display: block;
+  height: var(--medium);
+}
+
 p {
   margin: 0;
 }
 
 dialog {
-  display: flex;
-  flex-direction: column;
-
   background: var(--bg-mid);
   color: var(--fg-mid);
   margin: auto;
   padding: var(--large);
-  box-shadow: 0 var(--medium) var(--large) var(--fg-mid);
+  box-shadow: 0 var(--medium) var(--large) #171717;
   border-radius: var(--medium);
   border: none;
+
+  width: 90vw;
+  max-height: 90vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 dialog::backdrop {
@@ -24,6 +52,9 @@ header {
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
+
+  position: sticky;
+  top: 0;
 }
 
 header section {
@@ -70,11 +101,57 @@ header section p {
 }
 
 main {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  overflow: hidden;
+  height: 100%;
+}
+
+#options,
+#preview {
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  width: 100%;
+}
+
+#options {
+  overflow-y: scroll;
+  padding-right: 1rem;
+}
+
+#preview {
+  overflow-y: hidden;
+  align-items: center;
   justify-content: center;
-  height: 100%;
+  display: flex;
+  height: auto;
+
+}
+
+#preview a {
+  color: inherit;
+  display: flex;
+  align-items: center;
+  background: var(--overlay-mid);
+  border: solid transparent thin;
+  border-radius: var(--tiny);
+  justify-content: center;
+  margin: var(--tiny);
+  padding: var(--medium);
+  min-height: 1.5rem;
+  text-align: center;
+  text-decoration: none;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+#preview>* {
+  width: 80%;
 }
 
 label {
@@ -93,7 +170,6 @@ label>input {
   padding: var(--small) 0;
   flex-grow: 1;
   height: 2rem;
-  width: 30rem;
   background: var(--bg-light);
   color: var(--fg-dark);
   border: none;
@@ -122,7 +198,7 @@ better-text {
 .switch {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-width: 30rem;
+  flex-grow: 1;
   gap: 0.0625em;
 }
 
@@ -164,6 +240,9 @@ button:hover {
 footer {
   display: flex;
   flex-direction: row-reverse;
+
+  position: sticky;
+  bottom: 0;
 }
 
 /* Attributes */
@@ -178,16 +257,9 @@ footer {
   cursor: default;
 }
 
-@keyframes spin-animation {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.spin {
-  animation: spin-animation 1s infinite linear;
+.favicon {
+  width: 1rem;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  margin-right: var(--small);
 }

@@ -69,7 +69,8 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
     get $title() { return this.shadow.querySelector('#title'); }
     get $ident() { return this.shadow.querySelector('#ident'); }
     get $customActionsContainer() { return this.shadow.querySelector('#custom-actions-container'); }
-    get $main() { return this.shadow.querySelector('main'); }
+    get $options() { return this.shadow.querySelector('main #options'); }
+    get $preview() { return this.shadow.querySelector('main #preview'); }
     get $cancelBtn() { return this.shadow.querySelector('#edit-cancel'); }
     get $okBtn() { return this.shadow.querySelector('#edit-ok'); }
 
@@ -79,6 +80,9 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
 
     get showIdent() { return this.hasAttribute('show-ident'); }
     set showIdent(value) { value ? this.setAttribute('show-ident', '') : this.removeAttribute('show-ident'); }
+
+    get useCustomScrollbar() { return this.hasAttribute('use-custom-scrollbar'); }
+    set useCustomScrollbar(value) { value ? this.setAttribute('use-custom-scrollbar', '') : this.removeAttribute('use-custom-scrollbar'); }
 
     // Methods
     onVisibleChanged() {
@@ -97,7 +101,15 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
       }
     }
 
-    init({ title, ident, customActions, properties, options, element, callBack, cancelCallback }) {
+    onCustomScrollbarChanged() {
+      if (this.useCustomScrollbar) {
+        this.$dialog.classList.add('use-custom-scrollbar');
+      } else {
+        this.$dialog.classList.remove('use-custom-scrollbar');
+      }
+    }
+
+    init({ title, ident, customActions, properties, options, element, previewElement, callBack, cancelCallback }) {
       this.$title.textContent = title;
       this.$ident.textContent = ident;
       this._callBack = callBack;
@@ -107,6 +119,8 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
       if (element) {
         this.element = element;
         this.originalElement = domToJsonSingle(element);
+
+        this.$preview.appendChild(previewElement);
       }
 
       if (customActions) { this.addCustomActions(customActions); }
@@ -160,11 +174,24 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
             propValueElement = document.createElement('input');
             propValueElement.type = 'text';
             propValueElement.value = property.value;
+
+            // Add update listener
+            propValueElement.addEventListener('input', () => {
+              property.updateAction?.(this.getPropValueByType(label, property.type));
+            });
             break;
           case 'better-text':
             propValueElement = document.createElement('better-text');
             propValueElement.value = property.value.text;
             propValueElement.mode = property.value.mode;
+
+            // Add update listener
+            propValueElement.addEventListener('input', () => {
+              property.updateAction?.(this.getPropValueByType(label, property.type));
+            });
+            propValueElement.addEventListener('click', () => {
+              property.updateAction?.(this.getPropValueByType(label, property.type));
+            });
             break;
           case 'colour':
             propValueElement = document.createElement('color-switch');
@@ -172,6 +199,11 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
             propValueElement.auto = 'Automatic';
             propValueElement.manual = 'Manual';
             propValueElement.open = property.value?.[0] !== '!';
+
+            // Add update listener
+            propValueElement.addEventListener('input', () => {
+              property.updateAction?.(this.getPropValueByType(label, property.type));
+            });
             break;
           case 'switch':
             propValueElement = document.createElement('div');
@@ -188,6 +220,11 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
 
               if (option.name === property.selectedOption) input.checked = true;
 
+              // Add update listener
+              input.addEventListener('change', () => {
+                property.updateAction?.(option.name);
+              });
+
               propValueElement.appendChild(input);
               propValueElement.appendChild(label);
             }
@@ -196,6 +233,11 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
             propValueElement = document.createElement('input');
             propValueElement.type = 'checkbox';
             propValueElement.checked = property.value;
+
+            // Add update listener
+            propValueElement.addEventListener('input', () => {
+              property.updateAction?.(this.getPropValueByType(label, property.type));
+            });
             break;
           case 'slider':
             propValueElement = document.createElement('input');
@@ -204,21 +246,21 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
             propValueElement.max = property.max;
             propValueElement.step = property.step;
             propValueElement.value = property.value;
+
+            // Add update listener
+            propValueElement.addEventListener('input', () => {
+              property.updateAction?.(this.getPropValueByType(label, property.type));
+            });
             break;
         }
 
         if (property.locale?.primary) propName.setAttribute('data-locale', property.locale.primary);
         if (property.locale?.secondary) propValueElement.setAttribute('data-locale', property.locale.secondary);
         if (property.placeholder) propValueElement.setAttribute('placeholder', property.placeholder);
-        if (property.updateAction) {
-          propValueElement.addEventListener('input', () => {
-            property.updateAction(this.getPropValueByType(label, property.type));
-          });
-        }
 
         label.appendChild(propValueElement);
 
-        this.$main.appendChild(label);
+        this.$options.appendChild(label);
       }
     }
 
@@ -235,15 +277,17 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
     }
 
     ok() {
+      let preventClose = false;
       if (this._callBack) {
         const resObject = {};
         for (const prop of this._properties) {
           resObject[prop.name] = this.getPropValueByType(this.shadow.querySelector(`#${prop.name}`), prop.type);
         }
 
-        this._callBack(resObject);
+        preventClose = this._callBack(resObject, this.$preview.firstElementChild, this.$dialog);
       }
-      this.isVisible = false;
+
+      if (!preventClose) { this.isVisible = false; }
     }
 
     setLoading(value) {
@@ -263,7 +307,7 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
 
     // Structure
     static get observedAttributes() {
-      return ['visible', 'show-ident'];
+      return ['visible', 'show-ident', 'use-custom-scrollbar'];
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -275,6 +319,9 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
           break;
         case 'show-ident':
           this.onShowIdentChanged();
+          break;
+        case 'use-custom-scrollbar':
+          this.onCustomScrollbarChanged();
           break;
         default:
           break;

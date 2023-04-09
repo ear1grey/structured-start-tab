@@ -6,7 +6,7 @@ import * as syncService from './sync.service.js';
 import { saveChanges } from '../index.js';
 import { OPTS } from '../lib/options.js';
 import { setFavicon, newUuid } from '../lib/util.js';
-import { updateAndDisplayAgenda } from './agenda.service.js';
+import { updateAndDisplayAgenda, updateAndDisplayAgendas } from './agenda.service.js';
 import { domToJsonSingle, jsonElementToDom } from './parser.service.js';
 
 export function editLink(element) {
@@ -19,29 +19,31 @@ export function editLink(element) {
   document.body.appendChild(editWindow);
 
   const { backgroundColour, foregroundColour } = ui.getColours(element);
+  const iconSize = element.querySelector('.favicon')?.style.width.replace(/[^0-9.]/g, '') || 1;
+
+  const previewElement = jsonElementToDom(domToJsonSingle(element));
+  previewElement.style.flexGrow = 0;
+  previewElement.iconSize = iconSize;
 
   editWindow.init({
     element,
+    previewElement,
     title: chrome.i18n.getMessage('edit_link'),
-    callBack: (properties) => {
-      // Name
-      element.textContent = properties.name.value;
-      if (properties.name.mode === 'multi') element.style.whiteSpace = 'pre-wrap';
-      else element.style.whiteSpace = 'unset';
-      // URL
-      if (properties.url) {
-        element.href = properties.url;
-        setFavicon(element, properties.url, properties['icon-size']);
-      } else {
+    callBack: (properties, previewElement, dialog) => {
+      if (!properties.url) {
         if (!OPTS.allowEmptyUrl) {
-          ui.wiggleElement(document.querySelector('#editurl'));
-          return;
+          ui.wiggleElement(dialog.querySelector('label#url input'));
+          return true;
         }
-        element.removeAttribute('href');
+
+        previewElement?.removeAttribute?.('href');
+        previewElement?.querySelector?.('.favicon')?.remove?.();
       }
-      // Colours
-      element.style.background = properties.background;
-      element.style.color = properties.foreground;
+
+      if (previewElement) {
+        element.replaceWith(previewElement);
+        element = previewElement;
+      }
 
       // Complete
       saveChanges({ newChanges: true });
@@ -57,10 +59,62 @@ export function editLink(element) {
         },
         placeholder: 'Name',
         locale: { primary: 'name', secondary: 'placeholder_item_name' },
+        updateAction: (value) => {
+          if (value.mode === 'multi') {
+            previewElement.style.whiteSpace = 'pre-wrap';
+          } else { previewElement.style.whiteSpace = 'unset'; }
+
+          const favicon = previewElement.querySelector('.favicon');
+          previewElement.textContent = value.value;
+          if (favicon) { previewElement.prepend(favicon); }
+        },
       },
-      { name: 'url', type: 'text', value: element.href, placeholder: 'URL', locale: { primary: 'link', secondary: 'placeholder_url' } },
-      { name: 'background', type: 'colour', value: backgroundColour, locale: { primary: 'background' } },
-      { name: 'foreground', type: 'colour', value: foregroundColour, locale: { primary: 'text' } },
+      {
+        name: 'url',
+        type: 'text',
+        value: element.href,
+        placeholder: 'URL',
+        locale: {
+          primary: 'link',
+          secondary: 'placeholder_url',
+        },
+        updateAction: (value) => {
+          if (value) {
+            previewElement.href = value;
+            setFavicon(previewElement, value, previewElement.iconSize);
+          } else {
+            previewElement.removeAttribute('href');
+            previewElement.querySelector('.favicon')?.remove?.();
+          }
+        },
+      },
+      {
+        name: 'hideIcon',
+        type: 'checkbox',
+        value: element.getAttribute('hide-icon') === 'true',
+        locale: { primary: 'hide_icon' },
+        updateAction: (value) => {
+          if (value) {
+            previewElement.setAttribute('hide-icon', 'true');
+            previewElement.querySelector('.favicon')?.remove?.();
+          } else { previewElement.removeAttribute('hide-icon'); }
+          setFavicon(previewElement, previewElement.href, previewElement.iconSize);
+        },
+      },
+      {
+        name: 'background',
+        type: 'colour',
+        value: backgroundColour,
+        locale: { primary: 'background' },
+        updateAction: (value) => (previewElement.style.background = value),
+      },
+      {
+        name: 'foreground',
+        type: 'colour',
+        value: foregroundColour,
+        locale: { primary: 'text' },
+        updateAction: (value) => (previewElement.style.color = value),
+      },
       {
         name: 'font-size',
         type: 'slider',
@@ -69,23 +123,30 @@ export function editLink(element) {
         max: 5,
         step: 0.05,
         locale: { primary: 'font_size' },
-        updateAction: (value) => (element.style.fontSize = value + 'em'),
+        updateAction: (value) => (previewElement.style.fontSize = value + 'em'),
       },
       {
         name: 'icon-size',
         type: 'slider',
-        value: element.querySelector('.favicon')?.style.width.replace(/[^0-9.]/g, '') || 1,
+        value: iconSize,
         min: 0.5,
         max: 5, // Limiting to 5 due to too high quality loss
         step: 0.05,
         locale: { primary: 'icon_size' },
-        updateAction: (value) => (element.querySelector('.favicon').style.width = value + 'rem'),
+        updateAction: (value) => {
+          const favicon = previewElement.querySelector('.favicon');
+          if (favicon) favicon.style.width = value + 'rem';
+          previewElement.iconSize = value;
+        },
       },
     ],
     options: {
       allowEmptyUrl: OPTS.allowEmptyUrl,
     },
   });
+
+  // Propagate scrollbar usage
+  editWindow.setAttribute('use-custom-scrollbar', OPTS.useCustomScrollbar);
 
   // Make sure that links are always draggable
   element.setAttribute('draggable', 'true');
@@ -97,20 +158,34 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
 
   const { backgroundColour, foregroundColour, borderColour } = ui.getColours(element);
 
+  // Keep track of original properties - these properties will be edited during the preview to make it easier on the user
+  const isTopLevel = element.isTopLevel;
+  const folded = element.folded;
+
+  const previewElement = jsonElementToDom(domToJsonSingle(element));
+  previewElement.isTopLevel = false;
+  previewElement.folded = false;
+  previewElement.grow = 0;
+
+
   editWindow.init({
     element,
+    previewElement,
     title: title || chrome.i18n.getMessage('edit_panel'),
     ident: element.ident,
     customActions,
-    callBack: (properties) => {
-      element.header = properties.name.value;
-      if (properties.name.mode === 'multi') element.style.whiteSpace = 'pre-wrap';
-      else element.style.whiteSpace = 'unset';
-      element.backgroundColour = properties.background;
-      element.textColour = properties.foreground;
-      element.direction = properties.direction;
-      element.singleLineDisplay = properties.singleLineDisplay;
+    callBack: (properties, previewElement) => {
+      if (previewElement) {
+        element.replaceWith(previewElement);
+        element = previewElement;
+      }
+
+      // element.singleLineDisplay = properties.singleLineDisplay;
       element.private = properties.private;
+
+      // Restore original properties
+      element.isTopLevel = isTopLevel;
+      element.folded = folded;
 
       if (callbackExtension) {
         callbackExtension(properties);
@@ -131,10 +206,28 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
         },
         placeholder: 'Name',
         locale: { primary: 'name', secondary: 'placeholder_panel_name' },
+        updateAction: (value) => {
+          if (value.mode === 'multi') {
+            previewElement.style.whiteSpace = 'pre-wrap';
+          } else { previewElement.style.whiteSpace = 'unset'; }
+          previewElement.header = value.value;
+        },
       },
       ...extraProperties, // TODO: Add a way to edit where the custom properties are added (maybe add index?) - take into consideration default panel properties
-      { name: 'background', type: 'colour', value: backgroundColour, locale: { primary: 'background' } },
-      { name: 'foreground', type: 'colour', value: foregroundColour, locale: { primary: 'text' } },
+      {
+        name: 'background',
+        type: 'colour',
+        value: backgroundColour,
+        locale: { primary: 'background' },
+        updateAction: (value) => (previewElement.backgroundColour = value),
+      },
+      {
+        name: 'foreground',
+        type: 'colour',
+        value: foregroundColour,
+        locale: { primary: 'text' },
+        updateAction: (value) => (previewElement.textColour = value),
+      },
       {
         name: 'direction',
         type: 'switch',
@@ -142,8 +235,15 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
         options: [{ name: 'horizontal', locale: 'horizontal' }, { name: 'vertical', locale: 'vertical' }],
         selectedOption: element.direction === 'vertical' ? 'vertical' : 'horizontal',
         locale: { primary: 'direction' },
+        updateAction: (value) => (previewElement.direction = value),
       },
-      { name: 'singleLineDisplay', type: 'checkbox', value: element.singleLineDisplay, locale: { primary: 'flex' } },
+      {
+        name: 'singleLineDisplay',
+        type: 'checkbox',
+        value: element.singleLineDisplay,
+        locale: { primary: 'flex' },
+        updateAction: (value) => (previewElement.singleLineDisplay = value),
+      },
       { name: 'private', type: 'checkbox', value: element.private, locale: { primary: 'private' } },
       {
         name: 'padding',
@@ -153,7 +253,7 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
         max: 100,
         step: 1,
         locale: { primary: 'padding' },
-        updateAction: (value) => (element.padding = value),
+        updateAction: (value) => (previewElement.padding = value),
       },
       {
         name: 'border-size',
@@ -163,7 +263,7 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
         max: 30,
         step: 1,
         locale: { primary: 'border_size' },
-        updateAction: (value) => (element.borderSize = value),
+        updateAction: (value) => (previewElement.borderSize = value),
       },
       {
         name: 'font-size',
@@ -173,20 +273,23 @@ function editPanelBase({ element, title, customActions = [], extraProperties = [
         max: 5,
         step: 0.05,
         locale: { primary: 'font_size' },
-        updateAction: (value) => (element.fontSize = value),
+        updateAction: (value) => (previewElement.fontSize = value),
       },
       {
         name: 'border-colour',
         type: 'colour',
         value: borderColour,
         locale: { primary: 'border_colour' },
-        updateAction: (value) => (element.borderColour = value),
+        updateAction: (value) => (previewElement.borderColour = value),
       },
     ],
     options: {
       allowEmptyUrl: OPTS.allowEmptyUrl,
     },
   });
+
+  // Propagate scrollbar usage
+  editWindow.setAttribute('use-custom-scrollbar', OPTS.useCustomScrollbar);
 }
 
 export function editPanel(element) {
@@ -313,6 +416,7 @@ export function editPanel(element) {
       },
       ...storageActions,
     ],
+    callbackExtension: () => { updateAndDisplayAgendas(); },
   });
 }
 
