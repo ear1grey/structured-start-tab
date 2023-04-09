@@ -27,19 +27,20 @@ export function editLink(element) {
     element,
     previewElement,
     title: chrome.i18n.getMessage('edit_link'),
-    callBack: (properties, previewElement) => {
+    callBack: (properties, previewElement, dialog) => {
+      if (!properties.url) {
+        if (!OPTS.allowEmptyUrl) {
+          ui.wiggleElement(dialog.querySelector('label#url input'));
+          return true;
+        }
+
+        previewElement?.removeAttribute?.('href');
+        previewElement?.querySelector?.('.favicon')?.remove?.();
+      }
+
       if (previewElement) {
         element.replaceWith(previewElement);
         element = previewElement;
-      }
-
-      if (!properties.url) {
-        if (!OPTS.allowEmptyUrl) {
-          // TODO: Add message
-          // return;
-        }
-        element.removeAttribute('href');
-        element.firstChild.remove();
       }
 
       // Complete
@@ -61,9 +62,8 @@ export function editLink(element) {
             previewElement.style.whiteSpace = 'pre-wrap';
           } else { previewElement.style.whiteSpace = 'unset'; }
 
-          previewElement.textContent = value.value;
-
           const favicon = previewElement.querySelector('.favicon');
+          previewElement.textContent = value.value;
           if (favicon) { previewElement.prepend(favicon); }
         },
       },
@@ -80,6 +80,20 @@ export function editLink(element) {
           if (value) {
             previewElement.href = value;
             setFavicon(previewElement, value);
+          } else {
+            previewElement.removeAttribute('href');
+            previewElement.querySelector('.favicon')?.remove?.();
+          }
+        },
+      },
+      {
+        name: 'hideIcon',
+        type: 'checkbox',
+        value: element.hideIcon,
+        locale: { primary: 'flex' },
+        updateAction: (value) => {
+          if (value) {
+            previewElement.setAttribute('hide-icon', 'true');
           }
         },
       },
@@ -115,7 +129,10 @@ export function editLink(element) {
         max: 5, // Limiting to 5 due to too high quality loss
         step: 0.05,
         locale: { primary: 'icon_size' },
-        updateAction: (value) => (previewElement.querySelector('.favicon').style.width = value + 'rem'),
+        updateAction: (value) => {
+          const favicon = previewElement.querySelector('.favicon');
+          if (favicon) favicon.style.width = value + 'rem';
+        },
       },
     ],
     options: {

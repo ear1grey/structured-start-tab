@@ -8,10 +8,120 @@
   }
 }
 
+@keyframes wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  10% {
+    transform: translate(1px, 1px)
+  }
+
+  20% {
+    transform: translate(-1px, -2px)
+  }
+
+  30% {
+    transform: translate(-3px, 0px)
+  }
+
+  40% {
+    transform: translate(3px, 2px)
+  }
+
+  50% {
+    transform: translate(1px, -1px)
+  }
+
+  60% {
+    transform: translate(-1px, 2px)
+  }
+
+  70% {
+    transform: translate(-3px, 1px)
+  }
+
+  80% {
+    transform: translate(3px, 1px)
+  }
+
+  90% {
+    transform: translate(-1px, -1px)
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes sparkle {
+  60% {
+    filter: invert(0%)
+  }
+
+  70% {
+    filter: invert(100%)
+  }
+
+  80% {
+    filter: invert(0%)
+  }
+}
+
+@keyframes highlight-frames {
+  0% {
+    background: var(--overlay-mid);
+  }
+
+  10% {
+    background: var(--bg-highlight);
+  }
+
+  20% {
+    background: var(--overlay-mid);
+  }
+
+  30% {
+    background: var(--bg-highlight);
+  }
+
+  40% {
+    background: var(--overlay-mid);
+  }
+
+  50% {
+    background: var(--bg-highlight);
+  }
+
+  60% {
+    background: var(--overlay-mid);
+  }
+
+  70% {
+    background: var(--bg-highlight);
+  }
+
+  100% {
+    background: var(--overlay-mid);
+  }
+}
+
 .spin {
   animation: spin-animation 1s infinite linear;
 }
 
 #spinner {
   margin: 0 0.5rem 0 0;
+}
+
+.wiggle {
+  animation: wiggle 0.5s linear;
+}
+
+.highlight {
+  animation: highlight-frames 3s;
+}
+
+.flash {
+  animation: sparkle 1s linear;
 }

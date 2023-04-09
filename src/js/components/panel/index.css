@@ -9,8 +9,11 @@ section>h1 {
   flex-grow: 0;
 }
 
-section:not(.folded)>h1:not(:empty) {
+/* Only working on Firefox */
+section.folded:has(h1:empty) {
   border: 0.125rem solid transparent;
+  min-height: 1rem;
+  width: unset !important;
 }
 
 section.folded>h1:not(:empty) {

@@ -2,7 +2,7 @@ import { services } from './sync/index.js';
 import { OPTS, write } from '../lib/options.js';
 import { jsonToDom } from './parser.service.js';
 import { updateAgenda } from './agenda.service.js';
-import { areObjectEquals } from '../lib/util.js';
+import { areObjectEquals, addLinkListeners } from '../lib/util.js';
 
 /**
  * Any provider requires the following implementations:
@@ -244,6 +244,7 @@ const updateSubscriptions = async ({ window = null } = {}) => {
 
   if (updatePanelSubscriptionContent(OPTS.json, remotePanels) && window) {
     jsonToDom(window, OPTS.json);
+    addLinkListeners(window);
     updateAgenda();
   }
 

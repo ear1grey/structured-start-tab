@@ -74,6 +74,7 @@ const domToJson = (parentElement) => {
             url: child.href,
             fontSize: child.style.fontSize.replace(/[^0-9.]/g, ''),
             iconSize: child.querySelector('.favicon')?.style.width.replace(/[^0-9.]/g, ''),
+            hideIcon: child.getAttribute('hide-icon') === 'true',
           });
         break;
       case 'P':

@@ -398,10 +398,7 @@ export function prepareFoldables() {
 }
 
 function prepareListeners() {
-  const anchors = util.getAllBySelector(els.main, 'a');
-  for (const a of anchors) {
-    util.addAnchorListeners(a, util.linkClicked);
-  }
+  util.addLinkListeners(els.main);
   document.addEventListener('keydown', detectKeydown);
   els.addlink.addEventListener('click', addLink);
   els.addpanel.addEventListener('click', addPanel);

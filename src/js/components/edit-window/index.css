@@ -1,3 +1,5 @@
+@import url('/src/style/animations.css');
+
 dialog.use-custom-scrollbar #options::-webkit-scrollbar {
   width: calc(0.5rem + var(--small));
   height: var(--small);
@@ -253,20 +255,6 @@ footer {
   opacity: 0.5;
   pointer-events: none;
   cursor: default;
-}
-
-@keyframes spin-animation {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.spin {
-  animation: spin-animation 1s infinite linear;
 }
 
 .favicon {

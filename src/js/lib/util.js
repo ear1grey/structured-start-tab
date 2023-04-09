@@ -62,6 +62,8 @@ export function cloneTemplateToTarget(selector, where, after = true) {
 }
 
 export function setFavicon(elem, url, size = 1) {
+  if (elem.hideIcon) { return; }
+
   let favicon = elem.querySelector('img.favicon');
   if (!favicon) {
     favicon = document.createElement('img');
@@ -454,4 +456,11 @@ export function areObjectEquals(obj1, obj2, propertiesToIgnore = []) {
   }
 
   return true;
+}
+
+export function addLinkListeners(page) {
+  const anchors = getAllBySelector(page, 'a');
+  for (const a of anchors) {
+    addAnchorListeners(a, linkClicked);
+  }
 }

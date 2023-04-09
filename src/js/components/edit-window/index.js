@@ -277,15 +277,17 @@ Promise.all([getTemplate, getStyle]).then(([template, style]) => {
     }
 
     ok() {
+      let preventClose = false;
       if (this._callBack) {
         const resObject = {};
         for (const prop of this._properties) {
           resObject[prop.name] = this.getPropValueByType(this.shadow.querySelector(`#${prop.name}`), prop.type);
         }
 
-        this._callBack(resObject, this.$preview.firstElementChild);
+        preventClose = this._callBack(resObject, this.$preview.firstElementChild, this.$dialog);
       }
-      this.isVisible = false;
+
+      if (!preventClose) { this.isVisible = false; }
     }
 
     setLoading(value) {
