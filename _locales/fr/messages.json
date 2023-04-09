@@ -29,6 +29,9 @@
   "link": {
     "message": "Lien"
   },
+  "hide_icon": {
+    "message": "Cacher l'icône"
+  },
   "placeholder_url": {
     "message": "URL"
   },

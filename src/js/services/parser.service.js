@@ -196,6 +196,9 @@ const jsonElementToDom = (element, newId = false) => {
       link.style.color = element.textColour;
       link.textContent = element.name;
       if (element.textMode === 'multi') { link.style.whiteSpace = 'pre-wrap'; } else { link.style.whiteSpace = 'nowrap'; }
+      if (element.hideIcon) {
+        link.setAttribute('hide-icon', true);
+      }
       if (element.url) {
         link.setAttribute('href', element.url);
         setFavicon(link, element.url, element.iconSize);

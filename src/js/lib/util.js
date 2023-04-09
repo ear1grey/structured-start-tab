@@ -62,7 +62,7 @@ export function cloneTemplateToTarget(selector, where, after = true) {
 }
 
 export function setFavicon(elem, url, size = 1) {
-  if (elem.hideIcon) { return; }
+  if (elem.getAttribute('hide-icon') === 'true') { return; }
 
   let favicon = elem.querySelector('img.favicon');
   if (!favicon) {

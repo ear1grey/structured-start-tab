@@ -19,9 +19,11 @@ export function editLink(element) {
   document.body.appendChild(editWindow);
 
   const { backgroundColour, foregroundColour } = ui.getColours(element);
+  const iconSize = element.querySelector('.favicon')?.style.width.replace(/[^0-9.]/g, '') || 1;
 
   const previewElement = jsonElementToDom(domToJsonSingle(element));
   previewElement.style.flexGrow = 0;
+  previewElement.iconSize = iconSize;
 
   editWindow.init({
     element,
@@ -79,7 +81,7 @@ export function editLink(element) {
         updateAction: (value) => {
           if (value) {
             previewElement.href = value;
-            setFavicon(previewElement, value);
+            setFavicon(previewElement, value, previewElement.iconSize);
           } else {
             previewElement.removeAttribute('href');
             previewElement.querySelector('.favicon')?.remove?.();
@@ -89,12 +91,14 @@ export function editLink(element) {
       {
         name: 'hideIcon',
         type: 'checkbox',
-        value: element.hideIcon,
-        locale: { primary: 'flex' },
+        value: element.getAttribute('hide-icon') === 'true',
+        locale: { primary: 'hide_icon' },
         updateAction: (value) => {
           if (value) {
             previewElement.setAttribute('hide-icon', 'true');
-          }
+            previewElement.querySelector('.favicon')?.remove?.();
+          } else { previewElement.removeAttribute('hide-icon'); }
+          setFavicon(previewElement, previewElement.href, previewElement.iconSize);
         },
       },
       {
@@ -124,7 +128,7 @@ export function editLink(element) {
       {
         name: 'icon-size',
         type: 'slider',
-        value: element.querySelector('.favicon')?.style.width.replace(/[^0-9.]/g, '') || 1,
+        value: iconSize,
         min: 0.5,
         max: 5, // Limiting to 5 due to too high quality loss
         step: 0.05,
@@ -132,6 +136,7 @@ export function editLink(element) {
         updateAction: (value) => {
           const favicon = previewElement.querySelector('.favicon');
           if (favicon) favicon.style.width = value + 'rem';
+          previewElement.iconSize = value;
         },
       },
     ],
