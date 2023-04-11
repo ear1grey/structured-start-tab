@@ -17,8 +17,7 @@ export async function updateAndDisplayAgenda(agenda) {
   displayNewAgenda(agenda);
 }
 
-export async function updateAndDisplayAgendas() {
-  await options.load();
+export function updateAndDisplayAgendas() {
   OPTS.agendas.forEach(async (agenda) => {
     await updateAndDisplayAgenda(agenda);
   });

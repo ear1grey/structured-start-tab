@@ -41,6 +41,7 @@ export function editLink(element) {
       }
 
       if (previewElement) {
+        previewElement.style.flexGrow = 1;
         element.replaceWith(previewElement);
         element = previewElement;
       }

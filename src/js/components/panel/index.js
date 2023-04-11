@@ -90,13 +90,13 @@ const define = (css) => {
     get folded() { return this.hasAttribute('folded'); }
     set folded(isFolded) { setOrRemoveProperty(this, 'folded', isFolded); }
 
-    get grow() { return getValueOrDefault(this, 'grow', ''); }
+    get grow() { return getValueOrDefault(this, 'grow', '1'); }
     set grow(grow) { setOrRemoveProperty(this, 'grow', grow); }
 
     get blur() { return this.hasAttribute('blur'); }
     set blur(isBlur) { setOrRemoveProperty(this, 'blur', isBlur); }
 
-    get padding() { return getValueOrDefault(this, 'padding', '0'); }
+    get padding() { return getValueOrDefault(this, 'padding', '5'); }
 
     set padding(padding) { setOrRemoveProperty(this, 'padding', padding); }
 
