@@ -8,7 +8,6 @@ const findIdent = (element) => {
   return newUuid();
 };
 
-// Ids of elements that we don't want parsed
 const domToJson = (parentElement) => {
   const jsonContent = [];
 
