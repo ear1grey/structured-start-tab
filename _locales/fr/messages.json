@@ -332,6 +332,9 @@
   "end": {
     "message": "Fin"
   },
+  "automatic": {
+    "message": "Automatique"
+  },
   "configure_shortcut_title": {
     "message": "Configurer les raccourcis clavier"
   },

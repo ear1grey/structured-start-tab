@@ -50,8 +50,7 @@ function dragStart(e) {
 
   document.body.classList.add('dragOngoing');
   if (document.body.classList.contains('editing')) { return; }
-  const path = e.path || (e.composedPath && e.composedPath());
-  let target = e.target.tagName === 'SST-PANEL' ? path[0] : e.target;
+  let target = e.target.tagName === 'SST-PANEL' ? util.getElementPath(e)[0] : e.target;
   if (target.tagName === 'IMG') {
     target = target.parentElement;
 
@@ -239,15 +238,15 @@ function extractDataFromDrop(e) {
 }
 
 function eventPathInvalid(e, movingElement) {
-  const path = (e.path || (e.composedPath && e.composedPath()));
   const invalidIds = ['agenda', 'bookmark', 'sidebar'];
+
+  const path = util.getElementPath(e);
+
+  // Don't drag inside a subscription panel
+  if (util.isInsideSubscription(e, path)) return true;
 
   for (const elem of path) {
     if (elem.id && invalidIds.some(id => elem.id.includes(id))) return true;
-
-    // Don't drag into subscription panels
-    if (elem.isSubscribed) return true;
-
     // Don't drag into its own subscription
     if (movingElement && movingElement.isSubscribed && elem.ident === movingElement.remotePanelId) {
       return true;

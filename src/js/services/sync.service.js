@@ -99,15 +99,16 @@ export const syncFullContent = async ({ window = null, ignoreConflict = false } 
     write();
   }
 
-  if (updatedElements.length > 0) { // Push changes
-    await setFullContent({ version: 0, page: newPage });
-    OPTS.json = newPage;
-    write();
+  OPTS.json = newPage;
 
-    if (window) {
-      jsonToDom(window, OPTS.json);
-      updateAgenda();
-    }
+  if (window) {
+    jsonToDom(window, OPTS.json);
+    updateAgenda();
+  }
+
+  // Push changes
+  if (updatedElements.length > 0 || options.newChanges) {
+    await setFullContent({ version: 0, page: newPage });
   }
 
   updateSubscriptions({ window });
@@ -139,14 +140,14 @@ const buildResultingPage = (
 
       if (!remoteElement) { // Remote element not found
         if (newChanges) { // User added a new element
-          if (syncMode.includes('Push')) { // Push element creation
+          if (syncMode.includes('Push') || syncMode === 'automatic') { // Push element creation
             resultPage.push(localElement);
             updatedElements.push(localElement);
           } else { // Not allowed to push element creation
             conflictIdents.push(localElement.ident);
           }
         } else { // User deleted an element from another device
-          if (syncMode === 'hardPull') { // Pull element deletions
+          if (syncMode === 'hardPull' || syncMode === 'automatic') { // Pull element deletions
             updatedElements.push(localElement);
           } else { // Not allowed to pull element deletion
             conflictIdents.push(localElement.ident);
@@ -156,11 +157,11 @@ const buildResultingPage = (
         remote.splice(remoteElementIndex, 1);
 
         // Check if the panel properties are different
-        if (!elementBasePropertiesEqual(localElement, remoteElement)) {
+        if (!elementBasePropertiesEqual(localElement, remoteElement) && !newChanges && syncMode !== 'automatic') {
           conflictIdents.push(localElement.ident);
         }
 
-        const newElement = { ...remoteElement };
+        const newElement = { ...(newChanges ? localElement : remoteElement) };
         if (newElement.content) newElement.content = []; // Don't automatically add the content already present
         if (localElement.content) {
           const contentConflictIdents = [];
@@ -178,14 +179,14 @@ const buildResultingPage = (
     // Elements that are left in the remote but are not present in the local
     if (remote.length > 0) { // Local elements not found
       if (newChanges) { // User made changes
-        if (syncMode === 'hardPush') { // Push element deletions
+        if (syncMode === 'hardPush' || syncMode === 'automatic') { // Push element deletions
           updatedElements.push(...remote);
         } else { // Not allow to push element deletion
           const ids = remote.map(elem => elem.ident);
           conflictIdents.push(...ids);
         }
       } else { // User deleted an element from another device
-        if (syncMode.includes('Pull')) { // Pull element creation from another device
+        if (syncMode.includes('Pull') || syncMode === 'automatic') { // Pull element creation from another device
           resultPage.push(...remote);
           updatedElements.push(...remote);
         } else { // Not allowed to pull element creation from another device
