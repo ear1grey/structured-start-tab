@@ -63,7 +63,6 @@ export const setFullContent = async content => {
 export const syncFullContent = async ({ window = null, ignoreConflict = false } = {}) => {
   if (!OPTS.sync.enabled || (OPTS.sync.hasConflict && !ignoreConflict)) return;
 
-  const newPage = [];
   const remote = await getFullContent();
 
   if (remote == null) {
@@ -80,7 +79,13 @@ export const syncFullContent = async ({ window = null, ignoreConflict = false } 
 
   const conflictIdents = [];
   const updatedElements = [];
-  buildResultingPage(remote.page, OPTS.json, options, newPage, conflictIdents, updatedElements);
+  const newPage = buildResultingPage({
+    remote: remote.page,
+    local: OPTS.json,
+    options,
+    conflictIdents,
+    updatedElements,
+  });
 
   if (conflictIdents.length > 0) { // Show conflict page
     OPTS.sync.hasConflict = true;
@@ -123,93 +128,109 @@ const elementPropertiesEqual = (localElement, remoteElement, additionalPropsToIg
   return areObjectEquals(localElement, remoteElement, propertiesToIgnore);
 };
 
-const buildResultingPage = (
-  remote, local, { newChanges = false, syncMode = 'manual', syncFold = true, syncPrivate = true } = {}, resultPage, conflictIdents, updatedElements) => {
-  // clean-up content!!
-  // if (Array.isArray(local)) local = local.filter(elem => elem.id !== 'trash' && elem.remotePanelId == null);
-  // if (Array.isArray(remote)) remote = remote.filter(elem => elem.id !== 'trash' && elem.remotePanelId == null);
-  if (Array.isArray(local)) local = local.filter(elem => elem.id !== 'trash');
-  if (Array.isArray(remote)) remote = remote.filter(elem => elem.id !== 'trash');
+const buildResultingPage = ({
+  remote = null,
+  local = null,
+  options = { newChanges: false, syncMode: 'manual', syncFold: true, syncPrivate: true },
+  resultPage = [],
+  conflictIdents = [],
+  updatedElements = [],
+} = {}) => {
+  const autoSync = options.syncMode === 'automatic';
+  const isPushAllowed = () => options.syncMode.includes('Push') || autoSync;
+  const isPullAllowed = () => options.syncMode.includes('Pull') || autoSync;
+  const isDeletePushAllowed = () => options.syncMode.includes('hardPush') || autoSync;
+  const isDeletePullAllowed = () => options.syncMode.includes('hardPull') || autoSync;
 
-  // If they are both arrays, check all the elements
-  if (Array.isArray(local) && Array.isArray(remote)) {
-    // Go through all the elements of the incoming page
-    for (const localElement of local) {
-      const remoteElementIndex = remote.findIndex(elem => elem.ident === localElement.ident);
-      const remoteElement = remoteElementIndex !== -1 ? remote[remoteElementIndex] : null;
-
-      if (!remoteElement) { // Remote element not found
-        if (newChanges) { // User added a new element
-          if (syncMode.includes('Push') || syncMode === 'automatic') { // Push element creation
-            resultPage.push(localElement);
-            updatedElements.push(localElement);
-          } else { // Not allowed to push element creation
-            conflictIdents.push(localElement.ident);
-          }
-        } else { // User deleted an element from another device
-          if (syncMode === 'hardPull' || syncMode === 'automatic') { // Pull element deletions
-            updatedElements.push(localElement);
-          } else { // Not allowed to pull element deletion
-            conflictIdents.push(localElement.ident);
-          }
-        }
-      } else { // Remote element found
-        remote.splice(remoteElementIndex, 1);
-
-        // Check if the panel properties are different
-        if (!elementBasePropertiesEqual(localElement, remoteElement) && !newChanges && syncMode !== 'automatic') {
-          conflictIdents.push(localElement.ident);
-        }
-
-        const newElement = { ...(newChanges ? localElement : remoteElement) };
-        if (newElement.content) newElement.content = []; // Don't automatically add the content already present
-        if (localElement.content) {
-          const contentConflictIdents = [];
-          buildResultingPage(remoteElement.content, localElement.content, { newChanges, syncMode, syncFold, syncPrivate }, newElement.content, contentConflictIdents, updatedElements);
-          if (contentConflictIdents.length > 0) {
-            for (const contentConflictIdent of contentConflictIdents) {
-              conflictIdents.push(contentConflictIdent);
-            }
-          }
-        }
-        resultPage.push(newElement);
+  const handleMissingRemoteElement = (localElement) => {
+    if (options.newChanges) { // User added a new element
+      if (isPushAllowed()) { // Push element creation
+        resultPage.push(localElement);
+        updatedElements.push(localElement);
+      } else { // Not allowed to push element creation
+        conflictIdents.push(localElement.ident);
+      }
+    } else { // User deleted an element from another device
+      if (isDeletePullAllowed()) { // Pull element deletions
+        updatedElements.push(localElement);
+      } else { // Not allowed to pull element deletions
+        resultPage.push(localElement);
       }
     }
+  };
 
-    // Elements that are left in the remote but are not present in the local
-    if (remote.length > 0) { // Local elements not found
-      if (newChanges) { // User made changes
-        if (syncMode === 'hardPush' || syncMode === 'automatic') { // Push element deletions
-          updatedElements.push(...remote);
-        } else { // Not allow to push element deletion
-          const ids = remote.map(elem => elem.ident);
-          conflictIdents.push(...ids);
-        }
-      } else { // User deleted an element from another device
-        if (syncMode.includes('Pull') || syncMode === 'automatic') { // Pull element creation from another device
-          resultPage.push(...remote);
-          updatedElements.push(...remote);
-        } else { // Not allowed to pull element creation from another device
-          const ids = remote.map(elem => elem.ident);
-          conflictIdents.push(...ids);
-        }
-      }
+  const handleRemoteElement = (localElement, remoteElement) => {
+    // Check if the panel properties are different
+    if (!elementBasePropertiesEqual(localElement, remoteElement) &&
+    !options.newChanges && !autoSync) {
+      conflictIdents.push(localElement.ident);
     }
-  } else { // If they are not both arrays, check the base properties
-    if (!elementBasePropertiesEqual(local, remote)) {
-      conflictIdents.push(local.ident);
-    }
-    if (local.content) {
+
+    const newElement = { ...(options.newChanges ? localElement : remoteElement) };
+    if (newElement.content) newElement.content = []; // Don't automatically add the content already present
+    if (localElement.content) {
       const contentConflictIdents = [];
-      buildResultingPage(remote.content, local.content, { syncMode, syncFold, syncPrivate }, resultPage);
+      buildResultingPage({
+        remote: remoteElement.content,
+        local: localElement.content,
+        options,
+        resultPage: newElement.content,
+        conflictIdents: contentConflictIdents,
+        updatedElements,
+      });
       if (contentConflictIdents.length > 0) {
         for (const contentConflictIdent of contentConflictIdents) {
           conflictIdents.push(contentConflictIdent);
         }
       }
     }
-    resultPage.push(remote);
+
+    newElement.folded = options.syncFold && !options.newChanges ? remoteElement.folded : localElement.folded;
+    newElement.private = options.syncPrivate && !options.newChanges ? remoteElement.private : localElement.private;
+
+    resultPage.push(newElement);
+  };
+
+  const handleMissingLocalElements = () => {
+    if (options.newChanges) { // User made changes
+      if (isDeletePushAllowed()) { // Push element deletions
+        updatedElements.push(...remote);
+      } else { // Not allow to push element deletion
+        const ids = remote.map(elem => elem.ident);
+        conflictIdents.push(...ids);
+      }
+    } else { // User deleted an element from another device
+      if (isPullAllowed()) { // Pull element creation from another device
+        resultPage.push(...remote);
+        updatedElements.push(...remote);
+      } else { // Not allowed to pull element creation from another device
+        const ids = remote.map(elem => elem.ident);
+        conflictIdents.push(...ids);
+      }
+    }
+  };
+
+  // clean-up content
+  local = local.filter(elem => elem.id !== 'trash');
+  remote = remote.filter(elem => elem.id !== 'trash');
+
+  // Go through all the elements in the local page
+  for (const localElement of local) {
+    const remoteElementIndex = remote.findIndex(elem => elem.ident === localElement.ident);
+    const remoteElement = remoteElementIndex !== -1 ? remote[remoteElementIndex] : null;
+
+    if (!remoteElement) { // Remote element not found
+      handleMissingRemoteElement(localElement);
+    } else { // Remote element found
+      remote.splice(remoteElementIndex, 1);
+      handleRemoteElement(localElement, remoteElement);
+    }
   }
+
+  // Elements that are left in the remote but are not present in the local
+  if (remote.length > 0) { handleMissingLocalElements(); }
+
+  return resultPage;
 };
 
 // PANELS SHARE METHODS
