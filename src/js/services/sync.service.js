@@ -101,13 +101,13 @@ export const syncFullContent = async ({ window = null, ignoreConflict = false } 
     }
   } else {
     OPTS.sync.hasConflict = false;
+    OPTS.json = newPage;
     write();
   }
 
-  OPTS.json = newPage;
-
   if (window) {
     jsonToDom(window, OPTS.json);
+    addLinkListeners(window);
     updateAgenda();
   }
 
