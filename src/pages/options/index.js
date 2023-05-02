@@ -227,7 +227,8 @@ function buildSyncSettings(settings) {
   create(sync, 'dropdown', {
     id: 'sync.mode',
     options: [
-      { name: 'Manual', value: 'manual' },
+      { name: 'Manual', value: 'manual' }, // All changes are manual
+      { name: chrome.i18n.getMessage('automatic'), value: 'automatic' }, // All changes are automatic - system identifies which version is being used
       { name: chrome.i18n.getMessage('sync_soft_push'), value: 'softPush' }, // Pushes creations
       { name: chrome.i18n.getMessage('sync_hard_push'), value: 'hardPush' }, // Pushes creations and deletions
       { name: chrome.i18n.getMessage('sync_soft_pull'), value: 'softPull' }, // Pulls creations

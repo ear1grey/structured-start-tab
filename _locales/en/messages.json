@@ -329,6 +329,9 @@
   "end": {
     "message": "End"
   },
+  "automatic": {
+    "message": "Automatic"
+  },
   "configure_shortcut_title": {
     "message": "Configuring keyboard shortcuts"
   },

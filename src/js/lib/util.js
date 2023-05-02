@@ -230,7 +230,7 @@ export function calculateDynamicFlex(where) {
 }
 
 export function findTarget(e, returnFirst = false) {
-  const path = e.path || (e.composedPath && e.composedPath());
+  const path = getElementPath(e);
   if (path[0].tagName === 'A' || returnFirst) return path[0];
   if (path[0].tagName === 'IMG') return path[1];
   return e.target.tagName === 'SST-PANEL' ? path.find(x => x.tagName === 'SST-PANEL') : e.target;
@@ -416,7 +416,7 @@ export function setOrRemoveProperty(element, propertyName, propertyValue) {
 export function linkClicked(e) {
   const target = findTarget(e);
   if (target instanceof HTMLElement && target.tagName === 'A') {
-    if (e.shiftKey) {
+    if (e.shiftKey && !isInsideSubscription(e)) {
       e.preventDefault();
       import('../services/edit.service.js').then(({ editLink }) => {
         e.preventDefault();
@@ -463,4 +463,18 @@ export function addLinkListeners(page) {
   for (const a of anchors) {
     addAnchorListeners(a, linkClicked);
   }
+}
+
+export function getElementPath(element) {
+  return element.path || (element.composedPath && element.composedPath());
+}
+
+export function isInsideSubscription(element, path) {
+  path = path || getElementPath(element);
+
+  for (const e of path) {
+    if (e.isSubscribed) return true;
+  }
+
+  return false;
 }
