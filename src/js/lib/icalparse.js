@@ -23,9 +23,9 @@ export async function parseIcs(content, agenda, email) {
   }
   const events = [];
   for (const strEvent of strEvents) {
-    const event = getEventInfo(strEvent, timeZone, email);
-    if (event) {
-      events.push(event);
+    const eventDetailsList = getEventInfo(strEvent, timeZone, email);
+    if (eventDetailsList) {
+      events.push(...eventDetailsList);
     }
   }
   events.sort(function (a, b) {
@@ -38,6 +38,97 @@ export async function parseIcs(content, agenda, email) {
   }
   options.write();
 }
+
+// return all the events in the next year or the first 20 events
+function getRecurringEvents(recurringEvent) {
+  const frequencyDefinition = parseFrequencyArguments(recurringEvent.frequencyRules);
+  const events = [];
+
+  const eventDate = new Date(recurringEvent.utcDate);
+
+  // TODO: Add daily, monthly, and yearly recurring events
+  if (frequencyDefinition.frequency !== 'WEEKLY') return [];
+
+  // Skip if the end of the recurrence has passed
+  if (frequencyDefinition.until && Date.now() > frequencyDefinition.until) return [];
+
+  // Handle weekly recurring events
+  const increment = 7 * (frequencyDefinition.interval || 1);
+
+  const eventsCount = frequencyDefinition.count;
+  let occurrences = 0;
+
+  for (let day = 0; day < 365; day += increment) {
+    const beginningOfWeek = getBeginningOfWeek(addDays(eventDate, day));
+
+    // If the current week is newer than the end of the recurrence, stop
+    if (beginningOfWeek > frequencyDefinition.until) break;
+
+    // TODO: Add exception days (event deleted or moved)
+
+    for (const dayOfWeek of frequencyDefinition.byDay) {
+      const newEvent = {
+        title: recurringEvent.title,
+        utcDate: addDays(beginningOfWeek, getDaysToAdd(dayOfWeek)).valueOf(), // TODO: Fix timezone issue
+        utcDateParsed: addDays(beginningOfWeek, getDaysToAdd(dayOfWeek)), // TODO: Remove once dev complete
+        url: recurringEvent.url,
+      };
+
+      occurrences++;
+      if (eventsCount && occurrences >= eventsCount) return events;
+
+      // If the new event is in the past, skip it
+      if (newEvent.utcDate < Date.now()) continue;
+
+      events.push(newEvent);
+    }
+  }
+
+  return events;
+}
+
+function getDaysToAdd(dayOfWeek) {
+  const days = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
+  return days.indexOf(dayOfWeek);
+}
+
+const getBeginningOfWeek = (date) => {
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+  return new Date(date.setDate(diff));
+};
+
+function parseFrequencyArguments(frequencyRules) {
+  const rules = frequencyRules.split(';');
+
+  const frequencyDefinition = {};
+
+  for (const argument of rules) {
+    const key = argument.split('=')[0];
+    const value = argument.split('=')[1];
+
+    switch (key) {
+      case 'FREQ':
+        frequencyDefinition.frequency = value;
+        break;
+      case 'COUNT':
+        frequencyDefinition.count = parseInt(value);
+        break;
+      case 'INTERVAL':
+        frequencyDefinition.interval = parseInt(value);
+        break;
+      case 'BYDAY':
+        frequencyDefinition.byDay = value.split(',');
+        break;
+      case 'UNTIL':
+        frequencyDefinition.until = parseDate(value);
+        break;
+    }
+  }
+
+  return frequencyDefinition;
+}
+
 function getEventInfo(strEvent, timeZone, email) {
   const result = {
     title: '',
@@ -80,34 +171,44 @@ function getEventInfo(strEvent, timeZone, email) {
         }
       }
     }
+    if (line.includes('RRULE')) { result.frequencyRules = line.split(':')[1]; }
   }
+
+  // Don't return events that have been declined
+  if (result.declined) { return null; }
 
   // add time for all day events
   if (dtSTART.length === 8) { dtSTART += 'T000000Z'; }
   if (dtEnd.length === 8) { dtEnd += 'T235959Z'; }
 
   // Date parsing
-  let year = parseInt(dtSTART.substr(0, 4));
-  let month = parseInt(dtSTART.substr(4, 2)) - 1;
-  let day = parseInt(dtSTART.substr(6, 2));
-  let hour = parseInt(dtSTART.substr(9, 2));
-  let min = parseInt(dtSTART.substr(11, 2));
-  let sec = parseInt(dtSTART.substr(13, 2));
-  const utcDate = Date.UTC(year, month, day, hour, min, sec);
+  const utcDate = parseDate(dtSTART);
   result.utcDate = utcDate;
   const startDateNumber = new Date(utcDate);
-  if (startDateNumber < new Date(Date.now())) { return null; }
+  if (startDateNumber < new Date(Date.now()) && !result.frequencyRules) { return null; }
   result.startDate = startDateNumber.toLocaleString('en-GB', { timeZone });
-  year = parseInt(dtEnd.substr(0, 4));
-  month = parseInt(dtEnd.substr(4, 2)) - 1;
-  day = parseInt(dtEnd.substr(6, 2));
-  hour = parseInt(dtEnd.substr(9, 2));
-  min = parseInt(dtEnd.substr(11, 2));
-  sec = parseInt(dtEnd.substr(13, 2));
-  result.endDate = new Date(Date.UTC(year, month, day, hour, min, sec)).toLocaleString('en-GB', { timeZone });
+  result.endDate = parseDate(dtEnd).toLocaleString('en-GB', { timeZone });
 
-  // Don't return events that have been declined
-  if (result.declined) { return null; }
+  if (result.frequencyRules) {
+    const events = getRecurringEvents(result);
+    return events;
+  }
 
+  return [result];
+}
+
+function parseDate(date) {
+  const year = parseInt(date.substr(0, 4));
+  const month = parseInt(date.substr(4, 2)) - 1;
+  const day = parseInt(date.substr(6, 2));
+  const hour = parseInt(date.substr(9, 2));
+  const min = parseInt(date.substr(11, 2));
+  const sec = parseInt(date.substr(13, 2));
+  return Date.UTC(year, month, day, hour, min, sec);
+}
+
+function addDays(date, days) {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
   return result;
 }
