@@ -69,7 +69,7 @@ function getRecurringEvents(recurringEvent) {
     for (const dayOfWeek of frequencyDefinition.byDay) {
       const newEvent = {
         title: recurringEvent.title,
-        utcDate: addDays(beginningOfWeek, getDaysToAdd(dayOfWeek)).valueOf(), // TODO: Fix timezone issue
+        utcDate: addDays(beginningOfWeek, getDaysToAdd(dayOfWeek)).valueOf(),
         utcDateParsed: addDays(beginningOfWeek, getDaysToAdd(dayOfWeek)), // TODO: Remove once dev complete
         url: recurringEvent.url,
       };
@@ -153,8 +153,8 @@ function getEventInfo(strEvent, timeZone, email) {
 
   for (const line of consolidatedLines) {
     if (line.includes('SUMMARY')) { result.title = line.substring(line.indexOf(':') + 1); }
-    if (line.includes('DTSTART')) { dtSTART = line.split(':')[1]; }
-    if (line.includes('DTEND')) { dtEnd = line.split(':')[1]; }
+    if (line.includes('DTSTART')) { dtSTART = getDateDetails(line.substr(7)); }
+    if (line.includes('DTEND')) { dtEnd = getDateDetails(line.substr(5)); }
     if (line.includes('LOCATION')) { result.location = line.split(':')[1]; }
     if (line.includes('UID') && email !== '') {
       const uid = (line.split(':')[1]).split('@')[0];
@@ -178,16 +178,16 @@ function getEventInfo(strEvent, timeZone, email) {
   if (result.declined) { return null; }
 
   // add time for all day events
-  if (dtSTART.length === 8) { dtSTART += 'T000000Z'; }
-  if (dtEnd.length === 8) { dtEnd += 'T235959Z'; }
+  if (dtSTART.date?.length === 8) { dtSTART.date += 'T000000Z'; }
+  if (dtEnd.date?.length === 8) { dtEnd.date += 'T235959Z'; }
 
   // Date parsing
-  const utcDate = parseDate(dtSTART);
+  const utcDate = parseDate(dtSTART.date, dtSTART.timezone);
   result.utcDate = utcDate;
   const startDateNumber = new Date(utcDate);
   if (startDateNumber < new Date(Date.now()) && !result.frequencyRules) { return null; }
   result.startDate = startDateNumber.toLocaleString('en-GB', { timeZone });
-  result.endDate = parseDate(dtEnd).toLocaleString('en-GB', { timeZone });
+  result.endDate = parseDate(dtEnd.date).toLocaleString('en-GB', { timeZone });
 
   if (result.frequencyRules) {
     const events = getRecurringEvents(result);
@@ -197,18 +197,40 @@ function getEventInfo(strEvent, timeZone, email) {
   return [result];
 }
 
-function parseDate(date) {
+function getDateDetails(dateDefinition) {
+  const [additionalInfo, date] = dateDefinition.split(':');
+
+  let timezone = null;
+  for (const info of additionalInfo.split(';')) {
+    if (info.startsWith('TZID')) {
+      timezone = info.split('=')[1];
+    }
+  }
+
+  return { date, timezone };
+}
+
+function parseDate(date, timeZone) {
   const year = parseInt(date.substr(0, 4));
   const month = parseInt(date.substr(4, 2)) - 1;
   const day = parseInt(date.substr(6, 2));
   const hour = parseInt(date.substr(9, 2));
   const min = parseInt(date.substr(11, 2));
   const sec = parseInt(date.substr(13, 2));
-  return Date.UTC(year, month, day, hour, min, sec);
+
+  const utcDate = new Date(Date.UTC(year, month, day, hour, min, sec));
+  if (timeZone) { utcDate.setMinutes(utcDate.getMinutes() + (getOffset(timeZone, utcDate)) * -1); }
+  return utcDate.valueOf();
 }
 
 function addDays(date, days) {
   const result = new Date(date);
   result.setDate(result.getDate() + days);
   return result;
+}
+
+function getOffset(timeZone, date) {
+  const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
+  const tzDate = new Date(date.toLocaleString('en-US', { timeZone }));
+  return (tzDate.getTime() - utcDate.getTime()) / 6e4;
 }
